@@ -1,21 +1,24 @@
-/* A Bison parser, made by GNU Bison 2.7.  */
+/* A Bison parser, made by GNU Bison 2.3.  */
 
-/* Bison implementation for Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
-   
-   This program is free software: you can redistribute it and/or modify
+/* Skeleton implementation for Bison's Yacc-like parsers in C
+
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-   
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -26,7 +29,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -44,7 +47,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.7"
+#define YYBISON_VERSION "2.3"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -52,72 +55,10 @@
 /* Pure parsers.  */
 #define YYPURE 1
 
-/* Push parsers.  */
-#define YYPUSH 0
-
-/* Pull parsers.  */
-#define YYPULL 1
+/* Using locations.  */
+#define YYLSP_NEEDED 0
 
 
-
-
-/* Copy the first part of user declarations.  */
-/* Line 371 of yacc.c  */
-#line 41 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-
-
-/* Based on:
-ANSI C Yacc grammar
-
-In 1985, Jeff Lee published his Yacc grammar (which is accompanied by a
-matching Lex specification) for the April 30, 1985 draft version of the
-ANSI C standard.  Tom Stockfisch reposted it to net.sources in 1987; that
-original, as mentioned in the answer to question 17.25 of the comp.lang.c
-FAQ, can be ftp'ed from ftp.uu.net, file usenet/net.sources/ansi.c.grammar.Z.
-
-I intend to keep this version as close to the current C Standard grammar as
-possible; please let me know if you discover discrepancies.
-
-Jutta Degener, 1995
-*/
-
-#include "SymbolTable.h"
-#include "ParseHelper.h"
-#include "../Public/ShaderLang.h"
-
-using namespace glslang;
-
-
-/* Line 371 of yacc.c  */
-#line 93 "glslang.tab.c"
-
-# ifndef YY_NULL
-#  if defined __cplusplus && 201103L <= __cplusplus
-#   define YY_NULL nullptr
-#  else
-#   define YY_NULL 0
-#  endif
-# endif
-
-/* Enabling verbose error messages.  */
-#ifdef YYERROR_VERBOSE
-# undef YYERROR_VERBOSE
-# define YYERROR_VERBOSE 1
-#else
-# define YYERROR_VERBOSE 0
-#endif
-
-/* In a future release of Bison, this section will be replaced
-   by #include "glslang.tab.h".  */
-#ifndef YY_YY_GLSLANG_TAB_H_INCLUDED
-# define YY_YY_GLSLANG_TAB_H_INCLUDED
-/* Enabling traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 1
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -343,14 +284,276 @@ extern int yydebug;
      SUPERP = 473
    };
 #endif
+/* Tokens.  */
+#define ATTRIBUTE 258
+#define VARYING 259
+#define CONST 260
+#define BOOL 261
+#define FLOAT 262
+#define DOUBLE 263
+#define INT 264
+#define UINT 265
+#define BREAK 266
+#define CONTINUE 267
+#define DO 268
+#define ELSE 269
+#define FOR 270
+#define IF 271
+#define DISCARD 272
+#define RETURN 273
+#define SWITCH 274
+#define CASE 275
+#define DEFAULT 276
+#define SUBROUTINE 277
+#define BVEC2 278
+#define BVEC3 279
+#define BVEC4 280
+#define IVEC2 281
+#define IVEC3 282
+#define IVEC4 283
+#define UVEC2 284
+#define UVEC3 285
+#define UVEC4 286
+#define VEC2 287
+#define VEC3 288
+#define VEC4 289
+#define MAT2 290
+#define MAT3 291
+#define MAT4 292
+#define CENTROID 293
+#define IN 294
+#define OUT 295
+#define INOUT 296
+#define UNIFORM 297
+#define PATCH 298
+#define SAMPLE 299
+#define BUFFER 300
+#define SHARED 301
+#define COHERENT 302
+#define VOLATILE 303
+#define RESTRICT 304
+#define READONLY 305
+#define WRITEONLY 306
+#define DVEC2 307
+#define DVEC3 308
+#define DVEC4 309
+#define DMAT2 310
+#define DMAT3 311
+#define DMAT4 312
+#define NOPERSPECTIVE 313
+#define FLAT 314
+#define SMOOTH 315
+#define LAYOUT 316
+#define MAT2X2 317
+#define MAT2X3 318
+#define MAT2X4 319
+#define MAT3X2 320
+#define MAT3X3 321
+#define MAT3X4 322
+#define MAT4X2 323
+#define MAT4X3 324
+#define MAT4X4 325
+#define DMAT2X2 326
+#define DMAT2X3 327
+#define DMAT2X4 328
+#define DMAT3X2 329
+#define DMAT3X3 330
+#define DMAT3X4 331
+#define DMAT4X2 332
+#define DMAT4X3 333
+#define DMAT4X4 334
+#define ATOMIC_UINT 335
+#define SAMPLER1D 336
+#define SAMPLER2D 337
+#define SAMPLER3D 338
+#define SAMPLERCUBE 339
+#define SAMPLER1DSHADOW 340
+#define SAMPLER2DSHADOW 341
+#define SAMPLERCUBESHADOW 342
+#define SAMPLER1DARRAY 343
+#define SAMPLER2DARRAY 344
+#define SAMPLER1DARRAYSHADOW 345
+#define SAMPLER2DARRAYSHADOW 346
+#define ISAMPLER1D 347
+#define ISAMPLER2D 348
+#define ISAMPLER3D 349
+#define ISAMPLERCUBE 350
+#define ISAMPLER1DARRAY 351
+#define ISAMPLER2DARRAY 352
+#define USAMPLER1D 353
+#define USAMPLER2D 354
+#define USAMPLER3D 355
+#define USAMPLERCUBE 356
+#define USAMPLER1DARRAY 357
+#define USAMPLER2DARRAY 358
+#define SAMPLER2DRECT 359
+#define SAMPLER2DRECTSHADOW 360
+#define ISAMPLER2DRECT 361
+#define USAMPLER2DRECT 362
+#define SAMPLERBUFFER 363
+#define ISAMPLERBUFFER 364
+#define USAMPLERBUFFER 365
+#define SAMPLERCUBEARRAY 366
+#define SAMPLERCUBEARRAYSHADOW 367
+#define ISAMPLERCUBEARRAY 368
+#define USAMPLERCUBEARRAY 369
+#define SAMPLER2DMS 370
+#define ISAMPLER2DMS 371
+#define USAMPLER2DMS 372
+#define SAMPLER2DMSARRAY 373
+#define ISAMPLER2DMSARRAY 374
+#define USAMPLER2DMSARRAY 375
+#define IMAGE1D 376
+#define IIMAGE1D 377
+#define UIMAGE1D 378
+#define IMAGE2D 379
+#define IIMAGE2D 380
+#define UIMAGE2D 381
+#define IMAGE3D 382
+#define IIMAGE3D 383
+#define UIMAGE3D 384
+#define IMAGE2DRECT 385
+#define IIMAGE2DRECT 386
+#define UIMAGE2DRECT 387
+#define IMAGECUBE 388
+#define IIMAGECUBE 389
+#define UIMAGECUBE 390
+#define IMAGEBUFFER 391
+#define IIMAGEBUFFER 392
+#define UIMAGEBUFFER 393
+#define IMAGE1DARRAY 394
+#define IIMAGE1DARRAY 395
+#define UIMAGE1DARRAY 396
+#define IMAGE2DARRAY 397
+#define IIMAGE2DARRAY 398
+#define UIMAGE2DARRAY 399
+#define IMAGECUBEARRAY 400
+#define IIMAGECUBEARRAY 401
+#define UIMAGECUBEARRAY 402
+#define IMAGE2DMS 403
+#define IIMAGE2DMS 404
+#define UIMAGE2DMS 405
+#define IMAGE2DMSARRAY 406
+#define IIMAGE2DMSARRAY 407
+#define UIMAGE2DMSARRAY 408
+#define STRUCT 409
+#define VOID 410
+#define WHILE 411
+#define IDENTIFIER 412
+#define TYPE_NAME 413
+#define FLOATCONSTANT 414
+#define DOUBLECONSTANT 415
+#define INTCONSTANT 416
+#define UINTCONSTANT 417
+#define BOOLCONSTANT 418
+#define FIELD_SELECTION 419
+#define LEFT_OP 420
+#define RIGHT_OP 421
+#define INC_OP 422
+#define DEC_OP 423
+#define LE_OP 424
+#define GE_OP 425
+#define EQ_OP 426
+#define NE_OP 427
+#define AND_OP 428
+#define OR_OP 429
+#define XOR_OP 430
+#define MUL_ASSIGN 431
+#define DIV_ASSIGN 432
+#define ADD_ASSIGN 433
+#define MOD_ASSIGN 434
+#define LEFT_ASSIGN 435
+#define RIGHT_ASSIGN 436
+#define AND_ASSIGN 437
+#define XOR_ASSIGN 438
+#define OR_ASSIGN 439
+#define SUB_ASSIGN 440
+#define LEFT_PAREN 441
+#define RIGHT_PAREN 442
+#define LEFT_BRACKET 443
+#define RIGHT_BRACKET 444
+#define LEFT_BRACE 445
+#define RIGHT_BRACE 446
+#define DOT 447
+#define COMMA 448
+#define COLON 449
+#define EQUAL 450
+#define SEMICOLON 451
+#define BANG 452
+#define DASH 453
+#define TILDE 454
+#define PLUS 455
+#define STAR 456
+#define SLASH 457
+#define PERCENT 458
+#define LEFT_ANGLE 459
+#define RIGHT_ANGLE 460
+#define VERTICAL_BAR 461
+#define CARET 462
+#define AMPERSAND 463
+#define QUESTION 464
+#define INVARIANT 465
+#define PRECISE 466
+#define HIGH_PRECISION 467
+#define MEDIUM_PRECISION 468
+#define LOW_PRECISION 469
+#define PRECISION 470
+#define PACKED 471
+#define RESOURCE 472
+#define SUPERP 473
 
+
+
+
+/* Copy the first part of user declarations.  */
+#line 41 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+
+
+/* Based on:
+ANSI C Yacc grammar
+
+In 1985, Jeff Lee published his Yacc grammar (which is accompanied by a
+matching Lex specification) for the April 30, 1985 draft version of the
+ANSI C standard.  Tom Stockfisch reposted it to net.sources in 1987; that
+original, as mentioned in the answer to question 17.25 of the comp.lang.c
+FAQ, can be ftp'ed from ftp.uu.net, file usenet/net.sources/ansi.c.grammar.Z.
+
+I intend to keep this version as close to the current C Standard grammar as
+possible; please let me know if you discover discrepancies.
+
+Jutta Degener, 1995
+*/
+
+#include "SymbolTable.h"
+#include "ParseHelper.h"
+#include "../Public/ShaderLang.h"
+
+using namespace glslang;
+
+
+
+/* Enabling traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 1
+#endif
+
+/* Enabling verbose error messages.  */
+#ifdef YYERROR_VERBOSE
+# undef YYERROR_VERBOSE
+# define YYERROR_VERBOSE 1
+#else
+# define YYERROR_VERBOSE 0
+#endif
+
+/* Enabling the token table.  */
+#ifndef YYTOKEN_TABLE
+# define YYTOKEN_TABLE 0
+#endif
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
+#line 66 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
 {
-/* Line 387 of yacc.c  */
-#line 66 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-
     struct {
         glslang::TSourceLoc loc;
         union {
@@ -381,36 +584,19 @@ typedef union YYSTYPE
             glslang::TIdentifierList* identifierList;
         };
     } interm;
-
-
-/* Line 387 of yacc.c  */
-#line 388 "glslang.tab.c"
-} YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
+}
+/* Line 193 of yacc.c.  */
+#line 590 "glslang.tab.c"
+	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 
-#ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void *YYPARSE_PARAM);
-#else
-int yyparse ();
-#endif
-#else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void);
-#else
-int yyparse ();
-#endif
-#endif /* ! YYPARSE_PARAM */
-
-#endif /* !YY_YY_GLSLANG_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
-/* Line 390 of yacc.c  */
-#line 99 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 99 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
 
 
 #define YYPARSE_PARAM voidParseContext
@@ -421,8 +607,9 @@ int yyparse ();
 extern int yylex(YYSTYPE*, TParseContext&);
 
 
-/* Line 390 of yacc.c  */
-#line 426 "glslang.tab.c"
+
+/* Line 216 of yacc.c.  */
+#line 613 "glslang.tab.c"
 
 #ifdef short
 # undef short
@@ -475,36 +662,36 @@ typedef short int yytype_int16;
 # if defined YYENABLE_NLS && YYENABLE_NLS
 #  if ENABLE_NLS
 #   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
-#   define YY_(Msgid) dgettext ("bison-runtime", Msgid)
+#   define YY_(msgid) dgettext ("bison-runtime", msgid)
 #  endif
 # endif
 # ifndef YY_
-#  define YY_(Msgid) Msgid
+#  define YY_(msgid) msgid
 # endif
 #endif
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
-# define YYUSE(E) ((void) (E))
+# define YYUSE(e) ((void) (e))
 #else
-# define YYUSE(E) /* empty */
+# define YYUSE(e) /* empty */
 #endif
 
 /* Identity function, used to suppress warnings about constant conditions.  */
 #ifndef lint
-# define YYID(N) (N)
+# define YYID(n) (n)
 #else
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static int
-YYID (int yyi)
+YYID (int i)
 #else
 static int
-YYID (yyi)
-    int yyi;
+YYID (i)
+    int i;
 #endif
 {
-  return yyi;
+  return i;
 }
 #endif
 
@@ -525,12 +712,11 @@ YYID (yyi)
 #    define alloca _alloca
 #   else
 #    define YYSTACK_ALLOC alloca
-#    if ! defined _ALLOCA_H && ! defined EXIT_SUCCESS && (defined __STDC__ || defined __C99__FUNC__ \
+#    if ! defined _ALLOCA_H && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 #     include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-      /* Use EXIT_SUCCESS as a witness for stdlib.h.  */
-#     ifndef EXIT_SUCCESS
-#      define EXIT_SUCCESS 0
+#     ifndef _STDLIB_H
+#      define _STDLIB_H 1
 #     endif
 #    endif
 #   endif
@@ -553,24 +739,24 @@ YYID (yyi)
 #  ifndef YYSTACK_ALLOC_MAXIMUM
 #   define YYSTACK_ALLOC_MAXIMUM YYSIZE_MAXIMUM
 #  endif
-#  if (defined __cplusplus && ! defined EXIT_SUCCESS \
+#  if (defined __cplusplus && ! defined _STDLIB_H \
        && ! ((defined YYMALLOC || defined malloc) \
 	     && (defined YYFREE || defined free)))
 #   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-#   ifndef EXIT_SUCCESS
-#    define EXIT_SUCCESS 0
+#   ifndef _STDLIB_H
+#    define _STDLIB_H 1
 #   endif
 #  endif
 #  ifndef YYMALLOC
 #   define YYMALLOC malloc
-#   if ! defined malloc && ! defined EXIT_SUCCESS && (defined __STDC__ || defined __C99__FUNC__ \
+#   if ! defined malloc && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 void *malloc (YYSIZE_T); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
 #  ifndef YYFREE
 #   define YYFREE free
-#   if ! defined free && ! defined EXIT_SUCCESS && (defined __STDC__ || defined __C99__FUNC__ \
+#   if ! defined free && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 void free (void *); /* INFRINGES ON USER NAME SPACE */
 #   endif
@@ -586,9 +772,9 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
 {
-  yytype_int16 yyss_alloc;
-  YYSTYPE yyvs_alloc;
-};
+  yytype_int16 yyss;
+  YYSTYPE yyvs;
+  };
 
 /* The size of the maximum gap between one aligned stack and the next.  */
 # define YYSTACK_GAP_MAXIMUM (sizeof (union yyalloc) - 1)
@@ -599,45 +785,41 @@ union yyalloc
      ((N) * (sizeof (yytype_int16) + sizeof (YYSTYPE)) \
       + YYSTACK_GAP_MAXIMUM)
 
-# define YYCOPY_NEEDED 1
+/* Copy COUNT objects from FROM to TO.  The source and destination do
+   not overlap.  */
+# ifndef YYCOPY
+#  if defined __GNUC__ && 1 < __GNUC__
+#   define YYCOPY(To, From, Count) \
+      __builtin_memcpy (To, From, (Count) * sizeof (*(From)))
+#  else
+#   define YYCOPY(To, From, Count)		\
+      do					\
+	{					\
+	  YYSIZE_T yyi;				\
+	  for (yyi = 0; yyi < (Count); yyi++)	\
+	    (To)[yyi] = (From)[yyi];		\
+	}					\
+      while (YYID (0))
+#  endif
+# endif
 
 /* Relocate STACK from its old location to the new one.  The
    local variables YYSIZE and YYSTACKSIZE give the old and new number of
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack_alloc, Stack)				\
+# define YYSTACK_RELOCATE(Stack)					\
     do									\
       {									\
 	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack_alloc, Stack, yysize);			\
-	Stack = &yyptr->Stack_alloc;					\
+	YYCOPY (&yyptr->Stack, Stack, yysize);				\
+	Stack = &yyptr->Stack;						\
 	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
 	yyptr += yynewbytes / sizeof (*yyptr);				\
       }									\
     while (YYID (0))
 
 #endif
-
-#if defined YYCOPY_NEEDED && YYCOPY_NEEDED
-/* Copy COUNT objects from SRC to DST.  The source and destination do
-   not overlap.  */
-# ifndef YYCOPY
-#  if defined __GNUC__ && 1 < __GNUC__
-#   define YYCOPY(Dst, Src, Count) \
-      __builtin_memcpy (Dst, Src, (Count) * sizeof (*(Src)))
-#  else
-#   define YYCOPY(Dst, Src, Count)              \
-      do                                        \
-        {                                       \
-          YYSIZE_T yyi;                         \
-          for (yyi = 0; yyi < (Count); yyi++)   \
-            (Dst)[yyi] = (Src)[yyi];            \
-        }                                       \
-      while (YYID (0))
-#  endif
-# endif
-#endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  198
@@ -902,7 +1084,7 @@ static const yytype_uint16 yyrline[] =
 };
 #endif
 
-#if YYDEBUG || YYERROR_VERBOSE || 0
+#if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
@@ -960,7 +1142,7 @@ static const char *const yytname[] =
   "logical_and_expression", "logical_xor_expression",
   "logical_or_expression", "conditional_expression",
   "assignment_expression", "assignment_operator", "expression",
-  "constant_expression", "declaration", "block_structure", "$@1",
+  "constant_expression", "declaration", "block_structure", "@1",
   "identifier_list", "function_prototype", "function_declarator",
   "function_header_with_parameters", "function_header",
   "parameter_declarator", "parameter_declaration",
@@ -970,18 +1152,18 @@ static const char *const yytname[] =
   "precise_qualifier", "type_qualifier", "single_type_qualifier",
   "storage_qualifier", "type_name_list", "type_specifier",
   "array_specifier", "type_specifier_nonarray", "precision_qualifier",
-  "struct_specifier", "$@2", "$@3", "struct_declaration_list",
+  "struct_specifier", "@2", "@3", "struct_declaration_list",
   "struct_declaration", "struct_declarator_list", "struct_declarator",
   "initializer", "initializer_list", "declaration_statement", "statement",
-  "simple_statement", "compound_statement", "$@4", "$@5",
-  "statement_no_new_scope", "statement_scoped", "$@6", "$@7",
+  "simple_statement", "compound_statement", "@4", "@5",
+  "statement_no_new_scope", "statement_scoped", "@6", "@7",
   "compound_statement_no_new_scope", "statement_list",
   "expression_statement", "selection_statement",
-  "selection_rest_statement", "condition", "switch_statement", "$@8",
-  "switch_statement_list", "case_label", "iteration_statement", "$@9",
-  "$@10", "$@11", "for_init_statement", "conditionopt",
-  "for_rest_statement", "jump_statement", "translation_unit",
-  "external_declaration", "function_definition", "$@12", YY_NULL
+  "selection_rest_statement", "condition", "switch_statement", "@8",
+  "switch_statement_list", "case_label", "iteration_statement", "@9",
+  "@10", "@11", "for_init_statement", "conditionopt", "for_rest_statement",
+  "jump_statement", "translation_unit", "external_declaration",
+  "function_definition", "@12", 0
 };
 #endif
 
@@ -1099,8 +1281,8 @@ static const yytype_uint8 yyr2[] =
        2,     2,     3,     2,     1,     2,     1,     1,     0,     3
 };
 
-/* YYDEFACT[STATE-NAME] -- Default reduction number in state STATE-NUM.
-   Performed when YYTABLE doesn't specify something else to do.  Zero
+/* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
+   STATE-NUM when YYTABLE doesn't specify something else to do.  Zero
    means the default is an error.  */
 static const yytype_uint16 yydefact[] =
 {
@@ -1247,7 +1429,8 @@ static const yytype_int16 yypgoto[] =
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule which
-   number is the opposite.  If YYTABLE_NINF, syntax error.  */
+   number is the opposite.  If zero, do what YYDEFACT says.
+   If YYTABLE_NINF, syntax error.  */
 #define YYTABLE_NINF -28
 static const yytype_int16 yytable[] =
 {
@@ -1724,12 +1907,6 @@ static const yytype_int16 yytable[] =
      132,   133,   134,   135,   136,   137,   138,   139,   140,   141,
      142,     0,     0,   143
 };
-
-#define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-440)))
-
-#define yytable_value_is_error(Yytable_value) \
-  YYID (0)
 
 static const yytype_int16 yycheck[] =
 {
@@ -2276,50 +2453,78 @@ static const yytype_uint16 yystos[] =
 
 /* Like YYERROR except do call yyerror.  This remains here temporarily
    to ease the transition to the new meaning of YYERROR, for GCC.
-   Once GCC version 2 has supplanted version 1, this can go.  However,
-   YYFAIL appears to be in use.  Nevertheless, it is formally deprecated
-   in Bison 2.4.2's NEWS entry, where a plan to phase it out is
-   discussed.  */
+   Once GCC version 2 has supplanted version 1, this can go.  */
 
 #define YYFAIL		goto yyerrlab
-#if defined YYFAIL
-  /* This is here to suppress warnings from the GCC cpp's
-     -Wunused-macros.  Normally we don't worry about that warning, but
-     some users do, and we want to make it easy for users to remove
-     YYFAIL uses, which will produce warnings from Bison 2.5.  */
-#endif
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
-#define YYBACKUP(Token, Value)                                  \
-do                                                              \
-  if (yychar == YYEMPTY)                                        \
-    {                                                           \
-      yychar = (Token);                                         \
-      yylval = (Value);                                         \
-      YYPOPSTACK (yylen);                                       \
-      yystate = *yyssp;                                         \
-      goto yybackup;                                            \
-    }                                                           \
-  else                                                          \
-    {                                                           \
+#define YYBACKUP(Token, Value)					\
+do								\
+  if (yychar == YYEMPTY && yylen == 1)				\
+    {								\
+      yychar = (Token);						\
+      yylval = (Value);						\
+      yytoken = YYTRANSLATE (yychar);				\
+      YYPOPSTACK (1);						\
+      goto yybackup;						\
+    }								\
+  else								\
+    {								\
       yyerror (YY_("syntax error: cannot back up")); \
       YYERROR;							\
     }								\
 while (YYID (0))
 
-/* Error token number */
+
 #define YYTERROR	1
 #define YYERRCODE	256
 
 
-/* This macro is provided for backward compatibility. */
+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
+   If N is 0, then set CURRENT to the empty location which ends
+   the previous symbol: RHS[0] (always defined).  */
+
+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
+#ifndef YYLLOC_DEFAULT
+# define YYLLOC_DEFAULT(Current, Rhs, N)				\
+    do									\
+      if (YYID (N))                                                    \
+	{								\
+	  (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;	\
+	  (Current).first_column = YYRHSLOC (Rhs, 1).first_column;	\
+	  (Current).last_line    = YYRHSLOC (Rhs, N).last_line;		\
+	  (Current).last_column  = YYRHSLOC (Rhs, N).last_column;	\
+	}								\
+      else								\
+	{								\
+	  (Current).first_line   = (Current).last_line   =		\
+	    YYRHSLOC (Rhs, 0).last_line;				\
+	  (Current).first_column = (Current).last_column =		\
+	    YYRHSLOC (Rhs, 0).last_column;				\
+	}								\
+    while (YYID (0))
+#endif
+
+
+/* YY_LOCATION_PRINT -- Print the location on the stream.
+   This macro was not mandated originally: define only if we know
+   we won't break user code: when these are the locations we know.  */
+
 #ifndef YY_LOCATION_PRINT
-# define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+# if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
+#  define YY_LOCATION_PRINT(File, Loc)			\
+     fprintf (File, "%d.%d-%d.%d",			\
+	      (Loc).first_line, (Loc).first_column,	\
+	      (Loc).last_line,  (Loc).last_column)
+# else
+#  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+# endif
 #endif
 
 
 /* YYLEX -- calling `yylex' with the right arguments.  */
+
 #ifdef YYLEX_PARAM
 # define YYLEX yylex (&yylval, YYLEX_PARAM)
 #else
@@ -2369,8 +2574,6 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep)
     YYSTYPE const * const yyvaluep;
 #endif
 {
-  FILE *yyo = yyoutput;
-  YYUSE (yyo);
   if (!yyvaluep)
     return;
 # ifdef YYPRINT
@@ -2382,7 +2585,7 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep)
   switch (yytype)
     {
       default:
-        break;
+	break;
     }
 }
 
@@ -2420,20 +2623,17 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_stack_print (yytype_int16 *yybottom, yytype_int16 *yytop)
+yy_stack_print (yytype_int16 *bottom, yytype_int16 *top)
 #else
 static void
-yy_stack_print (yybottom, yytop)
-    yytype_int16 *yybottom;
-    yytype_int16 *yytop;
+yy_stack_print (bottom, top)
+    yytype_int16 *bottom;
+    yytype_int16 *top;
 #endif
 {
   YYFPRINTF (stderr, "Stack now");
-  for (; yybottom <= yytop; yybottom++)
-    {
-      int yybot = *yybottom;
-      YYFPRINTF (stderr, " %d", yybot);
-    }
+  for (; bottom <= top; ++bottom)
+    YYFPRINTF (stderr, " %d", *bottom);
   YYFPRINTF (stderr, "\n");
 }
 
@@ -2467,11 +2667,11 @@ yy_reduce_print (yyvsp, yyrule)
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
-      YYFPRINTF (stderr, "   $%d = ", yyi + 1);
+      fprintf (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
 		       		       );
-      YYFPRINTF (stderr, "\n");
+      fprintf (stderr, "\n");
     }
 }
 
@@ -2508,6 +2708,7 @@ int yydebug;
 # define YYMAXDEPTH 10000
 #endif
 
+
 
 #if YYERROR_VERBOSE
 
@@ -2610,145 +2811,115 @@ yytnamerr (char *yyres, const char *yystr)
 }
 # endif
 
-/* Copy into *YYMSG, which is of size *YYMSG_ALLOC, an error message
-   about the unexpected token YYTOKEN for the state stack whose top is
-   YYSSP.
-
-   Return 0 if *YYMSG was successfully written.  Return 1 if *YYMSG is
-   not large enough to hold the message.  In that case, also set
-   *YYMSG_ALLOC to the required number of bytes.  Return 2 if the
-   required number of bytes is too large to store.  */
-static int
-yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
-                yytype_int16 *yyssp, int yytoken)
+/* Copy into YYRESULT an error message about the unexpected token
+   YYCHAR while in state YYSTATE.  Return the number of bytes copied,
+   including the terminating null byte.  If YYRESULT is null, do not
+   copy anything; just return the number of bytes that would be
+   copied.  As a special case, return 0 if an ordinary "syntax error"
+   message will do.  Return YYSIZE_MAXIMUM if overflow occurs during
+   size calculation.  */
+static YYSIZE_T
+yysyntax_error (char *yyresult, int yystate, int yychar)
 {
-  YYSIZE_T yysize0 = yytnamerr (YY_NULL, yytname[yytoken]);
-  YYSIZE_T yysize = yysize0;
-  enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
-  /* Internationalized format string. */
-  const char *yyformat = YY_NULL;
-  /* Arguments of yyformat. */
-  char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
-  /* Number of reported tokens (one for the "unexpected", one per
-     "expected"). */
-  int yycount = 0;
+  int yyn = yypact[yystate];
 
-  /* There are many possibilities here to consider:
-     - Assume YYFAIL is not used.  It's too flawed to consider.  See
-       <http://lists.gnu.org/archive/html/bison-patches/2009-12/msg00024.html>
-       for details.  YYERROR is fine as it does not invoke this
-       function.
-     - If this state is a consistent state with a default action, then
-       the only way this function was invoked is if the default action
-       is an error action.  In that case, don't check for expected
-       tokens because there are none.
-     - The only way there can be no lookahead present (in yychar) is if
-       this state is a consistent state with a default action.  Thus,
-       detecting the absence of a lookahead is sufficient to determine
-       that there is no unexpected or expected token to report.  In that
-       case, just report a simple "syntax error".
-     - Don't assume there isn't a lookahead just because this state is a
-       consistent state with a default action.  There might have been a
-       previous inconsistent state, consistent state with a non-default
-       action, or user semantic action that manipulated yychar.
-     - Of course, the expected token list depends on states to have
-       correct lookahead information, and it depends on the parser not
-       to perform extra reductions after fetching a lookahead from the
-       scanner and before detecting a syntax error.  Thus, state merging
-       (from LALR or IELR) and default reductions corrupt the expected
-       token list.  However, the list is correct for canonical LR with
-       one exception: it will still contain any token that will not be
-       accepted due to an error action in a later state.
-  */
-  if (yytoken != YYEMPTY)
+  if (! (YYPACT_NINF < yyn && yyn <= YYLAST))
+    return 0;
+  else
     {
-      int yyn = yypact[*yyssp];
-      yyarg[yycount++] = yytname[yytoken];
-      if (!yypact_value_is_default (yyn))
-        {
-          /* Start YYX at -YYN if negative to avoid negative indexes in
-             YYCHECK.  In other words, skip the first -YYN actions for
-             this state because they are default actions.  */
-          int yyxbegin = yyn < 0 ? -yyn : 0;
-          /* Stay within bounds of both yycheck and yytname.  */
-          int yychecklim = YYLAST - yyn + 1;
-          int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
-          int yyx;
+      int yytype = YYTRANSLATE (yychar);
+      YYSIZE_T yysize0 = yytnamerr (0, yytname[yytype]);
+      YYSIZE_T yysize = yysize0;
+      YYSIZE_T yysize1;
+      int yysize_overflow = 0;
+      enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
+      char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
+      int yyx;
 
-          for (yyx = yyxbegin; yyx < yyxend; ++yyx)
-            if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR
-                && !yytable_value_is_error (yytable[yyx + yyn]))
-              {
-                if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
-                  {
-                    yycount = 1;
-                    yysize = yysize0;
-                    break;
-                  }
-                yyarg[yycount++] = yytname[yyx];
-                {
-                  YYSIZE_T yysize1 = yysize + yytnamerr (YY_NULL, yytname[yyx]);
-                  if (! (yysize <= yysize1
-                         && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
-                    return 2;
-                  yysize = yysize1;
-                }
-              }
-        }
+# if 0
+      /* This is so xgettext sees the translatable formats that are
+	 constructed on the fly.  */
+      YY_("syntax error, unexpected %s");
+      YY_("syntax error, unexpected %s, expecting %s");
+      YY_("syntax error, unexpected %s, expecting %s or %s");
+      YY_("syntax error, unexpected %s, expecting %s or %s or %s");
+      YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s");
+# endif
+      char *yyfmt;
+      char const *yyf;
+      static char const yyunexpected[] = "syntax error, unexpected %s";
+      static char const yyexpecting[] = ", expecting %s";
+      static char const yyor[] = " or %s";
+      char yyformat[sizeof yyunexpected
+		    + sizeof yyexpecting - 1
+		    + ((YYERROR_VERBOSE_ARGS_MAXIMUM - 2)
+		       * (sizeof yyor - 1))];
+      char const *yyprefix = yyexpecting;
+
+      /* Start YYX at -YYN if negative to avoid negative indexes in
+	 YYCHECK.  */
+      int yyxbegin = yyn < 0 ? -yyn : 0;
+
+      /* Stay within bounds of both yycheck and yytname.  */
+      int yychecklim = YYLAST - yyn + 1;
+      int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
+      int yycount = 1;
+
+      yyarg[0] = yytname[yytype];
+      yyfmt = yystpcpy (yyformat, yyunexpected);
+
+      for (yyx = yyxbegin; yyx < yyxend; ++yyx)
+	if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
+	  {
+	    if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
+	      {
+		yycount = 1;
+		yysize = yysize0;
+		yyformat[sizeof yyunexpected - 1] = '\0';
+		break;
+	      }
+	    yyarg[yycount++] = yytname[yyx];
+	    yysize1 = yysize + yytnamerr (0, yytname[yyx]);
+	    yysize_overflow |= (yysize1 < yysize);
+	    yysize = yysize1;
+	    yyfmt = yystpcpy (yyfmt, yyprefix);
+	    yyprefix = yyor;
+	  }
+
+      yyf = YY_(yyformat);
+      yysize1 = yysize + yystrlen (yyf);
+      yysize_overflow |= (yysize1 < yysize);
+      yysize = yysize1;
+
+      if (yysize_overflow)
+	return YYSIZE_MAXIMUM;
+
+      if (yyresult)
+	{
+	  /* Avoid sprintf, as that infringes on the user's name space.
+	     Don't have undefined behavior even if the translation
+	     produced a string with the wrong number of "%s"s.  */
+	  char *yyp = yyresult;
+	  int yyi = 0;
+	  while ((*yyp = *yyf) != '\0')
+	    {
+	      if (*yyp == '%' && yyf[1] == 's' && yyi < yycount)
+		{
+		  yyp += yytnamerr (yyp, yyarg[yyi++]);
+		  yyf += 2;
+		}
+	      else
+		{
+		  yyp++;
+		  yyf++;
+		}
+	    }
+	}
+      return yysize;
     }
-
-  switch (yycount)
-    {
-# define YYCASE_(N, S)                      \
-      case N:                               \
-        yyformat = S;                       \
-      break
-      YYCASE_(0, YY_("syntax error"));
-      YYCASE_(1, YY_("syntax error, unexpected %s"));
-      YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
-      YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
-      YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
-      YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
-# undef YYCASE_
-    }
-
-  {
-    YYSIZE_T yysize1 = yysize + yystrlen (yyformat);
-    if (! (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
-      return 2;
-    yysize = yysize1;
-  }
-
-  if (*yymsg_alloc < yysize)
-    {
-      *yymsg_alloc = 2 * yysize;
-      if (! (yysize <= *yymsg_alloc
-             && *yymsg_alloc <= YYSTACK_ALLOC_MAXIMUM))
-        *yymsg_alloc = YYSTACK_ALLOC_MAXIMUM;
-      return 1;
-    }
-
-  /* Avoid sprintf, as that infringes on the user's name space.
-     Don't have undefined behavior even if the translation
-     produced a string with the wrong number of "%s"s.  */
-  {
-    char *yyp = *yymsg;
-    int yyi = 0;
-    while ((*yyp = *yyformat) != '\0')
-      if (*yyp == '%' && yyformat[1] == 's' && yyi < yycount)
-        {
-          yyp += yytnamerr (yyp, yyarg[yyi++]);
-          yyformat += 2;
-        }
-      else
-        {
-          yyp++;
-          yyformat++;
-        }
-  }
-  return 0;
 }
 #endif /* YYERROR_VERBOSE */
+
 
 /*-----------------------------------------------.
 | Release the memory associated to this symbol.  |
@@ -2777,9 +2948,28 @@ yydestruct (yymsg, yytype, yyvaluep)
     {
 
       default:
-        break;
+	break;
     }
 }
+
+
+/* Prevent warnings from -Wmissing-prototypes.  */
+
+#ifdef YYPARSE_PARAM
+#if defined __STDC__ || defined __cplusplus
+int yyparse (void *YYPARSE_PARAM);
+#else
+int yyparse ();
+#endif
+#else /* ! YYPARSE_PARAM */
+#if defined __STDC__ || defined __cplusplus
+int yyparse (void);
+#else
+int yyparse ();
+#endif
+#endif /* ! YYPARSE_PARAM */
+
+
 
 
 
@@ -2810,69 +3000,22 @@ yyparse ()
 #endif
 #endif
 {
-/* The lookahead symbol.  */
+  /* The look-ahead symbol.  */
 int yychar;
 
+/* The semantic value of the look-ahead symbol.  */
+YYSTYPE yylval;
 
-#if defined __GNUC__ && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
-/* Suppress an incorrect diagnostic about yylval being uninitialized.  */
-# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN \
-    _Pragma ("GCC diagnostic push") \
-    _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")\
-    _Pragma ("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
-# define YY_IGNORE_MAYBE_UNINITIALIZED_END \
-    _Pragma ("GCC diagnostic pop")
-#else
-/* Default value used for initialization, for pacifying older GCCs
-   or non-GCC compilers.  */
-static YYSTYPE yyval_default;
-# define YY_INITIAL_VALUE(Value) = Value
-#endif
-#ifndef YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
-# define YY_IGNORE_MAYBE_UNINITIALIZED_END
-#endif
-#ifndef YY_INITIAL_VALUE
-# define YY_INITIAL_VALUE(Value) /* Nothing. */
-#endif
+/* Number of syntax errors so far.  */
+int yynerrs;
 
-/* The semantic value of the lookahead symbol.  */
-YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
-
-    /* Number of syntax errors so far.  */
-    int yynerrs;
-
-    int yystate;
-    /* Number of tokens to shift before error messages enabled.  */
-    int yyerrstatus;
-
-    /* The stacks and their tools:
-       `yyss': related to states.
-       `yyvs': related to semantic values.
-
-       Refer to the stacks through separate pointers, to allow yyoverflow
-       to reallocate them elsewhere.  */
-
-    /* The state stack.  */
-    yytype_int16 yyssa[YYINITDEPTH];
-    yytype_int16 *yyss;
-    yytype_int16 *yyssp;
-
-    /* The semantic value stack.  */
-    YYSTYPE yyvsa[YYINITDEPTH];
-    YYSTYPE *yyvs;
-    YYSTYPE *yyvsp;
-
-    YYSIZE_T yystacksize;
-
+  int yystate;
   int yyn;
   int yyresult;
-  /* Lookahead token as an internal (translated) token number.  */
+  /* Number of tokens to shift before error messages enabled.  */
+  int yyerrstatus;
+  /* Look-ahead token as an internal (translated) token number.  */
   int yytoken = 0;
-  /* The variables used to return semantic value and location from the
-     action routines.  */
-  YYSTYPE yyval;
-
 #if YYERROR_VERBOSE
   /* Buffer for error messages, and its allocated size.  */
   char yymsgbuf[128];
@@ -2880,22 +3023,54 @@ YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
   YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
 #endif
 
+  /* Three stacks and their tools:
+     `yyss': related to states,
+     `yyvs': related to semantic values,
+     `yyls': related to locations.
+
+     Refer to the stacks thru separate pointers, to allow yyoverflow
+     to reallocate them elsewhere.  */
+
+  /* The state stack.  */
+  yytype_int16 yyssa[YYINITDEPTH];
+  yytype_int16 *yyss = yyssa;
+  yytype_int16 *yyssp;
+
+  /* The semantic value stack.  */
+  YYSTYPE yyvsa[YYINITDEPTH];
+  YYSTYPE *yyvs = yyvsa;
+  YYSTYPE *yyvsp;
+
+
+
 #define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
+
+  YYSIZE_T yystacksize = YYINITDEPTH;
+
+  /* The variables used to return semantic value and location from the
+     action routines.  */
+  YYSTYPE yyval;
+
 
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
-
-  yyssp = yyss = yyssa;
-  yyvsp = yyvs = yyvsa;
-  yystacksize = YYINITDEPTH;
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
   yystate = 0;
   yyerrstatus = 0;
   yynerrs = 0;
-  yychar = YYEMPTY; /* Cause a token to be read.  */
+  yychar = YYEMPTY;		/* Cause a token to be read.  */
+
+  /* Initialize stack pointers.
+     Waste one element of value and location stack
+     so that they stay on the same level as the state stack.
+     The wasted elements are never initialized.  */
+
+  yyssp = yyss;
+  yyvsp = yyvs;
+
   goto yysetstate;
 
 /*------------------------------------------------------------.
@@ -2922,6 +3097,7 @@ YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
 	YYSTYPE *yyvs1 = yyvs;
 	yytype_int16 *yyss1 = yyss;
 
+
 	/* Each stack pointer address is followed by the size of the
 	   data in use in that stack, in bytes.  This used to be a
 	   conditional around just the two extra args, but that might
@@ -2929,6 +3105,7 @@ YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
 	yyoverflow (YY_("memory exhausted"),
 		    &yyss1, yysize * sizeof (*yyssp),
 		    &yyvs1, yysize * sizeof (*yyvsp),
+
 		    &yystacksize);
 
 	yyss = yyss1;
@@ -2951,8 +3128,9 @@ YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
 	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
 	if (! yyptr)
 	  goto yyexhaustedlab;
-	YYSTACK_RELOCATE (yyss_alloc, yyss);
-	YYSTACK_RELOCATE (yyvs_alloc, yyvs);
+	YYSTACK_RELOCATE (yyss);
+	YYSTACK_RELOCATE (yyvs);
+
 #  undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
 	  YYSTACK_FREE (yyss1);
@@ -2963,6 +3141,7 @@ YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
 
+
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
 		  (unsigned long int) yystacksize));
 
@@ -2972,9 +3151,6 @@ YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
-  if (yystate == YYFINAL)
-    YYACCEPT;
-
   goto yybackup;
 
 /*-----------.
@@ -2983,16 +3159,16 @@ YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
 yybackup:
 
   /* Do appropriate processing given the current state.  Read a
-     lookahead token if we need one and don't already have one.  */
+     look-ahead token if we need one and don't already have one.  */
 
-  /* First try to decide what to do without reference to lookahead token.  */
+  /* First try to decide what to do without reference to look-ahead token.  */
   yyn = yypact[yystate];
-  if (yypact_value_is_default (yyn))
+  if (yyn == YYPACT_NINF)
     goto yydefault;
 
-  /* Not known => get a lookahead token if don't already have one.  */
+  /* Not known => get a look-ahead token if don't already have one.  */
 
-  /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
+  /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
   if (yychar == YYEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token: "));
@@ -3018,27 +3194,29 @@ yybackup:
   yyn = yytable[yyn];
   if (yyn <= 0)
     {
-      if (yytable_value_is_error (yyn))
-        goto yyerrlab;
+      if (yyn == 0 || yyn == YYTABLE_NINF)
+	goto yyerrlab;
       yyn = -yyn;
       goto yyreduce;
     }
+
+  if (yyn == YYFINAL)
+    YYACCEPT;
 
   /* Count tokens shifted since error; after three, turn off error
      status.  */
   if (yyerrstatus)
     yyerrstatus--;
 
-  /* Shift the lookahead token.  */
+  /* Shift the look-ahead token.  */
   YY_SYMBOL_PRINT ("Shifting", yytoken, &yylval, &yylloc);
 
-  /* Discard the shifted token.  */
-  yychar = YYEMPTY;
+  /* Discard the shifted token unless it is eof.  */
+  if (yychar != YYEOF)
+    yychar = YYEMPTY;
 
   yystate = yyn;
-  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   *++yyvsp = yylval;
-  YY_IGNORE_MAYBE_UNINITIALIZED_END
 
   goto yynewstate;
 
@@ -3075,116 +3253,103 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-/* Line 1792 of yacc.c  */
-#line 219 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 219 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.handleVariable((yyvsp[(1) - (1)].lex).loc, (yyvsp[(1) - (1)].lex).symbol, (yyvsp[(1) - (1)].lex).string);
-    }
+    ;}
     break;
 
   case 3:
-/* Line 1792 of yacc.c  */
-#line 225 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 225 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 4:
-/* Line 1792 of yacc.c  */
-#line 228 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 228 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         TConstUnion *unionArray = new TConstUnion[1];
         unionArray->setIConst((yyvsp[(1) - (1)].lex).i);
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtInt, EvqConst), (yyvsp[(1) - (1)].lex).loc);
-    }
+    ;}
     break;
 
   case 5:
-/* Line 1792 of yacc.c  */
-#line 233 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 233 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {        
         parseContext.fullIntegerCheck((yyvsp[(1) - (1)].lex).loc, "unsigned literal");
         TConstUnion *unionArray = new TConstUnion[1];
         unionArray->setUConst((yyvsp[(1) - (1)].lex).u);
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtUint, EvqConst), (yyvsp[(1) - (1)].lex).loc);
-    }
+    ;}
     break;
 
   case 6:
-/* Line 1792 of yacc.c  */
-#line 239 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 239 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         TConstUnion *unionArray = new TConstUnion[1];
         unionArray->setDConst((yyvsp[(1) - (1)].lex).d);
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtFloat, EvqConst), (yyvsp[(1) - (1)].lex).loc);
-    }
+    ;}
     break;
 
   case 7:
-/* Line 1792 of yacc.c  */
-#line 244 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 244 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double literal");
         TConstUnion *unionArray = new TConstUnion[1];
         unionArray->setDConst((yyvsp[(1) - (1)].lex).d);
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtDouble, EvqConst), (yyvsp[(1) - (1)].lex).loc);
-    }
+    ;}
     break;
 
   case 8:
-/* Line 1792 of yacc.c  */
-#line 250 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 250 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         TConstUnion *unionArray = new TConstUnion[1];
         unionArray->setBConst((yyvsp[(1) - (1)].lex).b);
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtBool, EvqConst), (yyvsp[(1) - (1)].lex).loc);
-    }
+    ;}
     break;
 
   case 9:
-/* Line 1792 of yacc.c  */
-#line 255 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 255 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = (yyvsp[(2) - (3)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 10:
-/* Line 1792 of yacc.c  */
-#line 261 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 261 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 11:
-/* Line 1792 of yacc.c  */
-#line 264 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 264 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.handleBracketDereference((yyvsp[(2) - (4)].lex).loc, (yyvsp[(1) - (4)].interm.intermTypedNode), (yyvsp[(3) - (4)].interm.intermTypedNode));
-    }
+    ;}
     break;
 
   case 12:
-/* Line 1792 of yacc.c  */
-#line 267 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 267 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 13:
-/* Line 1792 of yacc.c  */
-#line 270 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 270 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.handleDotDereference((yyvsp[(3) - (3)].lex).loc, (yyvsp[(1) - (3)].interm.intermTypedNode), *(yyvsp[(3) - (3)].lex).string);
-    }
+    ;}
     break;
 
   case 14:
-/* Line 1792 of yacc.c  */
-#line 273 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 273 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.variableCheck((yyvsp[(1) - (2)].interm.intermTypedNode));
         parseContext.lValueErrorCheck((yyvsp[(2) - (2)].lex).loc, "++", (yyvsp[(1) - (2)].interm.intermTypedNode));
@@ -3193,12 +3358,11 @@ yyreduce:
             parseContext.unaryOpError((yyvsp[(2) - (2)].lex).loc, "++", (yyvsp[(1) - (2)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (2)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 15:
-/* Line 1792 of yacc.c  */
-#line 282 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 282 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.variableCheck((yyvsp[(1) - (2)].interm.intermTypedNode));
         parseContext.lValueErrorCheck((yyvsp[(2) - (2)].lex).loc, "--", (yyvsp[(1) - (2)].interm.intermTypedNode));
@@ -3207,116 +3371,104 @@ yyreduce:
             parseContext.unaryOpError((yyvsp[(2) - (2)].lex).loc, "--", (yyvsp[(1) - (2)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (2)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 16:
-/* Line 1792 of yacc.c  */
-#line 294 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 294 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.integerCheck((yyvsp[(1) - (1)].interm.intermTypedNode), "[]");
         (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 17:
-/* Line 1792 of yacc.c  */
-#line 301 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 301 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.handleFunctionCall((yyvsp[(1) - (1)].interm).loc, (yyvsp[(1) - (1)].interm).function, (yyvsp[(1) - (1)].interm).intermNode, (yyvsp[(1) - (1)].interm).intermAggregate);
         if ((yyval.interm.intermTypedNode) == 0)
             YYERROR;
         delete (yyvsp[(1) - (1)].interm).function;
-    }
+    ;}
     break;
 
   case 18:
-/* Line 1792 of yacc.c  */
-#line 310 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 310 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (1)].interm);
-    }
+    ;}
     break;
 
   case 19:
-/* Line 1792 of yacc.c  */
-#line 316 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 316 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (2)].interm);
         (yyval.interm).loc = (yyvsp[(2) - (2)].lex).loc;
-    }
+    ;}
     break;
 
   case 20:
-/* Line 1792 of yacc.c  */
-#line 320 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 320 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (2)].interm);
         (yyval.interm).loc = (yyvsp[(2) - (2)].lex).loc;
-    }
+    ;}
     break;
 
   case 21:
-/* Line 1792 of yacc.c  */
-#line 327 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 327 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (2)].interm);
-    }
+    ;}
     break;
 
   case 22:
-/* Line 1792 of yacc.c  */
-#line 330 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 330 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (1)].interm);
-    }
+    ;}
     break;
 
   case 23:
-/* Line 1792 of yacc.c  */
-#line 336 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 336 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         TParameter param = { 0, new TType };
         param.type->shallowCopy((yyvsp[(2) - (2)].interm.intermTypedNode)->getType());
         (yyvsp[(1) - (2)].interm).function->addParameter(param);
         (yyval.interm).function = (yyvsp[(1) - (2)].interm).function;
         (yyval.interm).intermNode = (yyvsp[(2) - (2)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 24:
-/* Line 1792 of yacc.c  */
-#line 343 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 343 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         TParameter param = { 0, new TType };
         param.type->shallowCopy((yyvsp[(3) - (3)].interm.intermTypedNode)->getType());
         (yyvsp[(1) - (3)].interm).function->addParameter(param);
         (yyval.interm).function = (yyvsp[(1) - (3)].interm).function;
         (yyval.interm).intermNode = parseContext.intermediate.growAggregate((yyvsp[(1) - (3)].interm).intermNode, (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
-    }
+    ;}
     break;
 
   case 25:
-/* Line 1792 of yacc.c  */
-#line 353 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 353 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (2)].interm);
-    }
+    ;}
     break;
 
   case 26:
-/* Line 1792 of yacc.c  */
-#line 361 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 361 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         // Constructor
         (yyval.interm).intermNode = 0;
         (yyval.interm).function = parseContext.handleConstructorCall((yyvsp[(1) - (1)].interm.type).loc, (yyvsp[(1) - (1)].interm.type)); 
-    }
+    ;}
     break;
 
   case 27:
-/* Line 1792 of yacc.c  */
-#line 366 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 366 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         //
         // Should be a method or subroutine call, but we don't have arguments yet.
@@ -3346,23 +3498,21 @@ yyreduce:
             TString empty("");
             (yyval.interm).function = new TFunction(&empty, TType(EbtVoid), EOpNull);
         }
-    }
+    ;}
     break;
 
   case 28:
-/* Line 1792 of yacc.c  */
-#line 399 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 399 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.variableCheck((yyvsp[(1) - (1)].interm.intermTypedNode));
         (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode);
         if (TIntermMethod* method = (yyvsp[(1) - (1)].interm.intermTypedNode)->getAsMethodNode())
             parseContext.error((yyvsp[(1) - (1)].interm.intermTypedNode)->getLoc(), "incomplete method syntax", method->getMethodName().c_str(), "");
-    }
+    ;}
     break;
 
   case 29:
-/* Line 1792 of yacc.c  */
-#line 405 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 405 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.lValueErrorCheck((yyvsp[(1) - (2)].lex).loc, "++", (yyvsp[(2) - (2)].interm.intermTypedNode));
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addUnaryMath(EOpPreIncrement, (yyvsp[(2) - (2)].interm.intermTypedNode), (yyvsp[(1) - (2)].lex).loc);
@@ -3370,12 +3520,11 @@ yyreduce:
             parseContext.unaryOpError((yyvsp[(1) - (2)].lex).loc, "++", (yyvsp[(2) - (2)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(2) - (2)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 30:
-/* Line 1792 of yacc.c  */
-#line 413 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 413 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.lValueErrorCheck((yyvsp[(1) - (2)].lex).loc, "--", (yyvsp[(2) - (2)].interm.intermTypedNode));
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addUnaryMath(EOpPreDecrement, (yyvsp[(2) - (2)].interm.intermTypedNode), (yyvsp[(1) - (2)].lex).loc);
@@ -3383,12 +3532,11 @@ yyreduce:
             parseContext.unaryOpError((yyvsp[(1) - (2)].lex).loc, "--", (yyvsp[(2) - (2)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(2) - (2)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 31:
-/* Line 1792 of yacc.c  */
-#line 421 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 421 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if ((yyvsp[(1) - (2)].interm).op != EOpNull) {
             (yyval.interm.intermTypedNode) = parseContext.intermediate.addUnaryMath((yyvsp[(1) - (2)].interm).op, (yyvsp[(2) - (2)].interm.intermTypedNode), (yyvsp[(1) - (2)].interm).loc);
@@ -3405,114 +3553,101 @@ yyreduce:
             }
         } else
             (yyval.interm.intermTypedNode) = (yyvsp[(2) - (2)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 32:
-/* Line 1792 of yacc.c  */
-#line 442 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpNull; }
+#line 442 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpNull; ;}
     break;
 
   case 33:
-/* Line 1792 of yacc.c  */
-#line 443 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpNegative; }
+#line 443 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpNegative; ;}
     break;
 
   case 34:
-/* Line 1792 of yacc.c  */
-#line 444 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpLogicalNot; }
+#line 444 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpLogicalNot; ;}
     break;
 
   case 35:
-/* Line 1792 of yacc.c  */
-#line 445 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpBitwiseNot; }
+#line 445 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpBitwiseNot; ;}
     break;
 
   case 36:
-/* Line 1792 of yacc.c  */
-#line 450 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 450 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 37:
-/* Line 1792 of yacc.c  */
-#line 451 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 451 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpMul, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
             parseContext.binaryOpError((yyvsp[(2) - (3)].lex).loc, "*", (yyvsp[(1) - (3)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(3) - (3)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (3)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 38:
-/* Line 1792 of yacc.c  */
-#line 458 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 458 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpDiv, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
             parseContext.binaryOpError((yyvsp[(2) - (3)].lex).loc, "/", (yyvsp[(1) - (3)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(3) - (3)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (3)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 39:
-/* Line 1792 of yacc.c  */
-#line 465 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 465 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpMod, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
             parseContext.binaryOpError((yyvsp[(2) - (3)].lex).loc, "%", (yyvsp[(1) - (3)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(3) - (3)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (3)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 40:
-/* Line 1792 of yacc.c  */
-#line 475 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 475 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 41:
-/* Line 1792 of yacc.c  */
-#line 476 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 476 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpAdd, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
             parseContext.binaryOpError((yyvsp[(2) - (3)].lex).loc, "+", (yyvsp[(1) - (3)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(3) - (3)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (3)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 42:
-/* Line 1792 of yacc.c  */
-#line 483 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 483 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpSub, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
             parseContext.binaryOpError((yyvsp[(2) - (3)].lex).loc, "-", (yyvsp[(1) - (3)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(3) - (3)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (3)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 43:
-/* Line 1792 of yacc.c  */
-#line 493 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 493 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 44:
-/* Line 1792 of yacc.c  */
-#line 494 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 494 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(2) - (3)].lex).loc, "bit shift left");
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpLeftShift, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
@@ -3520,12 +3655,11 @@ yyreduce:
             parseContext.binaryOpError((yyvsp[(2) - (3)].lex).loc, "<<", (yyvsp[(1) - (3)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(3) - (3)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (3)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 45:
-/* Line 1792 of yacc.c  */
-#line 502 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 502 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(2) - (3)].lex).loc, "bit shift right");
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpRightShift, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
@@ -3533,18 +3667,16 @@ yyreduce:
             parseContext.binaryOpError((yyvsp[(2) - (3)].lex).loc, ">>", (yyvsp[(1) - (3)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(3) - (3)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (3)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 46:
-/* Line 1792 of yacc.c  */
-#line 513 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 513 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 47:
-/* Line 1792 of yacc.c  */
-#line 514 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 514 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpLessThan, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
@@ -3553,12 +3685,11 @@ yyreduce:
             unionArray->setBConst(false);
             (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtBool, EvqConst), (yyvsp[(2) - (3)].lex).loc);
         }
-    }
+    ;}
     break;
 
   case 48:
-/* Line 1792 of yacc.c  */
-#line 523 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 523 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpGreaterThan, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
@@ -3567,12 +3698,11 @@ yyreduce:
             unionArray->setBConst(false);
             (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtBool, EvqConst), (yyvsp[(2) - (3)].lex).loc);
         }
-    }
+    ;}
     break;
 
   case 49:
-/* Line 1792 of yacc.c  */
-#line 532 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 532 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpLessThanEqual, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
@@ -3581,12 +3711,11 @@ yyreduce:
             unionArray->setBConst(false);
             (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtBool, EvqConst), (yyvsp[(2) - (3)].lex).loc);
         }
-    }
+    ;}
     break;
 
   case 50:
-/* Line 1792 of yacc.c  */
-#line 541 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 541 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpGreaterThanEqual, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
@@ -3595,18 +3724,16 @@ yyreduce:
             unionArray->setBConst(false);
             (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtBool, EvqConst), (yyvsp[(2) - (3)].lex).loc);
         }
-    }
+    ;}
     break;
 
   case 51:
-/* Line 1792 of yacc.c  */
-#line 553 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 553 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 52:
-/* Line 1792 of yacc.c  */
-#line 554 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 554 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpEqual, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
@@ -3616,12 +3743,11 @@ yyreduce:
             (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtBool, EvqConst), (yyvsp[(2) - (3)].lex).loc);
         } else if (((yyvsp[(1) - (3)].interm.intermTypedNode)->isArray() || (yyvsp[(3) - (3)].interm.intermTypedNode)->isArray()))
             parseContext.profileRequires((yyvsp[(2) - (3)].lex).loc, ENoProfile, 120, "GL_3DL_array_objects", "==");
-    }
+    ;}
     break;
 
   case 53:
-/* Line 1792 of yacc.c  */
-#line 564 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 564 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpNotEqual, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
@@ -3631,18 +3757,16 @@ yyreduce:
             (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtBool, EvqConst), (yyvsp[(2) - (3)].lex).loc);
         } else if (((yyvsp[(1) - (3)].interm.intermTypedNode)->isArray() || (yyvsp[(3) - (3)].interm.intermTypedNode)->isArray()))
             parseContext.profileRequires((yyvsp[(2) - (3)].lex).loc, ENoProfile, 120, "GL_3DL_array_objects", "!=");
-    }
+    ;}
     break;
 
   case 54:
-/* Line 1792 of yacc.c  */
-#line 577 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 577 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 55:
-/* Line 1792 of yacc.c  */
-#line 578 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 578 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(2) - (3)].lex).loc, "bitwise and");
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpAnd, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
@@ -3650,18 +3774,16 @@ yyreduce:
             parseContext.binaryOpError((yyvsp[(2) - (3)].lex).loc, "&", (yyvsp[(1) - (3)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(3) - (3)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (3)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 56:
-/* Line 1792 of yacc.c  */
-#line 589 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 589 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 57:
-/* Line 1792 of yacc.c  */
-#line 590 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 590 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(2) - (3)].lex).loc, "bitwise exclusive or");
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpExclusiveOr, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
@@ -3669,18 +3791,16 @@ yyreduce:
             parseContext.binaryOpError((yyvsp[(2) - (3)].lex).loc, "^", (yyvsp[(1) - (3)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(3) - (3)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (3)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 58:
-/* Line 1792 of yacc.c  */
-#line 601 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 601 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 59:
-/* Line 1792 of yacc.c  */
-#line 602 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 602 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(2) - (3)].lex).loc, "bitwise inclusive or");
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpInclusiveOr, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
@@ -3688,18 +3808,16 @@ yyreduce:
             parseContext.binaryOpError((yyvsp[(2) - (3)].lex).loc, "|", (yyvsp[(1) - (3)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(3) - (3)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (3)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 60:
-/* Line 1792 of yacc.c  */
-#line 613 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 613 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 61:
-/* Line 1792 of yacc.c  */
-#line 614 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 614 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpLogicalAnd, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
@@ -3708,18 +3826,16 @@ yyreduce:
             unionArray->setBConst(false);
             (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtBool, EvqConst), (yyvsp[(2) - (3)].lex).loc);
         }
-    }
+    ;}
     break;
 
   case 62:
-/* Line 1792 of yacc.c  */
-#line 626 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 626 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 63:
-/* Line 1792 of yacc.c  */
-#line 627 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 627 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpLogicalXor, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
@@ -3728,18 +3844,16 @@ yyreduce:
             unionArray->setBConst(false);
             (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtBool, EvqConst), (yyvsp[(2) - (3)].lex).loc);
         }
-    }
+    ;}
     break;
 
   case 64:
-/* Line 1792 of yacc.c  */
-#line 639 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 639 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 65:
-/* Line 1792 of yacc.c  */
-#line 640 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 640 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addBinaryMath(EOpLogicalOr, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
@@ -3748,18 +3862,16 @@ yyreduce:
             unionArray->setBConst(false);
             (yyval.interm.intermTypedNode) = parseContext.intermediate.addConstantUnion(unionArray, TType(EbtBool, EvqConst), (yyvsp[(2) - (3)].lex).loc);
         }
-    }
+    ;}
     break;
 
   case 66:
-/* Line 1792 of yacc.c  */
-#line 652 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 652 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 67:
-/* Line 1792 of yacc.c  */
-#line 653 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 653 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.boolCheck((yyvsp[(2) - (5)].lex).loc, (yyvsp[(1) - (5)].interm.intermTypedNode));
 
@@ -3768,18 +3880,16 @@ yyreduce:
             parseContext.binaryOpError((yyvsp[(2) - (5)].lex).loc, ":", (yyvsp[(3) - (5)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(5) - (5)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(5) - (5)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 68:
-/* Line 1792 of yacc.c  */
-#line 665 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); }
+#line 665 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode); ;}
     break;
 
   case 69:
-/* Line 1792 of yacc.c  */
-#line 666 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 666 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.lValueErrorCheck((yyvsp[(2) - (3)].interm).loc, "assign", (yyvsp[(1) - (3)].interm.intermTypedNode));
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addAssign((yyvsp[(2) - (3)].interm).op, (yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].interm).loc);
@@ -3788,141 +3898,124 @@ yyreduce:
             (yyval.interm.intermTypedNode) = (yyvsp[(1) - (3)].interm.intermTypedNode);
         } else if (((yyvsp[(1) - (3)].interm.intermTypedNode)->isArray() || (yyvsp[(3) - (3)].interm.intermTypedNode)->isArray()))
             parseContext.profileRequires((yyvsp[(2) - (3)].interm).loc, ENoProfile, 120, "GL_3DL_array_objects", "=");
-    }
+    ;}
     break;
 
   case 70:
-/* Line 1792 of yacc.c  */
-#line 678 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpAssign; }
+#line 678 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpAssign; ;}
     break;
 
   case 71:
-/* Line 1792 of yacc.c  */
-#line 679 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpMulAssign; }
+#line 679 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpMulAssign; ;}
     break;
 
   case 72:
-/* Line 1792 of yacc.c  */
-#line 680 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpDivAssign; }
+#line 680 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpDivAssign; ;}
     break;
 
   case 73:
-/* Line 1792 of yacc.c  */
-#line 681 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpModAssign; }
+#line 681 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpModAssign; ;}
     break;
 
   case 74:
-/* Line 1792 of yacc.c  */
-#line 682 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpAddAssign; }
+#line 682 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpAddAssign; ;}
     break;
 
   case 75:
-/* Line 1792 of yacc.c  */
-#line 683 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpSubAssign; }
+#line 683 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpSubAssign; ;}
     break;
 
   case 76:
-/* Line 1792 of yacc.c  */
-#line 684 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 684 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(1) - (1)].lex).loc, "bit-shift left assign");
         (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpLeftShiftAssign;
-    }
+    ;}
     break;
 
   case 77:
-/* Line 1792 of yacc.c  */
-#line 688 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 688 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(1) - (1)].lex).loc, "bit-shift right assign");
         (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpRightShiftAssign;
-    }
+    ;}
     break;
 
   case 78:
-/* Line 1792 of yacc.c  */
-#line 692 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 692 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(1) - (1)].lex).loc, "bitwise-and assign");
         (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpAndAssign;
-    }
+    ;}
     break;
 
   case 79:
-/* Line 1792 of yacc.c  */
-#line 696 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 696 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(1) - (1)].lex).loc, "bitwise-xor assign");
         (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpExclusiveOrAssign;
-    }
+    ;}
     break;
 
   case 80:
-/* Line 1792 of yacc.c  */
-#line 700 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 700 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(1) - (1)].lex).loc, "bitwise-or assign");
         (yyval.interm).loc = (yyvsp[(1) - (1)].lex).loc; (yyval.interm).op = EOpInclusiveOrAssign;
-    }
+    ;}
     break;
 
   case 81:
-/* Line 1792 of yacc.c  */
-#line 707 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 707 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 82:
-/* Line 1792 of yacc.c  */
-#line 710 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 710 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = parseContext.intermediate.addComma((yyvsp[(1) - (3)].interm.intermTypedNode), (yyvsp[(3) - (3)].interm.intermTypedNode), (yyvsp[(2) - (3)].lex).loc);
         if ((yyval.interm.intermTypedNode) == 0) {
             parseContext.binaryOpError((yyvsp[(2) - (3)].lex).loc, ",", (yyvsp[(1) - (3)].interm.intermTypedNode)->getCompleteString(), (yyvsp[(3) - (3)].interm.intermTypedNode)->getCompleteString());
             (yyval.interm.intermTypedNode) = (yyvsp[(3) - (3)].interm.intermTypedNode);
         }
-    }
+    ;}
     break;
 
   case 83:
-/* Line 1792 of yacc.c  */
-#line 720 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 720 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.constCheck((yyvsp[(1) - (1)].interm.intermTypedNode), "");
         (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 84:
-/* Line 1792 of yacc.c  */
-#line 727 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 727 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = 0;
         // TODO: 4.0 functionality: subroutines: make the identifier a user type for this signature
-    }
+    ;}
     break;
 
   case 85:
-/* Line 1792 of yacc.c  */
-#line 731 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 731 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if ((yyvsp[(1) - (2)].interm).intermAggregate)
             (yyvsp[(1) - (2)].interm).intermAggregate->setOperator(EOpSequence);
         (yyval.interm.intermNode) = (yyvsp[(1) - (2)].interm).intermAggregate;
-    }
+    ;}
     break;
 
   case 86:
-/* Line 1792 of yacc.c  */
-#line 736 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 736 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.profileRequires((yyvsp[(1) - (4)].lex).loc, ENoProfile, 130, 0, "precision statement");
 
@@ -3931,103 +4024,92 @@ yyreduce:
 
 		parseContext.setDefaultPrecision((yyvsp[(1) - (4)].lex).loc, (yyvsp[(3) - (4)].interm.type), (yyvsp[(2) - (4)].interm.type).qualifier.precision);
         (yyval.interm.intermNode) = 0;
-    }
+    ;}
     break;
 
   case 87:
-/* Line 1792 of yacc.c  */
-#line 745 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 745 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.addBlock((yyvsp[(1) - (2)].interm).loc, *(yyvsp[(1) - (2)].interm).typeList);
         (yyval.interm.intermNode) = 0;
-    }
+    ;}
     break;
 
   case 88:
-/* Line 1792 of yacc.c  */
-#line 749 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 749 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.addBlock((yyvsp[(1) - (3)].interm).loc, *(yyvsp[(1) - (3)].interm).typeList, (yyvsp[(2) - (3)].lex).string);
         (yyval.interm.intermNode) = 0;
-    }
+    ;}
     break;
 
   case 89:
-/* Line 1792 of yacc.c  */
-#line 753 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 753 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.addBlock((yyvsp[(1) - (4)].interm).loc, *(yyvsp[(1) - (4)].interm).typeList, (yyvsp[(2) - (4)].lex).string, (yyvsp[(3) - (4)].interm).arraySizes);
         (yyval.interm.intermNode) = 0;
-    }
+    ;}
     break;
 
   case 90:
-/* Line 1792 of yacc.c  */
-#line 757 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 757 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.updateQualifierDefaults((yyvsp[(1) - (2)].interm.type).loc, (yyvsp[(1) - (2)].interm.type).qualifier);
         (yyval.interm.intermNode) = 0;
-    }
+    ;}
     break;
 
   case 91:
-/* Line 1792 of yacc.c  */
-#line 761 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 761 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.addQualifierToExisting((yyvsp[(1) - (3)].interm.type).loc, (yyvsp[(1) - (3)].interm.type).qualifier, *(yyvsp[(2) - (3)].lex).string);
         (yyval.interm.intermNode) = 0;
-    }
+    ;}
     break;
 
   case 92:
-/* Line 1792 of yacc.c  */
-#line 765 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 765 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyvsp[(3) - (4)].interm.identifierList)->push_back((yyvsp[(2) - (4)].lex).string);
         parseContext.addQualifierToExisting((yyvsp[(1) - (4)].interm.type).loc, (yyvsp[(1) - (4)].interm.type).qualifier, *(yyvsp[(3) - (4)].interm.identifierList));
         (yyval.interm.intermNode) = 0;
-    }
+    ;}
     break;
 
   case 93:
-/* Line 1792 of yacc.c  */
-#line 773 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { parseContext.nestedBlockCheck((yyvsp[(1) - (3)].interm.type).loc); }
+#line 773 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { parseContext.nestedBlockCheck((yyvsp[(1) - (3)].interm.type).loc); ;}
     break;
 
   case 94:
-/* Line 1792 of yacc.c  */
-#line 773 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 773 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         --parseContext.structNestingLevel;
         parseContext.blockName = (yyvsp[(2) - (6)].lex).string;
         parseContext.currentBlockDefaults = (yyvsp[(1) - (6)].interm.type).qualifier;
         (yyval.interm).loc = (yyvsp[(1) - (6)].interm.type).loc;
         (yyval.interm).typeList = (yyvsp[(5) - (6)].interm.typeList);
-    }
+    ;}
     break;
 
   case 95:
-/* Line 1792 of yacc.c  */
-#line 782 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 782 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.identifierList) = NewPoolTIdentifierList();
         (yyval.interm.identifierList)->push_back((yyvsp[(2) - (2)].lex).string);
-    }
+    ;}
     break;
 
   case 96:
-/* Line 1792 of yacc.c  */
-#line 786 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 786 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.identifierList) = (yyvsp[(1) - (3)].interm.identifierList);
         (yyval.interm.identifierList)->push_back((yyvsp[(3) - (3)].lex).string);
-    }
+    ;}
     break;
 
   case 97:
-/* Line 1792 of yacc.c  */
-#line 793 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 793 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         // ES can't declare prototypes inside functions
         if (! parseContext.symbolTable.atGlobalLevel())
@@ -4068,28 +4150,25 @@ yyreduce:
 
         if (! parseContext.symbolTable.insert(*(yyval.interm).function))
             parseContext.error((yyvsp[(2) - (2)].lex).loc, "illegal redeclaration", (yyval.interm).function->getName().c_str(), "");
-    }
+    ;}
     break;
 
   case 98:
-/* Line 1792 of yacc.c  */
-#line 837 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 837 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.function) = (yyvsp[(1) - (1)].interm.function);
-    }
+    ;}
     break;
 
   case 99:
-/* Line 1792 of yacc.c  */
-#line 840 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 840 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.function) = (yyvsp[(1) - (1)].interm.function);
-    }
+    ;}
     break;
 
   case 100:
-/* Line 1792 of yacc.c  */
-#line 847 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 847 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         // Add the parameter
         (yyval.interm.function) = (yyvsp[(1) - (2)].interm.function);
@@ -4097,12 +4176,11 @@ yyreduce:
             (yyvsp[(1) - (2)].interm.function)->addParameter((yyvsp[(2) - (2)].interm).param);
         else
             delete (yyvsp[(2) - (2)].interm).param.type;
-    }
+    ;}
     break;
 
   case 101:
-/* Line 1792 of yacc.c  */
-#line 855 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 855 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         //
         // Only first parameter of one-parameter functions can be void
@@ -4119,12 +4197,11 @@ yyreduce:
             (yyval.interm.function) = (yyvsp[(1) - (3)].interm.function);
             (yyvsp[(1) - (3)].interm.function)->addParameter((yyvsp[(3) - (3)].interm).param);
         }
-    }
+    ;}
     break;
 
   case 102:
-/* Line 1792 of yacc.c  */
-#line 875 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 875 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if ((yyvsp[(1) - (3)].interm.type).qualifier.storage != EvqGlobal && (yyvsp[(1) - (3)].interm.type).qualifier.storage != EvqTemporary) {
             parseContext.error((yyvsp[(2) - (3)].lex).loc, "no qualifiers allowed for function return",
@@ -4136,12 +4213,11 @@ yyreduce:
         TType type((yyvsp[(1) - (3)].interm.type));
         function = new TFunction((yyvsp[(2) - (3)].lex).string, type);
         (yyval.interm.function) = function;
-    }
+    ;}
     break;
 
   case 103:
-/* Line 1792 of yacc.c  */
-#line 891 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 891 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if ((yyvsp[(1) - (2)].interm.type).arraySizes) {
             parseContext.profileRequires((yyvsp[(1) - (2)].interm.type).loc, ENoProfile, 120, "GL_3DL_array_objects", "arrayed type");
@@ -4156,12 +4232,11 @@ yyreduce:
         TParameter param = {(yyvsp[(2) - (2)].lex).string, new TType((yyvsp[(1) - (2)].interm.type))};
         (yyval.interm).loc = (yyvsp[(2) - (2)].lex).loc;
         (yyval.interm).param = param;
-    }
+    ;}
     break;
 
   case 104:
-/* Line 1792 of yacc.c  */
-#line 906 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 906 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if ((yyvsp[(1) - (3)].interm.type).arraySizes) {
             parseContext.profileRequires((yyvsp[(1) - (3)].interm.type).loc, ENoProfile, 120, "GL_3DL_array_objects", "arrayed type");
@@ -4178,12 +4253,11 @@ yyreduce:
         TParameter param = { (yyvsp[(2) - (3)].lex).string, new TType((yyvsp[(1) - (3)].interm.type))};
         (yyval.interm).loc = (yyvsp[(2) - (3)].lex).loc;
         (yyval.interm).param = param;
-    }
+    ;}
     break;
 
   case 105:
-/* Line 1792 of yacc.c  */
-#line 929 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 929 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(2) - (2)].interm);
         if ((yyvsp[(1) - (2)].interm.type).qualifier.precision != EpqNone)
@@ -4191,23 +4265,21 @@ yyreduce:
 
         parseContext.parameterSamplerCheck((yyvsp[(2) - (2)].interm).loc, (yyvsp[(1) - (2)].interm.type).qualifier.storage, *(yyval.interm).param.type);
         parseContext.paramCheck((yyvsp[(1) - (2)].interm.type).loc, (yyvsp[(1) - (2)].interm.type).qualifier.storage, (yyval.interm).param.type);
-    }
+    ;}
     break;
 
   case 106:
-/* Line 1792 of yacc.c  */
-#line 937 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 937 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (1)].interm);
 
         parseContext.parameterSamplerCheck((yyvsp[(1) - (1)].interm).loc, EvqIn, *(yyvsp[(1) - (1)].interm).param.type);
         parseContext.paramCheck((yyvsp[(1) - (1)].interm).loc, EvqTemporary, (yyval.interm).param.type);
-    }
+    ;}
     break;
 
   case 107:
-/* Line 1792 of yacc.c  */
-#line 946 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 946 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(2) - (2)].interm);
         if ((yyvsp[(1) - (2)].interm.type).qualifier.precision != EpqNone)
@@ -4215,50 +4287,45 @@ yyreduce:
 
         parseContext.parameterSamplerCheck((yyvsp[(2) - (2)].interm).loc, (yyvsp[(1) - (2)].interm.type).qualifier.storage, *(yyval.interm).param.type);
         parseContext.paramCheck((yyvsp[(1) - (2)].interm.type).loc, (yyvsp[(1) - (2)].interm.type).qualifier.storage, (yyval.interm).param.type);
-    }
+    ;}
     break;
 
   case 108:
-/* Line 1792 of yacc.c  */
-#line 954 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 954 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (1)].interm);
 
         parseContext.parameterSamplerCheck((yyvsp[(1) - (1)].interm).loc, EvqIn, *(yyvsp[(1) - (1)].interm).param.type);
         parseContext.paramCheck((yyvsp[(1) - (1)].interm).loc, EvqTemporary, (yyval.interm).param.type);
-    }
+    ;}
     break;
 
   case 109:
-/* Line 1792 of yacc.c  */
-#line 963 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 963 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         TParameter param = { 0, new TType((yyvsp[(1) - (1)].interm.type)) };
         (yyval.interm).param = param;
-    }
+    ;}
     break;
 
   case 110:
-/* Line 1792 of yacc.c  */
-#line 970 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 970 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (1)].interm);
-    }
+    ;}
     break;
 
   case 111:
-/* Line 1792 of yacc.c  */
-#line 973 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 973 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (3)].interm);
         parseContext.nonInitConstCheck((yyvsp[(3) - (3)].lex).loc, *(yyvsp[(3) - (3)].lex).string, (yyval.interm).type);
         parseContext.nonInitCheck((yyvsp[(3) - (3)].lex).loc, *(yyvsp[(3) - (3)].lex).string, (yyval.interm).type);
-    }
+    ;}
     break;
 
   case 112:
-/* Line 1792 of yacc.c  */
-#line 978 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 978 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.nonInitConstCheck((yyvsp[(3) - (4)].lex).loc, *(yyvsp[(3) - (4)].lex).string, (yyvsp[(1) - (4)].interm).type);
         if (parseContext.profile == EEsProfile)
@@ -4272,12 +4339,11 @@ yyreduce:
             TVariable* variable;
             parseContext.arrayCheck((yyvsp[(4) - (4)].interm).loc, *(yyvsp[(3) - (4)].lex).string, (yyvsp[(1) - (4)].interm).type, variable);
         }
-    }
+    ;}
     break;
 
   case 113:
-/* Line 1792 of yacc.c  */
-#line 992 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 992 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (6)].interm);
 
@@ -4301,12 +4367,11 @@ yyreduce:
                 (yyval.interm).intermAggregate = (yyvsp[(1) - (6)].interm).intermAggregate;
         } else
             (yyval.interm).intermAggregate = 0;
-    }
+    ;}
     break;
 
   case 114:
-/* Line 1792 of yacc.c  */
-#line 1016 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1016 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (5)].interm);
 
@@ -4321,22 +4386,20 @@ yyreduce:
                 (yyval.interm).intermAggregate = (yyvsp[(1) - (5)].interm).intermAggregate;
         } else
             (yyval.interm).intermAggregate = 0;
-    }
+    ;}
     break;
 
   case 115:
-/* Line 1792 of yacc.c  */
-#line 1034 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1034 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm).type = (yyvsp[(1) - (1)].interm.type);
         (yyval.interm).intermAggregate = 0;
         parseContext.updateTypedDefaults((yyvsp[(1) - (1)].interm.type).loc, (yyval.interm).type.qualifier, 0);
-    }
+    ;}
     break;
 
   case 116:
-/* Line 1792 of yacc.c  */
-#line 1039 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1039 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm).intermAggregate = 0;
         (yyval.interm).type = (yyvsp[(1) - (2)].interm.type);
@@ -4345,12 +4408,11 @@ yyreduce:
         parseContext.nonInitCheck((yyvsp[(2) - (2)].lex).loc, *(yyvsp[(2) - (2)].lex).string, (yyval.interm).type);
         
         parseContext.updateTypedDefaults((yyvsp[(2) - (2)].lex).loc, (yyval.interm).type.qualifier, (yyvsp[(2) - (2)].lex).string);
-    }
+    ;}
     break;
 
   case 117:
-/* Line 1792 of yacc.c  */
-#line 1048 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1048 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm).intermAggregate = 0;
         parseContext.nonInitConstCheck((yyvsp[(2) - (3)].lex).loc, *(yyvsp[(2) - (3)].lex).string, (yyvsp[(1) - (3)].interm.type));        
@@ -4366,12 +4428,11 @@ yyreduce:
             parseContext.arrayCheck((yyvsp[(3) - (3)].interm).loc, *(yyvsp[(2) - (3)].lex).string, (yyvsp[(1) - (3)].interm.type), variable);
         }
         parseContext.updateTypedDefaults((yyvsp[(2) - (3)].lex).loc, (yyval.interm).type.qualifier, (yyvsp[(2) - (3)].lex).string);
-    }
+    ;}
     break;
 
   case 118:
-/* Line 1792 of yacc.c  */
-#line 1064 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1064 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {        
         parseContext.arrayDimCheck((yyvsp[(3) - (5)].interm).loc, (yyvsp[(1) - (5)].interm.type).arraySizes, (yyvsp[(3) - (5)].interm).arraySizes);
 
@@ -4397,12 +4458,11 @@ yyreduce:
                 (yyval.interm).intermAggregate = 0;
         } else
             (yyval.interm).intermAggregate = 0;
-    }
+    ;}
     break;
 
   case 119:
-/* Line 1792 of yacc.c  */
-#line 1090 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1090 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm).type = (yyvsp[(1) - (4)].interm.type);
 
@@ -4417,12 +4477,11 @@ yyreduce:
                 (yyval.interm).intermAggregate = 0;
         } else
             (yyval.interm).intermAggregate = 0;
-    }
+    ;}
     break;
 
   case 120:
-/* Line 1792 of yacc.c  */
-#line 1109 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1109 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type) = (yyvsp[(1) - (1)].interm.type);
 
@@ -4434,12 +4493,11 @@ yyreduce:
         }
 
         parseContext.precisionQualifierCheck((yyval.interm.type).loc, (yyval.interm.type));
-    }
+    ;}
     break;
 
   case 121:
-/* Line 1792 of yacc.c  */
-#line 1121 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1121 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalQualifierFix((yyvsp[(1) - (2)].interm.type).loc, (yyvsp[(1) - (2)].interm.type).qualifier, (yyvsp[(2) - (2)].interm.type));
 
@@ -4462,208 +4520,186 @@ yyreduce:
             (parseContext.language == EShLangVertex   && (yyval.interm.type).qualifier.storage == EvqVaryingOut ||
              parseContext.language == EShLangFragment && (yyval.interm.type).qualifier.storage == EvqVaryingIn))
             (yyval.interm.type).qualifier.smooth = true;
-    }
+    ;}
     break;
 
   case 122:
-/* Line 1792 of yacc.c  */
-#line 1147 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1147 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.profileRequires((yyval.interm.type).loc, ENoProfile, 120, 0, "invariant");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.invariant = true;
-    }
+    ;}
     break;
 
   case 123:
-/* Line 1792 of yacc.c  */
-#line 1155 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1155 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "smooth");
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ENoProfile, 130, 0, "smooth");
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, EEsProfile, 300, 0, "smooth");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.smooth = true;
-    }
+    ;}
     break;
 
   case 124:
-/* Line 1792 of yacc.c  */
-#line 1162 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1162 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "flat");
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ENoProfile, 130, 0, "flat");
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, EEsProfile, 300, 0, "flat");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.flat = true;
-    }
+    ;}
     break;
 
   case 125:
-/* Line 1792 of yacc.c  */
-#line 1169 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1169 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "noperspective");
         parseContext.requireProfile((yyvsp[(1) - (1)].lex).loc, static_cast<EProfileMask>(~EEsProfileMask), "noperspective");
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ENoProfile, 130, 0, "noperspective");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.nopersp = true;
-    }
+    ;}
     break;
 
   case 126:
-/* Line 1792 of yacc.c  */
-#line 1179 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1179 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type) = (yyvsp[(3) - (4)].interm.type);
-    }
+    ;}
     break;
 
   case 127:
-/* Line 1792 of yacc.c  */
-#line 1185 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1185 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type) = (yyvsp[(1) - (1)].interm.type);
-    }
+    ;}
     break;
 
   case 128:
-/* Line 1792 of yacc.c  */
-#line 1188 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1188 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type) = (yyvsp[(1) - (3)].interm.type);
         parseContext.mergeLayoutQualifiers((yyvsp[(2) - (3)].lex).loc, (yyval.interm.type).qualifier, (yyvsp[(3) - (3)].interm.type).qualifier);
-    }
+    ;}
     break;
 
   case 129:
-/* Line 1792 of yacc.c  */
-#line 1194 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1194 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         parseContext.setLayoutQualifier((yyvsp[(1) - (1)].lex).loc, (yyval.interm.type), *(yyvsp[(1) - (1)].lex).string);
-    }
+    ;}
     break;
 
   case 130:
-/* Line 1792 of yacc.c  */
-#line 1198 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1198 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (3)].lex).loc);
         parseContext.setLayoutQualifier((yyvsp[(1) - (3)].lex).loc, (yyval.interm.type), *(yyvsp[(1) - (3)].lex).string, (yyvsp[(3) - (3)].lex).i);
-    }
+    ;}
     break;
 
   case 131:
-/* Line 1792 of yacc.c  */
-#line 1202 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1202 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (3)].lex).loc);
         parseContext.setLayoutQualifier((yyvsp[(1) - (3)].lex).loc, (yyval.interm.type), *(yyvsp[(1) - (3)].lex).string, (int)(yyvsp[(3) - (3)].lex).u);
-    }
+    ;}
     break;
 
   case 132:
-/* Line 1792 of yacc.c  */
-#line 1206 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1206 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     { // because "shared" is both an identifier and a keyword
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         TString strShared("shared");
         parseContext.setLayoutQualifier((yyvsp[(1) - (1)].lex).loc, (yyval.interm.type), strShared);
-    }
+    ;}
     break;
 
   case 133:
-/* Line 1792 of yacc.c  */
-#line 1214 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1214 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
-    }
+    ;}
     break;
 
   case 134:
-/* Line 1792 of yacc.c  */
-#line 1220 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1220 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type) = (yyvsp[(1) - (1)].interm.type);
-    }
+    ;}
     break;
 
   case 135:
-/* Line 1792 of yacc.c  */
-#line 1223 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1223 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type) = (yyvsp[(1) - (2)].interm.type);
         if ((yyval.interm.type).basicType == EbtVoid)
             (yyval.interm.type).basicType = (yyvsp[(2) - (2)].interm.type).basicType;
 
         parseContext.mergeQualifiers((yyval.interm.type).loc, (yyval.interm.type).qualifier, (yyvsp[(2) - (2)].interm.type).qualifier, false);
-    }
+    ;}
     break;
 
   case 136:
-/* Line 1792 of yacc.c  */
-#line 1233 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1233 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type) = (yyvsp[(1) - (1)].interm.type);
-    }
+    ;}
     break;
 
   case 137:
-/* Line 1792 of yacc.c  */
-#line 1236 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1236 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type) = (yyvsp[(1) - (1)].interm.type);
-    }
+    ;}
     break;
 
   case 138:
-/* Line 1792 of yacc.c  */
-#line 1239 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1239 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type) = (yyvsp[(1) - (1)].interm.type);
-    }
+    ;}
     break;
 
   case 139:
-/* Line 1792 of yacc.c  */
-#line 1242 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1242 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         // allow inheritance of storage qualifier from block declaration
         (yyval.interm.type) = (yyvsp[(1) - (1)].interm.type);
-    }
+    ;}
     break;
 
   case 140:
-/* Line 1792 of yacc.c  */
-#line 1246 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1246 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         // allow inheritance of storage qualifier from block declaration
         (yyval.interm.type) = (yyvsp[(1) - (1)].interm.type);
-    }
+    ;}
     break;
 
   case 141:
-/* Line 1792 of yacc.c  */
-#line 1250 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1250 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         // allow inheritance of storage qualifier from block declaration
         (yyval.interm.type) = (yyvsp[(1) - (1)].interm.type);
-    }
+    ;}
     break;
 
   case 142:
-/* Line 1792 of yacc.c  */
-#line 1257 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1257 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.storage = EvqConst;
-    }
+    ;}
     break;
 
   case 143:
-/* Line 1792 of yacc.c  */
-#line 1261 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1261 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.requireStage((yyvsp[(1) - (1)].lex).loc, EShLangVertexMask, "attribute");
         parseContext.checkDeprecated((yyvsp[(1) - (1)].lex).loc, ECoreProfile, 130, "attribute");
@@ -4675,12 +4711,11 @@ yyreduce:
 
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.storage = EvqVaryingIn;
-    }
+    ;}
     break;
 
   case 144:
-/* Line 1792 of yacc.c  */
-#line 1273 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1273 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.checkDeprecated((yyvsp[(1) - (1)].lex).loc, ENoProfile, 130, "varying");
         parseContext.checkDeprecated((yyvsp[(1) - (1)].lex).loc, ECoreProfile, 130, "varying");
@@ -4694,161 +4729,145 @@ yyreduce:
             (yyval.interm.type).qualifier.storage = EvqVaryingOut;
         else
             (yyval.interm.type).qualifier.storage = EvqVaryingIn;
-    }
+    ;}
     break;
 
   case 145:
-/* Line 1792 of yacc.c  */
-#line 1287 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1287 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "out");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.storage = EvqInOut;
-    }
+    ;}
     break;
 
   case 146:
-/* Line 1792 of yacc.c  */
-#line 1292 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1292 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "in");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.storage = EvqIn;
-    }
+    ;}
     break;
 
   case 147:
-/* Line 1792 of yacc.c  */
-#line 1297 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1297 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "out");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.storage = EvqOut;
-    }
+    ;}
     break;
 
   case 148:
-/* Line 1792 of yacc.c  */
-#line 1302 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1302 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ENoProfile, 120, 0, "centroid");
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, EEsProfile, 300, 0, "centroid");
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "centroid");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.centroid = true;
-    }
+    ;}
     break;
 
   case 149:
-/* Line 1792 of yacc.c  */
-#line 1309 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1309 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "patch");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.patch = true;
-    }
+    ;}
     break;
 
   case 150:
-/* Line 1792 of yacc.c  */
-#line 1314 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1314 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "sample");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.sample = true;
-    }
+    ;}
     break;
 
   case 151:
-/* Line 1792 of yacc.c  */
-#line 1319 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1319 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "uniform");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.storage = EvqUniform;
-    }
+    ;}
     break;
 
   case 152:
-/* Line 1792 of yacc.c  */
-#line 1324 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1324 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "buffer");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.storage = EvqUniform; // TODO: 4.0 functionality: implement BUFFER
-    }
+    ;}
     break;
 
   case 153:
-/* Line 1792 of yacc.c  */
-#line 1329 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1329 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.requireProfile((yyvsp[(1) - (1)].lex).loc, static_cast<EProfileMask>(~EEsProfileMask), "shared");
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ECoreProfile, 430, 0, "shared");
         parseContext.requireStage((yyvsp[(1) - (1)].lex).loc, EShLangComputeMask, "shared");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.shared = true;
-    }
+    ;}
     break;
 
   case 154:
-/* Line 1792 of yacc.c  */
-#line 1336 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1336 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.coherent = true;
-    }
+    ;}
     break;
 
   case 155:
-/* Line 1792 of yacc.c  */
-#line 1340 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1340 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.volatil = true;
-    }
+    ;}
     break;
 
   case 156:
-/* Line 1792 of yacc.c  */
-#line 1344 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1344 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.restrict = true;
-    }
+    ;}
     break;
 
   case 157:
-/* Line 1792 of yacc.c  */
-#line 1348 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1348 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.readonly = true;
-    }
+    ;}
     break;
 
   case 158:
-/* Line 1792 of yacc.c  */
-#line 1352 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1352 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.writeonly = true;
-    }
+    ;}
     break;
 
   case 159:
-/* Line 1792 of yacc.c  */
-#line 1356 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1356 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "subroutine");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         (yyval.interm.type).qualifier.storage = EvqUniform;
-    }
+    ;}
     break;
 
   case 160:
-/* Line 1792 of yacc.c  */
-#line 1361 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1361 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.globalCheck((yyvsp[(1) - (4)].lex).loc, parseContext.symbolTable.atGlobalLevel(), "subroutine");
         (yyval.interm.type).init((yyvsp[(1) - (4)].lex).loc);
@@ -4856,57 +4875,51 @@ yyreduce:
         // TODO: 4.0 semantics: subroutines
         // 1) make sure each identifier is a type declared earlier with SUBROUTINE
         // 2) save all of the identifiers for future comparison with the declared function
-    }
+    ;}
     break;
 
   case 161:
-/* Line 1792 of yacc.c  */
-#line 1372 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1372 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         // TODO: 4.0 functionality: subroutine type to list
-    }
+    ;}
     break;
 
   case 162:
-/* Line 1792 of yacc.c  */
-#line 1375 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1375 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
-    }
+    ;}
     break;
 
   case 163:
-/* Line 1792 of yacc.c  */
-#line 1380 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1380 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type) = (yyvsp[(1) - (1)].interm.type);
         (yyval.interm.type).qualifier.precision = parseContext.getDefaultPrecision((yyval.interm.type));
-    }
+    ;}
     break;
 
   case 164:
-/* Line 1792 of yacc.c  */
-#line 1384 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1384 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {        
         parseContext.arrayDimCheck((yyvsp[(2) - (2)].interm).loc, (yyvsp[(2) - (2)].interm).arraySizes, 0);
         (yyval.interm.type) = (yyvsp[(1) - (2)].interm.type);
         (yyval.interm.type).qualifier.precision = parseContext.getDefaultPrecision((yyval.interm.type));
         (yyval.interm.type).arraySizes = (yyvsp[(2) - (2)].interm).arraySizes;
-    }
+    ;}
     break;
 
   case 165:
-/* Line 1792 of yacc.c  */
-#line 1393 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1393 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm).loc = (yyvsp[(1) - (2)].lex).loc;
         (yyval.interm).arraySizes = NewPoolTArraySizes();
         (yyval.interm).arraySizes->setSize(0);
-    }
+    ;}
     break;
 
   case 166:
-/* Line 1792 of yacc.c  */
-#line 1398 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1398 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm).loc = (yyvsp[(1) - (3)].lex).loc;
         (yyval.interm).arraySizes = NewPoolTArraySizes();
@@ -4914,1254 +4927,1131 @@ yyreduce:
         int size;
         parseContext.arraySizeCheck((yyvsp[(2) - (3)].interm.intermTypedNode)->getLoc(), (yyvsp[(2) - (3)].interm.intermTypedNode), size);
         (yyval.interm).arraySizes->setSize(size);
-    }
+    ;}
     break;
 
   case 167:
-/* Line 1792 of yacc.c  */
-#line 1406 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1406 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (3)].interm);
         (yyval.interm).arraySizes->setSize(0);
-    }
+    ;}
     break;
 
   case 168:
-/* Line 1792 of yacc.c  */
-#line 1410 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1410 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm) = (yyvsp[(1) - (4)].interm);
 
         int size;
         parseContext.arraySizeCheck((yyvsp[(3) - (4)].interm.intermTypedNode)->getLoc(), (yyvsp[(3) - (4)].interm.intermTypedNode), size);
         (yyval.interm).arraySizes->setSize(size);
-    }
+    ;}
     break;
 
   case 169:
-/* Line 1792 of yacc.c  */
-#line 1420 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1420 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtVoid;
-    }
+    ;}
     break;
 
   case 170:
-/* Line 1792 of yacc.c  */
-#line 1424 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1424 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
-    }
+    ;}
     break;
 
   case 171:
-/* Line 1792 of yacc.c  */
-#line 1428 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1428 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
-    }
+    ;}
     break;
 
   case 172:
-/* Line 1792 of yacc.c  */
-#line 1433 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1433 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtInt;
-    }
+    ;}
     break;
 
   case 173:
-/* Line 1792 of yacc.c  */
-#line 1437 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1437 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(1) - (1)].lex).loc, "unsigned integer");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtUint;
-    }
+    ;}
     break;
 
   case 174:
-/* Line 1792 of yacc.c  */
-#line 1442 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1442 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtBool;
-    }
+    ;}
     break;
 
   case 175:
-/* Line 1792 of yacc.c  */
-#line 1446 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1446 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setVector(2);
-    }
+    ;}
     break;
 
   case 176:
-/* Line 1792 of yacc.c  */
-#line 1451 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1451 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setVector(3);
-    }
+    ;}
     break;
 
   case 177:
-/* Line 1792 of yacc.c  */
-#line 1456 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1456 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setVector(4);
-    }
+    ;}
     break;
 
   case 178:
-/* Line 1792 of yacc.c  */
-#line 1461 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1461 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double vector");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setVector(2);
-    }
+    ;}
     break;
 
   case 179:
-/* Line 1792 of yacc.c  */
-#line 1467 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1467 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double vector");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setVector(3);
-    }
+    ;}
     break;
 
   case 180:
-/* Line 1792 of yacc.c  */
-#line 1473 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1473 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double vector");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setVector(4);
-    }
+    ;}
     break;
 
   case 181:
-/* Line 1792 of yacc.c  */
-#line 1479 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1479 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtBool;
         (yyval.interm.type).setVector(2);
-    }
+    ;}
     break;
 
   case 182:
-/* Line 1792 of yacc.c  */
-#line 1484 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1484 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtBool;
         (yyval.interm.type).setVector(3);
-    }
+    ;}
     break;
 
   case 183:
-/* Line 1792 of yacc.c  */
-#line 1489 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1489 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtBool;
         (yyval.interm.type).setVector(4);
-    }
+    ;}
     break;
 
   case 184:
-/* Line 1792 of yacc.c  */
-#line 1494 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1494 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtInt;
         (yyval.interm.type).setVector(2);
-    }
+    ;}
     break;
 
   case 185:
-/* Line 1792 of yacc.c  */
-#line 1499 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1499 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtInt;
         (yyval.interm.type).setVector(3);
-    }
+    ;}
     break;
 
   case 186:
-/* Line 1792 of yacc.c  */
-#line 1504 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1504 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtInt;
         (yyval.interm.type).setVector(4);
-    }
+    ;}
     break;
 
   case 187:
-/* Line 1792 of yacc.c  */
-#line 1509 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1509 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(1) - (1)].lex).loc, "unsigned integer vector");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtUint;
         (yyval.interm.type).setVector(2);
-    }
+    ;}
     break;
 
   case 188:
-/* Line 1792 of yacc.c  */
-#line 1515 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1515 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(1) - (1)].lex).loc, "unsigned integer vector");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtUint;
         (yyval.interm.type).setVector(3);
-    }
+    ;}
     break;
 
   case 189:
-/* Line 1792 of yacc.c  */
-#line 1521 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1521 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.fullIntegerCheck((yyvsp[(1) - (1)].lex).loc, "unsigned integer vector");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtUint;
         (yyval.interm.type).setVector(4);
-    }
+    ;}
     break;
 
   case 190:
-/* Line 1792 of yacc.c  */
-#line 1527 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1527 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(2, 2);
-    }
+    ;}
     break;
 
   case 191:
-/* Line 1792 of yacc.c  */
-#line 1532 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1532 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(3, 3);
-    }
+    ;}
     break;
 
   case 192:
-/* Line 1792 of yacc.c  */
-#line 1537 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1537 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(4, 4);
-    }
+    ;}
     break;
 
   case 193:
-/* Line 1792 of yacc.c  */
-#line 1542 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1542 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(2, 2);
-    }
+    ;}
     break;
 
   case 194:
-/* Line 1792 of yacc.c  */
-#line 1547 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1547 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(2, 3);
-    }
+    ;}
     break;
 
   case 195:
-/* Line 1792 of yacc.c  */
-#line 1552 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1552 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(2, 4);
-    }
+    ;}
     break;
 
   case 196:
-/* Line 1792 of yacc.c  */
-#line 1557 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1557 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(3, 2);
-    }
+    ;}
     break;
 
   case 197:
-/* Line 1792 of yacc.c  */
-#line 1562 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1562 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(3, 3);
-    }
+    ;}
     break;
 
   case 198:
-/* Line 1792 of yacc.c  */
-#line 1567 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1567 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(3, 4);
-    }
+    ;}
     break;
 
   case 199:
-/* Line 1792 of yacc.c  */
-#line 1572 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1572 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(4, 2);
-    }
+    ;}
     break;
 
   case 200:
-/* Line 1792 of yacc.c  */
-#line 1577 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1577 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(4, 3);
-    }
+    ;}
     break;
 
   case 201:
-/* Line 1792 of yacc.c  */
-#line 1582 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1582 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtFloat;
         (yyval.interm.type).setMatrix(4, 4);
-    }
+    ;}
     break;
 
   case 202:
-/* Line 1792 of yacc.c  */
-#line 1587 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1587 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(2, 2);
-    }
+    ;}
     break;
 
   case 203:
-/* Line 1792 of yacc.c  */
-#line 1593 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1593 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(3, 3);
-    }
+    ;}
     break;
 
   case 204:
-/* Line 1792 of yacc.c  */
-#line 1599 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1599 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(4, 4);
-    }
+    ;}
     break;
 
   case 205:
-/* Line 1792 of yacc.c  */
-#line 1605 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1605 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(2, 2);
-    }
+    ;}
     break;
 
   case 206:
-/* Line 1792 of yacc.c  */
-#line 1611 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1611 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(2, 3);
-    }
+    ;}
     break;
 
   case 207:
-/* Line 1792 of yacc.c  */
-#line 1617 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1617 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(2, 4);
-    }
+    ;}
     break;
 
   case 208:
-/* Line 1792 of yacc.c  */
-#line 1623 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1623 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(3, 2);
-    }
+    ;}
     break;
 
   case 209:
-/* Line 1792 of yacc.c  */
-#line 1629 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1629 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(3, 3);
-    }
+    ;}
     break;
 
   case 210:
-/* Line 1792 of yacc.c  */
-#line 1635 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1635 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(3, 4);
-    }
+    ;}
     break;
 
   case 211:
-/* Line 1792 of yacc.c  */
-#line 1641 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1641 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(4, 2);
-    }
+    ;}
     break;
 
   case 212:
-/* Line 1792 of yacc.c  */
-#line 1647 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1647 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(4, 3);
-    }
+    ;}
     break;
 
   case 213:
-/* Line 1792 of yacc.c  */
-#line 1653 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1653 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.doubleCheck((yyvsp[(1) - (1)].lex).loc, "double matrix");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtDouble;
         (yyval.interm.type).setMatrix(4, 4);
-    }
+    ;}
     break;
 
   case 214:
-/* Line 1792 of yacc.c  */
-#line 1659 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1659 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         // TODO: 4.2 functionality: add type
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtInt;
-    }
+    ;}
     break;
 
   case 215:
-/* Line 1792 of yacc.c  */
-#line 1664 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1664 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, Esd1D);
-    }
+    ;}
     break;
 
   case 216:
-/* Line 1792 of yacc.c  */
-#line 1669 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1669 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, Esd2D);
-    }
+    ;}
     break;
 
   case 217:
-/* Line 1792 of yacc.c  */
-#line 1674 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1674 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, Esd3D);
-    }
+    ;}
     break;
 
   case 218:
-/* Line 1792 of yacc.c  */
-#line 1679 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1679 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, EsdCube);
-    }
+    ;}
     break;
 
   case 219:
-/* Line 1792 of yacc.c  */
-#line 1684 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1684 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, Esd1D, false, true);
-    }
+    ;}
     break;
 
   case 220:
-/* Line 1792 of yacc.c  */
-#line 1689 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1689 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, Esd2D, false, true);
-    }
+    ;}
     break;
 
   case 221:
-/* Line 1792 of yacc.c  */
-#line 1694 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1694 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, EsdCube, false, true);
-    }
+    ;}
     break;
 
   case 222:
-/* Line 1792 of yacc.c  */
-#line 1699 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1699 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, Esd1D, true);
-    }
+    ;}
     break;
 
   case 223:
-/* Line 1792 of yacc.c  */
-#line 1704 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1704 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, Esd2D, true);
-    }
+    ;}
     break;
 
   case 224:
-/* Line 1792 of yacc.c  */
-#line 1709 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1709 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, Esd1D, true, true);
-    }
+    ;}
     break;
 
   case 225:
-/* Line 1792 of yacc.c  */
-#line 1714 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1714 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, Esd2D, true, true);
-    }
+    ;}
     break;
 
   case 226:
-/* Line 1792 of yacc.c  */
-#line 1719 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1719 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, EsdCube, true);
-    }
+    ;}
     break;
 
   case 227:
-/* Line 1792 of yacc.c  */
-#line 1724 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1724 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, EsdCube, true, true);
-    }
+    ;}
     break;
 
   case 228:
-/* Line 1792 of yacc.c  */
-#line 1729 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1729 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtInt, Esd1D);
-    }
+    ;}
     break;
 
   case 229:
-/* Line 1792 of yacc.c  */
-#line 1734 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1734 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtInt, Esd2D);
-    }
+    ;}
     break;
 
   case 230:
-/* Line 1792 of yacc.c  */
-#line 1739 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1739 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtInt, Esd3D);
-    }
+    ;}
     break;
 
   case 231:
-/* Line 1792 of yacc.c  */
-#line 1744 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1744 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtInt, EsdCube);
-    }
+    ;}
     break;
 
   case 232:
-/* Line 1792 of yacc.c  */
-#line 1749 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1749 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtInt, Esd1D, true);
-    }
+    ;}
     break;
 
   case 233:
-/* Line 1792 of yacc.c  */
-#line 1754 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1754 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtInt, Esd2D, true);
-    }
+    ;}
     break;
 
   case 234:
-/* Line 1792 of yacc.c  */
-#line 1759 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1759 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtInt, Esd3D, true);
-    }
+    ;}
     break;
 
   case 235:
-/* Line 1792 of yacc.c  */
-#line 1764 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1764 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtUint, Esd1D);
-    }
+    ;}
     break;
 
   case 236:
-/* Line 1792 of yacc.c  */
-#line 1769 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1769 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtUint, Esd2D);
-    }
+    ;}
     break;
 
   case 237:
-/* Line 1792 of yacc.c  */
-#line 1774 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1774 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtUint, Esd3D);
-    }
+    ;}
     break;
 
   case 238:
-/* Line 1792 of yacc.c  */
-#line 1779 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1779 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtUint, EsdCube);
-    }
+    ;}
     break;
 
   case 239:
-/* Line 1792 of yacc.c  */
-#line 1784 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1784 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtUint, Esd1D, true);
-    }
+    ;}
     break;
 
   case 240:
-/* Line 1792 of yacc.c  */
-#line 1789 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1789 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtUint, Esd2D, true);
-    }
+    ;}
     break;
 
   case 241:
-/* Line 1792 of yacc.c  */
-#line 1794 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1794 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtUint, EsdCube, true);
-    }
+    ;}
     break;
 
   case 242:
-/* Line 1792 of yacc.c  */
-#line 1799 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1799 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ENoProfile, 140, "GL_ARB_texture_rectangle", "rectangle texture");
 
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, EsdRect);
-    }
+    ;}
     break;
 
   case 243:
-/* Line 1792 of yacc.c  */
-#line 1806 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1806 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ECoreProfile, 140, "GL_ARB_texture_rectangle", "rectangle texture");
 
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, EsdRect, false, true);
-    }
+    ;}
     break;
 
   case 244:
-/* Line 1792 of yacc.c  */
-#line 1813 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1813 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ECoreProfile, 140, "GL_ARB_texture_rectangle", "rectangle texture");
 
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtInt, EsdRect);
-    }
+    ;}
     break;
 
   case 245:
-/* Line 1792 of yacc.c  */
-#line 1820 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1820 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ECoreProfile, 140, "GL_ARB_texture_rectangle", "rectangle texture");
 
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtUint, EsdRect);
-    }
+    ;}
     break;
 
   case 246:
-/* Line 1792 of yacc.c  */
-#line 1827 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1827 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, EsdBuffer);
-    }
+    ;}
     break;
 
   case 247:
-/* Line 1792 of yacc.c  */
-#line 1832 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1832 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtInt, EsdBuffer);
-    }
+    ;}
     break;
 
   case 248:
-/* Line 1792 of yacc.c  */
-#line 1837 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1837 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtUint, EsdBuffer);
-    }
+    ;}
     break;
 
   case 249:
-/* Line 1792 of yacc.c  */
-#line 1842 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1842 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, Esd2D, false, false, true);
-    }
+    ;}
     break;
 
   case 250:
-/* Line 1792 of yacc.c  */
-#line 1847 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1847 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtInt, Esd2D, false, false, true);
-    }
+    ;}
     break;
 
   case 251:
-/* Line 1792 of yacc.c  */
-#line 1852 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1852 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtUint, Esd2D, false, false, true);
-    }
+    ;}
     break;
 
   case 252:
-/* Line 1792 of yacc.c  */
-#line 1857 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1857 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtFloat, Esd2D, true, false, true);
-    }
+    ;}
     break;
 
   case 253:
-/* Line 1792 of yacc.c  */
-#line 1862 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1862 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtInt, Esd2D, true, false, true);
-    }
+    ;}
     break;
 
   case 254:
-/* Line 1792 of yacc.c  */
-#line 1867 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1867 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.set(EbtUint, Esd2D, true, false, true);
-    }
+    ;}
     break;
 
   case 255:
-/* Line 1792 of yacc.c  */
-#line 1872 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1872 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtFloat, Esd1D);
-    }
+    ;}
     break;
 
   case 256:
-/* Line 1792 of yacc.c  */
-#line 1877 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1877 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtInt, Esd1D);
-    }
+    ;}
     break;
 
   case 257:
-/* Line 1792 of yacc.c  */
-#line 1882 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1882 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtUint, Esd1D);
-    }
+    ;}
     break;
 
   case 258:
-/* Line 1792 of yacc.c  */
-#line 1887 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1887 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtFloat, Esd2D);
-    }
+    ;}
     break;
 
   case 259:
-/* Line 1792 of yacc.c  */
-#line 1892 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1892 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtInt, Esd2D);
-    }
+    ;}
     break;
 
   case 260:
-/* Line 1792 of yacc.c  */
-#line 1897 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1897 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtUint, Esd2D);
-    }
+    ;}
     break;
 
   case 261:
-/* Line 1792 of yacc.c  */
-#line 1902 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1902 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtFloat, Esd3D);
-    }
+    ;}
     break;
 
   case 262:
-/* Line 1792 of yacc.c  */
-#line 1907 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1907 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtInt, Esd3D);
-    }
+    ;}
     break;
 
   case 263:
-/* Line 1792 of yacc.c  */
-#line 1912 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1912 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtUint, Esd3D);
-    }
+    ;}
     break;
 
   case 264:
-/* Line 1792 of yacc.c  */
-#line 1917 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1917 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtFloat, EsdRect);
-    }
+    ;}
     break;
 
   case 265:
-/* Line 1792 of yacc.c  */
-#line 1922 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1922 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtInt, EsdRect);
-    }
+    ;}
     break;
 
   case 266:
-/* Line 1792 of yacc.c  */
-#line 1927 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1927 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtUint, EsdRect);
-    }
+    ;}
     break;
 
   case 267:
-/* Line 1792 of yacc.c  */
-#line 1932 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1932 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtFloat, EsdCube);
-    }
+    ;}
     break;
 
   case 268:
-/* Line 1792 of yacc.c  */
-#line 1937 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1937 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtInt, EsdCube);
-    }
+    ;}
     break;
 
   case 269:
-/* Line 1792 of yacc.c  */
-#line 1942 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1942 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtUint, EsdCube);
-    }
+    ;}
     break;
 
   case 270:
-/* Line 1792 of yacc.c  */
-#line 1947 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1947 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtFloat, EsdBuffer);
-    }
+    ;}
     break;
 
   case 271:
-/* Line 1792 of yacc.c  */
-#line 1952 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1952 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtInt, EsdBuffer);
-    }
+    ;}
     break;
 
   case 272:
-/* Line 1792 of yacc.c  */
-#line 1957 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1957 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtUint, EsdBuffer);
-    }
+    ;}
     break;
 
   case 273:
-/* Line 1792 of yacc.c  */
-#line 1962 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1962 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtFloat, Esd1D, true);
-    }
+    ;}
     break;
 
   case 274:
-/* Line 1792 of yacc.c  */
-#line 1967 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1967 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtInt, Esd1D, true);
-    }
+    ;}
     break;
 
   case 275:
-/* Line 1792 of yacc.c  */
-#line 1972 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1972 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtUint, Esd1D, true);
-    }
+    ;}
     break;
 
   case 276:
-/* Line 1792 of yacc.c  */
-#line 1977 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1977 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtFloat, Esd2D, true);
-    }
+    ;}
     break;
 
   case 277:
-/* Line 1792 of yacc.c  */
-#line 1982 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1982 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtInt, Esd2D, true);
-    }
+    ;}
     break;
 
   case 278:
-/* Line 1792 of yacc.c  */
-#line 1987 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1987 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtUint, Esd2D, true);
-    }
+    ;}
     break;
 
   case 279:
-/* Line 1792 of yacc.c  */
-#line 1992 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1992 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtFloat, EsdCube, true);
-    }
+    ;}
     break;
 
   case 280:
-/* Line 1792 of yacc.c  */
-#line 1997 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 1997 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtInt, EsdCube, true);
-    }
+    ;}
     break;
 
   case 281:
-/* Line 1792 of yacc.c  */
-#line 2002 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2002 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtUint, EsdCube, true);
-    }
+    ;}
     break;
 
   case 282:
-/* Line 1792 of yacc.c  */
-#line 2007 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2007 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtFloat, Esd2D, false, false, true);
-    }
+    ;}
     break;
 
   case 283:
-/* Line 1792 of yacc.c  */
-#line 2012 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2012 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtInt, Esd2D, false, false, true);
-    }
+    ;}
     break;
 
   case 284:
-/* Line 1792 of yacc.c  */
-#line 2017 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2017 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtUint, Esd2D, false, false, true);
-    }
+    ;}
     break;
 
   case 285:
-/* Line 1792 of yacc.c  */
-#line 2022 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2022 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtFloat, Esd2D, true, false, true);
-    }
+    ;}
     break;
 
   case 286:
-/* Line 1792 of yacc.c  */
-#line 2027 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2027 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtInt, Esd2D, true, false, true);
-    }
+    ;}
     break;
 
   case 287:
-/* Line 1792 of yacc.c  */
-#line 2032 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2032 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc, parseContext.symbolTable.atGlobalLevel());
         (yyval.interm.type).basicType = EbtSampler;
         (yyval.interm.type).sampler.setImage(EbtUint, Esd2D, true, false, true);
-    }
+    ;}
     break;
 
   case 288:
-/* Line 1792 of yacc.c  */
-#line 2037 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2037 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.type) = (yyvsp[(1) - (1)].interm.type);
         (yyval.interm.type).qualifier.storage = parseContext.symbolTable.atGlobalLevel() ? EvqGlobal : EvqTemporary;
-    }
+    ;}
     break;
 
   case 289:
-/* Line 1792 of yacc.c  */
-#line 2041 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2041 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         //
         // This is for user defined type names.  The lexical phase looked up the
@@ -6174,51 +6064,46 @@ yyreduce:
             (yyval.interm.type).userDef = &structure;
         } else
             parseContext.error((yyvsp[(1) - (1)].lex).loc, "expected type name", (yyvsp[(1) - (1)].lex).string->c_str(), "");
-    }
+    ;}
     break;
 
   case 290:
-/* Line 1792 of yacc.c  */
-#line 2057 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2057 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ENoProfile, 130, 0, "highp precision qualifier");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         if (parseContext.profile == EEsProfile)
 		    (yyval.interm.type).qualifier.precision = EpqHigh;
-    }
+    ;}
     break;
 
   case 291:
-/* Line 1792 of yacc.c  */
-#line 2063 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2063 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ENoProfile, 130, 0, "mediump precision qualifier");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         if (parseContext.profile == EEsProfile)
 	    	(yyval.interm.type).qualifier.precision = EpqMedium;
-    }
+    ;}
     break;
 
   case 292:
-/* Line 1792 of yacc.c  */
-#line 2069 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2069 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.profileRequires((yyvsp[(1) - (1)].lex).loc, ENoProfile, 130, 0, "lowp precision qualifier");
         (yyval.interm.type).init((yyvsp[(1) - (1)].lex).loc);
         if (parseContext.profile == EEsProfile)
     		(yyval.interm.type).qualifier.precision = EpqLow;
-    }
+    ;}
     break;
 
   case 293:
-/* Line 1792 of yacc.c  */
-#line 2078 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { parseContext.nestedStructCheck((yyvsp[(1) - (3)].lex).loc); }
+#line 2078 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { parseContext.nestedStructCheck((yyvsp[(1) - (3)].lex).loc); ;}
     break;
 
   case 294:
-/* Line 1792 of yacc.c  */
-#line 2078 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2078 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         TType* structure = new TType((yyvsp[(5) - (6)].interm.typeList), *(yyvsp[(2) - (6)].lex).string);
         TVariable* userTypeDef = new TVariable((yyvsp[(2) - (6)].lex).string, *structure, true);
@@ -6228,38 +6113,34 @@ yyreduce:
         (yyval.interm.type).basicType = EbtStruct;
         (yyval.interm.type).userDef = structure;
         --parseContext.structNestingLevel;
-    }
+    ;}
     break;
 
   case 295:
-/* Line 1792 of yacc.c  */
-#line 2088 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { parseContext.nestedStructCheck((yyvsp[(1) - (2)].lex).loc); }
+#line 2088 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { parseContext.nestedStructCheck((yyvsp[(1) - (2)].lex).loc); ;}
     break;
 
   case 296:
-/* Line 1792 of yacc.c  */
-#line 2088 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2088 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         TType* structure = new TType((yyvsp[(4) - (5)].interm.typeList), TString(""));
         (yyval.interm.type).init((yyvsp[(1) - (5)].lex).loc);
         (yyval.interm.type).basicType = EbtStruct;
         (yyval.interm.type).userDef = structure;
         --parseContext.structNestingLevel;
-    }
+    ;}
     break;
 
   case 297:
-/* Line 1792 of yacc.c  */
-#line 2098 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2098 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.typeList) = (yyvsp[(1) - (1)].interm.typeList);
-    }
+    ;}
     break;
 
   case 298:
-/* Line 1792 of yacc.c  */
-#line 2101 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2101 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.typeList) = (yyvsp[(1) - (2)].interm.typeList);
         for (unsigned int i = 0; i < (yyvsp[(2) - (2)].interm.typeList)->size(); ++i) {
@@ -6269,12 +6150,11 @@ yyreduce:
             }
             (yyval.interm.typeList)->push_back((*(yyvsp[(2) - (2)].interm.typeList))[i]);
         }
-    }
+    ;}
     break;
 
   case 299:
-/* Line 1792 of yacc.c  */
-#line 2114 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2114 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if ((yyvsp[(1) - (3)].interm.type).arraySizes) {
             parseContext.profileRequires((yyvsp[(1) - (3)].interm.type).loc, ENoProfile, 120, "GL_3DL_array_objects", "arrayed type");
@@ -6292,12 +6172,11 @@ yyreduce:
             parseContext.arrayDimCheck((yyvsp[(1) - (3)].interm.type).loc, (*(yyval.interm.typeList))[i].type, (yyvsp[(1) - (3)].interm.type).arraySizes);
             (*(yyval.interm.typeList))[i].type->mergeType((yyvsp[(1) - (3)].interm.type));
         }
-    }
+    ;}
     break;
 
   case 300:
-/* Line 1792 of yacc.c  */
-#line 2132 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2132 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if ((yyvsp[(2) - (4)].interm.type).arraySizes) {
             parseContext.profileRequires((yyvsp[(2) - (4)].interm.type).loc, ENoProfile, 120, "GL_3DL_array_objects", "arrayed type");
@@ -6316,39 +6195,35 @@ yyreduce:
             parseContext.arrayDimCheck((yyvsp[(1) - (4)].interm.type).loc, (*(yyval.interm.typeList))[i].type, (yyvsp[(2) - (4)].interm.type).arraySizes);
             (*(yyval.interm.typeList))[i].type->mergeType((yyvsp[(2) - (4)].interm.type));
         }
-    }
+    ;}
     break;
 
   case 301:
-/* Line 1792 of yacc.c  */
-#line 2154 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2154 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.typeList) = NewPoolTTypeList();
         (yyval.interm.typeList)->push_back((yyvsp[(1) - (1)].interm.typeLine));
-    }
+    ;}
     break;
 
   case 302:
-/* Line 1792 of yacc.c  */
-#line 2158 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2158 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.typeList)->push_back((yyvsp[(3) - (3)].interm.typeLine));
-    }
+    ;}
     break;
 
   case 303:
-/* Line 1792 of yacc.c  */
-#line 2164 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2164 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.typeLine).type = new TType(EbtVoid);
         (yyval.interm.typeLine).loc = (yyvsp[(1) - (1)].lex).loc;
         (yyval.interm.typeLine).type->setFieldName(*(yyvsp[(1) - (1)].lex).string);
-    }
+    ;}
     break;
 
   case 304:
-/* Line 1792 of yacc.c  */
-#line 2169 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2169 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {        
         if (parseContext.profile == EEsProfile)
             parseContext.arraySizeRequiredCheck((yyvsp[(2) - (2)].interm).loc, (yyvsp[(2) - (2)].interm).arraySizes->getSize());
@@ -6358,195 +6233,167 @@ yyreduce:
         (yyval.interm.typeLine).loc = (yyvsp[(1) - (2)].lex).loc;
         (yyval.interm.typeLine).type->setFieldName(*(yyvsp[(1) - (2)].lex).string);
         (yyval.interm.typeLine).type->setArraySizes((yyvsp[(2) - (2)].interm).arraySizes);
-    }
+    ;}
     break;
 
   case 305:
-/* Line 1792 of yacc.c  */
-#line 2182 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2182 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 306:
-/* Line 1792 of yacc.c  */
-#line 2185 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2185 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = (yyvsp[(2) - (3)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 307:
-/* Line 1792 of yacc.c  */
-#line 2188 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2188 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = (yyvsp[(2) - (4)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 308:
-/* Line 1792 of yacc.c  */
-#line 2194 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2194 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 309:
-/* Line 1792 of yacc.c  */
-#line 2197 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2197 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         // TODO: 4.2 functionality: implement the initializer list
         (yyval.interm.intermTypedNode) = (yyvsp[(3) - (3)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 310:
-/* Line 1792 of yacc.c  */
-#line 2204 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); }
+#line 2204 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); ;}
     break;
 
   case 311:
-/* Line 1792 of yacc.c  */
-#line 2208 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermAggregate); }
+#line 2208 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermAggregate); ;}
     break;
 
   case 312:
-/* Line 1792 of yacc.c  */
-#line 2209 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); }
+#line 2209 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); ;}
     break;
 
   case 313:
-/* Line 1792 of yacc.c  */
-#line 2215 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); }
+#line 2215 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); ;}
     break;
 
   case 314:
-/* Line 1792 of yacc.c  */
-#line 2216 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); }
+#line 2216 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); ;}
     break;
 
   case 315:
-/* Line 1792 of yacc.c  */
-#line 2217 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); }
+#line 2217 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); ;}
     break;
 
   case 316:
-/* Line 1792 of yacc.c  */
-#line 2218 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); }
+#line 2218 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); ;}
     break;
 
   case 317:
-/* Line 1792 of yacc.c  */
-#line 2219 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); }
+#line 2219 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); ;}
     break;
 
   case 318:
-/* Line 1792 of yacc.c  */
-#line 2220 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); }
+#line 2220 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); ;}
     break;
 
   case 319:
-/* Line 1792 of yacc.c  */
-#line 2221 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); }
+#line 2221 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); ;}
     break;
 
   case 320:
-/* Line 1792 of yacc.c  */
-#line 2225 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermAggregate) = 0; }
+#line 2225 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermAggregate) = 0; ;}
     break;
 
   case 321:
-/* Line 1792 of yacc.c  */
-#line 2226 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { parseContext.symbolTable.push(); }
+#line 2226 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { parseContext.symbolTable.push(); ;}
     break;
 
   case 322:
-/* Line 1792 of yacc.c  */
-#line 2227 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { parseContext.symbolTable.pop(&parseContext.defaultPrecision[0]); }
+#line 2227 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { parseContext.symbolTable.pop(&parseContext.defaultPrecision[0]); ;}
     break;
 
   case 323:
-/* Line 1792 of yacc.c  */
-#line 2228 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2228 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if ((yyvsp[(3) - (5)].interm.intermAggregate) != 0)
             (yyvsp[(3) - (5)].interm.intermAggregate)->setOperator(EOpSequence);
         (yyval.interm.intermAggregate) = (yyvsp[(3) - (5)].interm.intermAggregate);
-    }
+    ;}
     break;
 
   case 324:
-/* Line 1792 of yacc.c  */
-#line 2236 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); }
+#line 2236 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); ;}
     break;
 
   case 325:
-/* Line 1792 of yacc.c  */
-#line 2237 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); }
+#line 2237 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode); ;}
     break;
 
   case 326:
-/* Line 1792 of yacc.c  */
-#line 2241 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermAggregate); }
+#line 2241 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermAggregate); ;}
     break;
 
   case 327:
-/* Line 1792 of yacc.c  */
-#line 2242 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { parseContext.symbolTable.push(); }
+#line 2242 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { parseContext.symbolTable.push(); ;}
     break;
 
   case 328:
-/* Line 1792 of yacc.c  */
-#line 2242 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { parseContext.symbolTable.pop(&parseContext.defaultPrecision[0]); }
+#line 2242 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { parseContext.symbolTable.pop(&parseContext.defaultPrecision[0]); ;}
     break;
 
   case 329:
-/* Line 1792 of yacc.c  */
-#line 2242 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = (yyvsp[(2) - (3)].interm.intermNode); }
+#line 2242 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = (yyvsp[(2) - (3)].interm.intermNode); ;}
     break;
 
   case 330:
-/* Line 1792 of yacc.c  */
-#line 2246 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2246 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = 0;
-    }
+    ;}
     break;
 
   case 331:
-/* Line 1792 of yacc.c  */
-#line 2249 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2249 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if ((yyvsp[(2) - (3)].interm.intermAggregate))
             (yyvsp[(2) - (3)].interm.intermAggregate)->setOperator(EOpSequence);
         (yyval.interm.intermNode) = (yyvsp[(2) - (3)].interm.intermAggregate);
-    }
+    ;}
     break;
 
   case 332:
-/* Line 1792 of yacc.c  */
-#line 2257 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2257 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermAggregate) = parseContext.intermediate.makeAggregate((yyvsp[(1) - (1)].interm.intermNode));
         if ((yyvsp[(1) - (1)].interm.intermNode) && (yyvsp[(1) - (1)].interm.intermNode)->getAsBranchNode() && ((yyvsp[(1) - (1)].interm.intermNode)->getAsBranchNode()->getFlowOp() == EOpCase ||
@@ -6554,12 +6401,11 @@ yyreduce:
             parseContext.wrapupSwitchSubsequence(0, (yyvsp[(1) - (1)].interm.intermNode));
             (yyval.interm.intermAggregate) = 0;  // start a fresh subsequence for what's after this case
         }
-    }
+    ;}
     break;
 
   case 333:
-/* Line 1792 of yacc.c  */
-#line 2265 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2265 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if ((yyvsp[(2) - (2)].interm.intermNode) && (yyvsp[(2) - (2)].interm.intermNode)->getAsBranchNode() && ((yyvsp[(2) - (2)].interm.intermNode)->getAsBranchNode()->getFlowOp() == EOpCase || 
                                             (yyvsp[(2) - (2)].interm.intermNode)->getAsBranchNode()->getFlowOp() == EOpDefault)) {
@@ -6567,60 +6413,53 @@ yyreduce:
             (yyval.interm.intermAggregate) = 0;  // start a fresh subsequence for what's after this case
         } else
             (yyval.interm.intermAggregate) = parseContext.intermediate.growAggregate((yyvsp[(1) - (2)].interm.intermAggregate), (yyvsp[(2) - (2)].interm.intermNode));
-    }
+    ;}
     break;
 
   case 334:
-/* Line 1792 of yacc.c  */
-#line 2276 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = 0; }
+#line 2276 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = 0; ;}
     break;
 
   case 335:
-/* Line 1792 of yacc.c  */
-#line 2277 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { (yyval.interm.intermNode) = static_cast<TIntermNode*>((yyvsp[(1) - (2)].interm.intermTypedNode)); }
+#line 2277 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { (yyval.interm.intermNode) = static_cast<TIntermNode*>((yyvsp[(1) - (2)].interm.intermTypedNode)); ;}
     break;
 
   case 336:
-/* Line 1792 of yacc.c  */
-#line 2281 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2281 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.boolCheck((yyvsp[(1) - (5)].lex).loc, (yyvsp[(3) - (5)].interm.intermTypedNode));
         (yyval.interm.intermNode) = parseContext.intermediate.addSelection((yyvsp[(3) - (5)].interm.intermTypedNode), (yyvsp[(5) - (5)].interm.nodePair), (yyvsp[(1) - (5)].lex).loc);
-    }
+    ;}
     break;
 
   case 337:
-/* Line 1792 of yacc.c  */
-#line 2288 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2288 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.nodePair).node1 = (yyvsp[(1) - (3)].interm.intermNode);
         (yyval.interm.nodePair).node2 = (yyvsp[(3) - (3)].interm.intermNode);
-    }
+    ;}
     break;
 
   case 338:
-/* Line 1792 of yacc.c  */
-#line 2292 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2292 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.nodePair).node1 = (yyvsp[(1) - (1)].interm.intermNode);
         (yyval.interm.nodePair).node2 = 0;
-    }
+    ;}
     break;
 
   case 339:
-/* Line 1792 of yacc.c  */
-#line 2300 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2300 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode);
         parseContext.boolCheck((yyvsp[(1) - (1)].interm.intermTypedNode)->getLoc(), (yyvsp[(1) - (1)].interm.intermTypedNode));
-    }
+    ;}
     break;
 
   case 340:
-/* Line 1792 of yacc.c  */
-#line 2304 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2304 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         TIntermNode* intermNode;
         parseContext.boolCheck((yyvsp[(2) - (4)].lex).loc, (yyvsp[(1) - (4)].interm.type));
@@ -6629,110 +6468,98 @@ yyreduce:
             (yyval.interm.intermTypedNode) = 0;
         else
             (yyval.interm.intermTypedNode) = (yyvsp[(4) - (4)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 341:
-/* Line 1792 of yacc.c  */
-#line 2316 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2316 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         // start new switch sequence on the switch stack
         parseContext.switchSequenceStack.push_back(new TIntermSequence);
-    }
+    ;}
     break;
 
   case 342:
-/* Line 1792 of yacc.c  */
-#line 2320 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2320 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = parseContext.addSwitch((yyvsp[(1) - (8)].lex).loc, (yyvsp[(3) - (8)].interm.intermTypedNode), (yyvsp[(7) - (8)].interm.intermAggregate));
         delete parseContext.switchSequenceStack.back();
         parseContext.switchSequenceStack.pop_back();
-    }
+    ;}
     break;
 
   case 343:
-/* Line 1792 of yacc.c  */
-#line 2328 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2328 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermAggregate) = 0;
-    }
+    ;}
     break;
 
   case 344:
-/* Line 1792 of yacc.c  */
-#line 2331 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2331 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermAggregate) = (yyvsp[(1) - (1)].interm.intermAggregate);
-    }
+    ;}
     break;
 
   case 345:
-/* Line 1792 of yacc.c  */
-#line 2337 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2337 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.constCheck((yyvsp[(2) - (3)].interm.intermTypedNode), "case");
         parseContext.integerCheck((yyvsp[(2) - (3)].interm.intermTypedNode), "case");
         (yyval.interm.intermNode) = parseContext.intermediate.addBranch(EOpCase, (yyvsp[(2) - (3)].interm.intermTypedNode), (yyvsp[(1) - (3)].lex).loc);
-    }
+    ;}
     break;
 
   case 346:
-/* Line 1792 of yacc.c  */
-#line 2342 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2342 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = parseContext.intermediate.addBranch(EOpDefault, (yyvsp[(1) - (2)].lex).loc);
-    }
+    ;}
     break;
 
   case 347:
-/* Line 1792 of yacc.c  */
-#line 2348 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2348 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.symbolTable.push();
         ++parseContext.loopNestingLevel;
-    }
+    ;}
     break;
 
   case 348:
-/* Line 1792 of yacc.c  */
-#line 2352 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2352 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.symbolTable.pop(&parseContext.defaultPrecision[0]);
         (yyval.interm.intermNode) = parseContext.intermediate.addLoop((yyvsp[(6) - (6)].interm.intermNode), (yyvsp[(4) - (6)].interm.intermTypedNode), 0, true, (yyvsp[(1) - (6)].lex).loc);
         --parseContext.loopNestingLevel;
-    }
+    ;}
     break;
 
   case 349:
-/* Line 1792 of yacc.c  */
-#line 2357 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
-    { ++parseContext.loopNestingLevel; }
+#line 2357 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+    { ++parseContext.loopNestingLevel; ;}
     break;
 
   case 350:
-/* Line 1792 of yacc.c  */
-#line 2357 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2357 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.boolCheck((yyvsp[(8) - (8)].lex).loc, (yyvsp[(6) - (8)].interm.intermTypedNode));
 
         (yyval.interm.intermNode) = parseContext.intermediate.addLoop((yyvsp[(3) - (8)].interm.intermNode), (yyvsp[(6) - (8)].interm.intermTypedNode), 0, false, (yyvsp[(4) - (8)].lex).loc);
         --parseContext.loopNestingLevel;
-    }
+    ;}
     break;
 
   case 351:
-/* Line 1792 of yacc.c  */
-#line 2363 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2363 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.symbolTable.push();
         ++parseContext.loopNestingLevel;
-    }
+    ;}
     break;
 
   case 352:
-/* Line 1792 of yacc.c  */
-#line 2367 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2367 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.symbolTable.pop(&parseContext.defaultPrecision[0]);
         (yyval.interm.intermNode) = parseContext.intermediate.makeAggregate((yyvsp[(4) - (7)].interm.intermNode), (yyvsp[(2) - (7)].lex).loc);
@@ -6742,92 +6569,82 @@ yyreduce:
                 (yyvsp[(1) - (7)].lex).loc);
         (yyval.interm.intermNode)->getAsAggregate()->setOperator(EOpSequence);
         --parseContext.loopNestingLevel;
-    }
+    ;}
     break;
 
   case 353:
-/* Line 1792 of yacc.c  */
-#line 2380 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2380 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode);
-    }
+    ;}
     break;
 
   case 354:
-/* Line 1792 of yacc.c  */
-#line 2383 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2383 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode);
-    }
+    ;}
     break;
 
   case 355:
-/* Line 1792 of yacc.c  */
-#line 2389 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2389 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = (yyvsp[(1) - (1)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 356:
-/* Line 1792 of yacc.c  */
-#line 2392 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2392 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermTypedNode) = 0;
-    }
+    ;}
     break;
 
   case 357:
-/* Line 1792 of yacc.c  */
-#line 2398 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2398 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.nodePair).node1 = (yyvsp[(1) - (2)].interm.intermTypedNode);
         (yyval.interm.nodePair).node2 = 0;
-    }
+    ;}
     break;
 
   case 358:
-/* Line 1792 of yacc.c  */
-#line 2402 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2402 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.nodePair).node1 = (yyvsp[(1) - (3)].interm.intermTypedNode);
         (yyval.interm.nodePair).node2 = (yyvsp[(3) - (3)].interm.intermTypedNode);
-    }
+    ;}
     break;
 
   case 359:
-/* Line 1792 of yacc.c  */
-#line 2409 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2409 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if (parseContext.loopNestingLevel <= 0)
             parseContext.error((yyvsp[(1) - (2)].lex).loc, "continue statement only allowed in loops", "", "");
         (yyval.interm.intermNode) = parseContext.intermediate.addBranch(EOpContinue, (yyvsp[(1) - (2)].lex).loc);
-    }
+    ;}
     break;
 
   case 360:
-/* Line 1792 of yacc.c  */
-#line 2414 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2414 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         if (parseContext.loopNestingLevel + parseContext.switchSequenceStack.size() <= 0)
             parseContext.error((yyvsp[(1) - (2)].lex).loc, "break statement only allowed in switch and loops", "", "");
         (yyval.interm.intermNode) = parseContext.intermediate.addBranch(EOpBreak, (yyvsp[(1) - (2)].lex).loc);
-    }
+    ;}
     break;
 
   case 361:
-/* Line 1792 of yacc.c  */
-#line 2419 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2419 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = parseContext.intermediate.addBranch(EOpReturn, (yyvsp[(1) - (2)].lex).loc);
         if (parseContext.currentFunctionType->getBasicType() != EbtVoid)
             parseContext.error((yyvsp[(1) - (2)].lex).loc, "non-void function must return a value", "return", "");
-    }
+    ;}
     break;
 
   case 362:
-/* Line 1792 of yacc.c  */
-#line 2424 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2424 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = parseContext.intermediate.addBranch(EOpReturn, (yyvsp[(2) - (3)].interm.intermTypedNode), (yyvsp[(1) - (3)].lex).loc);
         parseContext.functionReturnsValue = true;
@@ -6835,63 +6652,56 @@ yyreduce:
             parseContext.error((yyvsp[(1) - (3)].lex).loc, "void function cannot return a value", "return", "");
         else if (*(parseContext.currentFunctionType) != (yyvsp[(2) - (3)].interm.intermTypedNode)->getType())
             parseContext.error((yyvsp[(1) - (3)].lex).loc, "function return is not matching type:", "return", "");
-    }
+    ;}
     break;
 
   case 363:
-/* Line 1792 of yacc.c  */
-#line 2432 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2432 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         parseContext.requireStage((yyvsp[(1) - (2)].lex).loc, EShLangFragmentMask, "discard");
         (yyval.interm.intermNode) = parseContext.intermediate.addBranch(EOpKill, (yyvsp[(1) - (2)].lex).loc);
-    }
+    ;}
     break;
 
   case 364:
-/* Line 1792 of yacc.c  */
-#line 2441 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2441 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode);
         parseContext.intermediate.setTreeRoot((yyval.interm.intermNode));
-    }
+    ;}
     break;
 
   case 365:
-/* Line 1792 of yacc.c  */
-#line 2445 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2445 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = parseContext.intermediate.growAggregate((yyvsp[(1) - (2)].interm.intermNode), (yyvsp[(2) - (2)].interm.intermNode));
         parseContext.intermediate.setTreeRoot((yyval.interm.intermNode));
-    }
+    ;}
     break;
 
   case 366:
-/* Line 1792 of yacc.c  */
-#line 2452 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2452 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode);
-    }
+    ;}
     break;
 
   case 367:
-/* Line 1792 of yacc.c  */
-#line 2455 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2455 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyval.interm.intermNode) = (yyvsp[(1) - (1)].interm.intermNode);
-    }
+    ;}
     break;
 
   case 368:
-/* Line 1792 of yacc.c  */
-#line 2461 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2461 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         (yyvsp[(1) - (1)].interm).intermAggregate = parseContext.handleFunctionPrototype((yyvsp[(1) - (1)].interm).loc, *(yyvsp[(1) - (1)].interm).function);
-    }
+    ;}
     break;
 
   case 369:
-/* Line 1792 of yacc.c  */
-#line 2464 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2464 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
     {
         //   May be best done as post process phase on intermediate code
         if (parseContext.currentFunctionType->getBasicType() != EbtVoid && ! parseContext.functionReturnsValue)
@@ -6906,25 +6716,14 @@ yyreduce:
         (yyval.interm.intermNode)->getAsAggregate()->setOptimize(parseContext.contextPragma.optimize);
         (yyval.interm.intermNode)->getAsAggregate()->setDebug(parseContext.contextPragma.debug);
         (yyval.interm.intermNode)->getAsAggregate()->addToPragmaTable(parseContext.contextPragma.pragmaTable);
-    }
+    ;}
     break;
 
 
-/* Line 1792 of yacc.c  */
-#line 6915 "glslang.tab.c"
+/* Line 1267 of yacc.c.  */
+#line 6725 "glslang.tab.c"
       default: break;
     }
-  /* User semantic actions sometimes alter yychar, and that requires
-     that yytoken be updated with the new translation.  We take the
-     approach of translating immediately before every use of yytoken.
-     One alternative is translating here after every semantic action,
-     but that translation would be missed if the semantic action invokes
-     YYABORT, YYACCEPT, or YYERROR immediately after altering yychar or
-     if it invokes YYBACKUP.  In the case of YYABORT or YYACCEPT, an
-     incorrect destructor might then be invoked immediately.  In the
-     case of YYERROR or YYBACKUP, subsequent parser actions might lead
-     to an incorrect destructor call or verbose syntax error message
-     before the lookahead is translated.  */
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
 
   YYPOPSTACK (yylen);
@@ -6932,6 +6731,7 @@ yyreduce:
   YY_STACK_PRINT (yyss, yyssp);
 
   *++yyvsp = yyval;
+
 
   /* Now `shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
@@ -6952,10 +6752,6 @@ yyreduce:
 | yyerrlab -- here on detecting error |
 `------------------------------------*/
 yyerrlab:
-  /* Make sure we have latest lookahead translation.  See comments at
-     user semantic actions for why this is necessary.  */
-  yytoken = yychar == YYEMPTY ? YYEMPTY : YYTRANSLATE (yychar);
-
   /* If not already recovering from an error, report this error.  */
   if (!yyerrstatus)
     {
@@ -6963,36 +6759,37 @@ yyerrlab:
 #if ! YYERROR_VERBOSE
       yyerror (YY_("syntax error"));
 #else
-# define YYSYNTAX_ERROR yysyntax_error (&yymsg_alloc, &yymsg, \
-                                        yyssp, yytoken)
       {
-        char const *yymsgp = YY_("syntax error");
-        int yysyntax_error_status;
-        yysyntax_error_status = YYSYNTAX_ERROR;
-        if (yysyntax_error_status == 0)
-          yymsgp = yymsg;
-        else if (yysyntax_error_status == 1)
-          {
-            if (yymsg != yymsgbuf)
-              YYSTACK_FREE (yymsg);
-            yymsg = (char *) YYSTACK_ALLOC (yymsg_alloc);
-            if (!yymsg)
-              {
-                yymsg = yymsgbuf;
-                yymsg_alloc = sizeof yymsgbuf;
-                yysyntax_error_status = 2;
-              }
-            else
-              {
-                yysyntax_error_status = YYSYNTAX_ERROR;
-                yymsgp = yymsg;
-              }
-          }
-        yyerror (yymsgp);
-        if (yysyntax_error_status == 2)
-          goto yyexhaustedlab;
+	YYSIZE_T yysize = yysyntax_error (0, yystate, yychar);
+	if (yymsg_alloc < yysize && yymsg_alloc < YYSTACK_ALLOC_MAXIMUM)
+	  {
+	    YYSIZE_T yyalloc = 2 * yysize;
+	    if (! (yysize <= yyalloc && yyalloc <= YYSTACK_ALLOC_MAXIMUM))
+	      yyalloc = YYSTACK_ALLOC_MAXIMUM;
+	    if (yymsg != yymsgbuf)
+	      YYSTACK_FREE (yymsg);
+	    yymsg = (char *) YYSTACK_ALLOC (yyalloc);
+	    if (yymsg)
+	      yymsg_alloc = yyalloc;
+	    else
+	      {
+		yymsg = yymsgbuf;
+		yymsg_alloc = sizeof yymsgbuf;
+	      }
+	  }
+
+	if (0 < yysize && yysize <= yymsg_alloc)
+	  {
+	    (void) yysyntax_error (yymsg, yystate, yychar);
+	    yyerror (yymsg);
+	  }
+	else
+	  {
+	    yyerror (YY_("syntax error"));
+	    if (yysize != 0)
+	      goto yyexhaustedlab;
+	  }
       }
-# undef YYSYNTAX_ERROR
 #endif
     }
 
@@ -7000,7 +6797,7 @@ yyerrlab:
 
   if (yyerrstatus == 3)
     {
-      /* If just tried and failed to reuse lookahead token after an
+      /* If just tried and failed to reuse look-ahead token after an
 	 error, discard it.  */
 
       if (yychar <= YYEOF)
@@ -7017,7 +6814,7 @@ yyerrlab:
 	}
     }
 
-  /* Else will try to reuse lookahead token after shifting the error
+  /* Else will try to reuse look-ahead token after shifting the error
      token.  */
   goto yyerrlab1;
 
@@ -7051,7 +6848,7 @@ yyerrlab1:
   for (;;)
     {
       yyn = yypact[yystate];
-      if (!yypact_value_is_default (yyn))
+      if (yyn != YYPACT_NINF)
 	{
 	  yyn += YYTERROR;
 	  if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
@@ -7074,9 +6871,10 @@ yyerrlab1:
       YY_STACK_PRINT (yyss, yyssp);
     }
 
-  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+  if (yyn == YYFINAL)
+    YYACCEPT;
+
   *++yyvsp = yylval;
-  YY_IGNORE_MAYBE_UNINITIALIZED_END
 
 
   /* Shift the error token.  */
@@ -7100,7 +6898,7 @@ yyabortlab:
   yyresult = 1;
   goto yyreturn;
 
-#if !defined yyoverflow || YYERROR_VERBOSE
+#ifndef yyoverflow
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
@@ -7111,14 +6909,9 @@ yyexhaustedlab:
 #endif
 
 yyreturn:
-  if (yychar != YYEMPTY)
-    {
-      /* Make sure we have latest lookahead translation.  See comments at
-         user semantic actions for why this is necessary.  */
-      yytoken = YYTRANSLATE (yychar);
-      yydestruct ("Cleanup: discarding lookahead",
-                  yytoken, &yylval);
-    }
+  if (yychar != YYEOF && yychar != YYEMPTY)
+     yydestruct ("Cleanup: discarding lookahead",
+		 yytoken, &yylval);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
@@ -7142,6 +6935,6 @@ yyreturn:
 }
 
 
-/* Line 2055 of yacc.c  */
-#line 2481 "C:/Users/Christophe/Documents/GitHub/glslang/glslang/MachineIndependent/glslang.y"
+#line 2481 "/Users/christophericcio/Documents/Repository/Github/glslang/glslang/MachineIndependent/glslang.y"
+
 
