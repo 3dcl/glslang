@@ -972,21 +972,61 @@ init_declarator_list
     }
     | init_declarator_list COMMA IDENTIFIER {
         $$ = $1;
-        parseContext.declareVariable($3.loc, *$3.string, $1.type);
+        parseContext.nonInitConstCheck($3.loc, *$3.string, $$.type);
+        parseContext.nonInitCheck($3.loc, *$3.string, $$.type);
     }
     | init_declarator_list COMMA IDENTIFIER array_specifier {
+        parseContext.nonInitConstCheck($3.loc, *$3.string, $1.type);
+        if (parseContext.profile == EEsProfile)
+            parseContext.arraySizeRequiredCheck($4.loc, $4.arraySizes->getSize());
+        parseContext.arrayDimCheck($3.loc, $1.type.arraySizes, $4.arraySizes);
+
         $$ = $1;
-        parseContext.declareVariable($3.loc, *$3.string, $1.type, $4.arraySizes);
+
+        if (! parseContext.arrayQualifierError($4.loc, $1.type)) {
+            $1.type.arraySizes = $4.arraySizes;
+            TVariable* variable;
+            parseContext.arrayCheck($4.loc, *$3.string, $1.type, variable);
+        }
     }
     | init_declarator_list COMMA IDENTIFIER array_specifier EQUAL initializer {
-        $$.type = $1.type;
-        TIntermNode* initNode = parseContext.declareVariable($3.loc, *$3.string, $1.type, $4.arraySizes, $6);
-        $$.intermAggregate = parseContext.intermediate.growAggregate($1.intermAggregate, initNode, $5.loc);
+        $$ = $1;
+
+        TVariable* variable = 0;
+        if (! parseContext.arrayQualifierError($4.loc, $1.type)) {
+            $1.type.arraySizes = $4.arraySizes;
+            parseContext.arrayCheck($4.loc, *$3.string, $1.type, variable);
+        }
+        parseContext.arrayDimCheck($3.loc, $1.type.arraySizes, $4.arraySizes);
+
+        parseContext.profileRequires($5.loc, ENoProfile, 120, "GL_3DL_array_objects", "initializer");
+
+        TIntermNode* intermNode;
+        if (! parseContext.executeInitializerError($3.loc, *$3.string, $1.type, $6, intermNode, variable)) {
+            //
+            // build the intermediate representation
+            //
+            if (intermNode)
+                $$.intermAggregate = parseContext.intermediate.growAggregate($1.intermNode, intermNode, $5.loc);
+            else
+                $$.intermAggregate = $1.intermAggregate;
+        } else
+            $$.intermAggregate = 0;
     }
     | init_declarator_list COMMA IDENTIFIER EQUAL initializer {
-        $$.type = $1.type;
-        TIntermNode* initNode = parseContext.declareVariable($3.loc, *$3.string, $1.type, 0, $5);
-        $$.intermAggregate = parseContext.intermediate.growAggregate($1.intermAggregate, initNode, $4.loc);
+        $$ = $1;
+
+        TIntermNode* intermNode;
+        if (!parseContext.executeInitializerError($3.loc, *$3.string, $1.type, $5, intermNode)) {
+            //
+            // build the intermediate representation
+            //
+            if (intermNode)
+                $$.intermAggregate = parseContext.intermediate.growAggregate($1.intermNode, intermNode, $4.loc);
+            else
+                $$.intermAggregate = $1.intermAggregate;
+        } else
+            $$.intermAggregate = 0;
     }
     ;
 
@@ -997,26 +1037,70 @@ single_declaration
         parseContext.updateTypedDefaults($1.loc, $$.type.qualifier, 0);
     }
     | fully_specified_type IDENTIFIER {
-        $$.type = $1;
         $$.intermAggregate = 0;
-        parseContext.declareVariable($2.loc, *$2.string, $1);
+        $$.type = $1;
+
+        parseContext.nonInitConstCheck($2.loc, *$2.string, $$.type);
+        parseContext.nonInitCheck($2.loc, *$2.string, $$.type);
+        
         parseContext.updateTypedDefaults($2.loc, $$.type.qualifier, $2.string);
     }
     | fully_specified_type IDENTIFIER array_specifier {
-        $$.type = $1;
         $$.intermAggregate = 0;
-        parseContext.declareVariable($2.loc, *$2.string, $1, $3.arraySizes);
+        parseContext.nonInitConstCheck($2.loc, *$2.string, $1);        
+        if (parseContext.profile == EEsProfile)
+            parseContext.arraySizeRequiredCheck($3.loc, $3.arraySizes->getSize());        
+        parseContext.arrayDimCheck($2.loc, $1.arraySizes, $3.arraySizes);
+
+        $$.type = $1;
+
+        if (! parseContext.arrayQualifierError($3.loc, $1)) {
+            $1.arraySizes = $3.arraySizes;
+            TVariable* variable;
+            parseContext.arrayCheck($3.loc, *$2.string, $1, variable);
+        }
         parseContext.updateTypedDefaults($2.loc, $$.type.qualifier, $2.string);
     }
-    | fully_specified_type IDENTIFIER array_specifier EQUAL initializer {
+    | fully_specified_type IDENTIFIER array_specifier EQUAL initializer {        
+        parseContext.arrayDimCheck($3.loc, $1.arraySizes, $3.arraySizes);
+
+        $$.intermAggregate = 0;
         $$.type = $1;
-        TIntermNode* initNode = parseContext.declareVariable($2.loc, *$2.string, $1, $3.arraySizes, $5);
-        $$.intermAggregate = parseContext.intermediate.growAggregate(0, initNode, $4.loc);
+
+        TVariable* variable = 0;
+        if (! parseContext.arrayQualifierError($3.loc, $1)) {
+            $1.arraySizes = $3.arraySizes;
+            parseContext.arrayCheck($3.loc, *$2.string, $1, variable);
+        }
+
+        parseContext.profileRequires($4.loc, ENoProfile, 120, "GL_3DL_array_objects", "initializer");
+
+        TIntermNode* intermNode;
+        if (!parseContext.executeInitializerError($2.loc, *$2.string, $1, $5, intermNode, variable)) {
+            //
+            // Build intermediate representation
+            //
+            if (intermNode)
+                $$.intermAggregate = parseContext.intermediate.makeAggregate(intermNode, $4.loc);
+            else
+                $$.intermAggregate = 0;
+        } else
+            $$.intermAggregate = 0;
     }
     | fully_specified_type IDENTIFIER EQUAL initializer {
         $$.type = $1;
-        TIntermNode* initNode = parseContext.declareVariable($2.loc, *$2.string, $1, 0, $4);
-        $$.intermAggregate = parseContext.intermediate.growAggregate(0, initNode, $3.loc);
+
+        TIntermNode* intermNode;
+        if (!parseContext.executeInitializerError($2.loc, *$2.string, $1, $4, intermNode)) {
+            //
+            // Build intermediate representation
+            //
+            if (intermNode)
+                $$.intermAggregate = parseContext.intermediate.makeAggregate(intermNode, $3.loc);
+            else
+                $$.intermAggregate = 0;
+        } else
+            $$.intermAggregate = 0;
     }
 
 // Grammar Note:  No 'enum', or 'typedef'.
@@ -1044,7 +1128,7 @@ fully_specified_type
                 parseContext.arraySizeRequiredCheck($2.loc, $2.arraySizes->getSize());
         }
 
-        if ($2.arraySizes && parseContext.arrayQualifierError($2.loc, $1.qualifier))
+        if ($2.arraySizes && parseContext.arrayQualifierError($2.loc, $1))
             $2.arraySizes = 0;
         
         parseContext.mergeQualifiers($2.loc, $2.qualifier, $1.qualifier, true);
@@ -2037,7 +2121,7 @@ struct_declaration
 
         $$ = $2;
 
-        parseContext.voidErrorCheck($1.loc, (*$2)[0].type->getFieldName(), $1.basicType);
+        parseContext.voidErrorCheck($1.loc, (*$2)[0].type->getFieldName(), $1);
         parseContext.precisionQualifierCheck($1.loc, $1);
 
         for (unsigned int i = 0; i < $$->size(); ++i) {
@@ -2055,7 +2139,7 @@ struct_declaration
 
         $$ = $3;
 
-        parseContext.voidErrorCheck($2.loc, (*$3)[0].type->getFieldName(), $2.basicType);
+        parseContext.voidErrorCheck($2.loc, (*$3)[0].type->getFieldName(), $2);
         parseContext.mergeQualifiers($2.loc, $2.qualifier, $1.qualifier, true);
         parseContext.precisionQualifierCheck($2.loc, $2);
 
@@ -2218,14 +2302,13 @@ condition
         parseContext.boolCheck($1->getLoc(), $1);
     }
     | fully_specified_type IDENTIFIER EQUAL initializer {
+        TIntermNode* intermNode;
         parseContext.boolCheck($2.loc, $1);
 
-        TType type($1);
-        TIntermNode* initNode = parseContext.declareVariable($2.loc, *$2.string, $1, 0, $4);
-        if (initNode)
-            $$ = initNode->getAsTyped();
-        else
+        if (parseContext.executeInitializerError($2.loc, *$2.string, $1, $4, intermNode))
             $$ = 0;
+        else
+            $$ = $4;
     }
     ;
 

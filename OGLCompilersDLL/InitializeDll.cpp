@@ -37,9 +37,8 @@
 #include <assert.h>
 
 #include "InitializeDll.h"
-#include "Include/InitializeGlobals.h"
-
-#include "Public/ShaderLang.h"
+#include "../glslang/Include/InitializeGlobals.h"
+#include "../glslang/Public/ShaderLang.h"
 
 namespace glslang {
 

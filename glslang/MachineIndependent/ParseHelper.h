@@ -100,12 +100,13 @@ public:
     void globalCheck(TSourceLoc, bool global, const char* token);
     bool constructorError(TSourceLoc, TIntermNode*, TFunction&, TOperator, TType&);
     void arraySizeCheck(TSourceLoc, TIntermTyped* expr, int& size);
-    bool arrayQualifierError(TSourceLoc, const TQualifier&);
+    bool arrayQualifierError(TSourceLoc, const TPublicType&);
     void arraySizeRequiredCheck(TSourceLoc, int size);
     void arrayDimError(TSourceLoc);
     void arrayDimCheck(TSourceLoc, TArraySizes* sizes1, TArraySizes* sizes2);
     void arrayDimCheck(TSourceLoc, const TType*, TArraySizes*);
-    bool voidErrorCheck(TSourceLoc, const TString&, TBasicType);
+    void arrayCheck(TSourceLoc, TString& identifier, const TPublicType&, TVariable*& variable);
+    bool voidErrorCheck(TSourceLoc, const TString&, const TPublicType&);
     void boolCheck(TSourceLoc, const TIntermTyped*);
     void boolCheck(TSourceLoc, const TPublicType&);
     bool samplerErrorCheck(TSourceLoc, const TPublicType& pType, const char* reason);
@@ -118,7 +119,9 @@ public:
     void precisionQualifierCheck(TSourceLoc, TPublicType&);
     void parameterSamplerCheck(TSourceLoc, TStorageQualifier qualifier, const TType& type);
     bool containsSampler(const TType& type);
-    TVariable* redeclareBuiltin(TSourceLoc, const TString&, const TType&, bool& newDeclaration);
+    void nonInitConstCheck(TSourceLoc, TString& identifier, TPublicType& type);
+    void nonInitCheck(TSourceLoc, TString& identifier, TPublicType& type);
+    TVariable* redeclare(TSourceLoc, const TString&, const TType&, bool& newDeclaration);
     void paramCheck(TSourceLoc, TStorageQualifier qualifier, TType* type);
     void nestedBlockCheck(TSourceLoc);
     void nestedStructCheck(TSourceLoc);
@@ -128,7 +131,8 @@ public:
     void mergeLayoutQualifiers(TSourceLoc, TQualifier& dest, const TQualifier& src);
 
     const TFunction* findFunction(TSourceLoc, TFunction* pfnCall, bool *builtIn = 0);
-    TIntermNode* declareVariable(TSourceLoc, TString& identifier, TPublicType&, TArraySizes* typeArray = 0, TIntermTyped* initializer = 0);
+    bool executeInitializerError(TSourceLoc, TString& identifier, TPublicType& pType,
+                                 TIntermTyped* initializer, TIntermNode*& intermNode, TVariable* variable = 0);
     TIntermTyped* addConstructor(TIntermNode*, const TType&, TOperator, TFunction*, TSourceLoc);
     TIntermTyped* constructStruct(TIntermNode*, const TType&, int, TSourceLoc);
     TIntermTyped* constructBuiltIn(const TType&, TOperator, TIntermNode*, TSourceLoc, bool subset);
@@ -166,11 +170,6 @@ public:
 protected:
     const char* getPreamble();
     TBehavior getExtensionBehavior(const char* behavior);
-    void nonInitConstCheck(TSourceLoc, TString& identifier, TType& type);
-    TVariable* declareNonArray(TSourceLoc, TString& identifier, TType&, bool& newDeclaration);
-    void declareArray(TSourceLoc, TString& identifier, const TType&, TVariable*&, bool& newDeclaration);
-    TIntermNode* executeInitializer(TSourceLoc, TString& identifier, TType&, TIntermTyped* initializer, TVariable* variable);
-
 
 public:
     //

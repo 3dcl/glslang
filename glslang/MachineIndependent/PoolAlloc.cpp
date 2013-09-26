@@ -35,8 +35,8 @@
 #include "../Include/PoolAlloc.h"
 #include "../Include/Common.h"
 
-#include "Include/InitializeGlobals.h"
-#include "osinclude.h"
+#include "../Include/InitializeGlobals.h"
+#include "../OSDependent/osinclude.h"
 
 namespace glslang {
 

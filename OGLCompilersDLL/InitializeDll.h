@@ -34,8 +34,7 @@
 #ifndef __INITIALIZEDLL_H
 #define __INITIALIZEDLL_H
 
-
-#include "osinclude.h"
+#include "../glslang/OSDependent/osinclude.h"
 
 namespace glslang {
 

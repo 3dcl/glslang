@@ -41,7 +41,7 @@
 #include <string.h>
 
 #include "Scan.h"
-#include "Include/Types.h"
+#include "../Include/Types.h"
 #include "SymbolTable.h"
 #include "glslang_tab.cpp.h"
 #include "ParseHelper.h"

@@ -644,8 +644,7 @@ TIntermAggregate* TIntermediate::growAggregate(TIntermNode* left, TIntermNode* r
 TIntermAggregate* TIntermediate::growAggregate(TIntermNode* left, TIntermNode* right, TSourceLoc loc)
 {
     TIntermAggregate* aggNode = growAggregate(left, right);
-    if (aggNode)
-        aggNode->setLoc(loc);
+    aggNode->setLoc(loc);
 
     return aggNode;
 }
