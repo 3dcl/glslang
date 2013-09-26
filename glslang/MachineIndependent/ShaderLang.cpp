@@ -125,7 +125,7 @@ bool InitializeSymbolTable(const TString& builtIns, int version, EProfile profil
     const char* builtInShaders[2];
     int builtInLengths[2];
     builtInShaders[0] = builtIns.c_str();
-    builtInLengths[0] = builtIns.size();
+    builtInLengths[0] = static_cast<int>(builtIns.size());
 
     if (! parseContext.parseShaderStrings(ppContext, const_cast<char**>(builtInShaders), builtInLengths, 1) != 0) {
         infoSink.info.message(EPrefixInternalError, "Unable to parse built-ins");
@@ -399,7 +399,7 @@ bool CompileDeferred(
     int* lengths = new int[numStrings];
     for (int s = 0; s < numStrings; ++s) {
         if (inputLengths == 0 || inputLengths[s] < 0)
-            lengths[s] = strlen(shaderStrings[s]);
+            lengths[s] = static_cast<int>(strlen(shaderStrings[s]));
         else
             lengths[s] = inputLengths[s];
     }

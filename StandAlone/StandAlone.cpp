@@ -513,7 +513,7 @@ bool CompileFile(const char *fileName, ShHandle compiler, int Options)
 
     // move to length-based strings, rather than null-terminated strings
     for (int s = 0; s < NumShaderStrings; ++s)
-        lengths[s] = strlen(shaderStrings[s]);
+        lengths[s] = static_cast<int>(strlen(shaderStrings[s]));
 
     if (! shaderStrings)
         return false;

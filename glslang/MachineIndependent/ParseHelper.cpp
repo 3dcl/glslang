@@ -137,7 +137,7 @@ bool TParseContext::parseShaderStrings(TPpContext& ppContext, char* strings[], i
     }
 
     if (getPreamble())
-        ppContext.setPreamble(getPreamble(), strlen(getPreamble()));
+        ppContext.setPreamble(getPreamble(), static_cast<int>(strlen(getPreamble())));
     ppContext.setShaderStrings(strings, lengths, numStrings);
 
     // TODO: desktop PP: a shader containing nothing but white space and comments is valid, even though it has no parse tokens

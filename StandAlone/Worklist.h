@@ -78,7 +78,7 @@ namespace glslang {
             return true;
         }
 
-        int size()
+        std::size_t size()
         {
             return worklist.size();
         }
