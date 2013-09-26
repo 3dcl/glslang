@@ -905,8 +905,8 @@ void TIntermediate::merge(TInfoSink& infoSink, TIntermediate& unit)
 {
     numMains += unit.numMains;
 
-    if (profile != EEsProfile && unit.profile == EEsProfile ||
-        profile == EEsProfile && unit.profile != EEsProfile)
+    if ((profile != EEsProfile && unit.profile == EEsProfile) ||
+        (profile == EEsProfile && unit.profile != EEsProfile))
         error(infoSink, "Cannot mix ES profile with non-ES profile shaders\n");
 
     if (unit.treeRoot == 0)
@@ -1264,8 +1264,8 @@ bool TIntermBinary::promote()
     case EOpInclusiveOrAssign:
     case EOpExclusiveOrAssign:
         // Check for integer-only operands.
-        if ( left->getBasicType() != EbtInt &&  left->getBasicType() != EbtUint ||
-            right->getBasicType() != EbtInt && right->getBasicType() != EbtUint)
+        if ((left->getBasicType() != EbtInt &&  left->getBasicType() != EbtUint) ||
+            (right->getBasicType() != EbtInt && right->getBasicType() != EbtUint))
             return false;
         if (left->isMatrix() || right->isMatrix())
             return false;
@@ -1442,8 +1442,8 @@ bool TIntermBinary::promote()
     case EOpSubAssign:
     case EOpDivAssign:
     case EOpModAssign:
-        if (left->isMatrix() && right->isVector() ||
-            left->isVector() && right->isMatrix() ||
+        if ((left->isMatrix() && right->isVector()) ||
+            (left->isVector() && right->isMatrix()) ||
             left->getBasicType() != right->getBasicType())
             return false;
         if (left->isMatrix() && right->isMatrix() && (left->getMatrixCols() != right->getMatrixCols() || left->getMatrixRows() != right->getMatrixRows()))

@@ -399,8 +399,8 @@ void TBuiltIns::initialize(int version, EProfile profile)
             s.append("bvec4 isinf(vec4  x);");
         }
 
-        if (profile == EEsProfile && version >= 300 ||
-            profile != EEsProfile && version >= 330) {
+        if ((profile == EEsProfile && version >= 300) ||
+            (profile != EEsProfile && version >= 330)) {
             s.append("int   floatBitsToInt(float value);");
             s.append("ivec2 floatBitsToInt(vec2  value);");
             s.append("ivec3 floatBitsToInt(vec3  value);");
@@ -422,8 +422,8 @@ void TBuiltIns::initialize(int version, EProfile profile)
             s.append("vec4  uintBitsToFloat(uvec4 value);");
         }
 
-        if (profile == EEsProfile && version >= 300 ||
-            profile != EEsProfile && version >= 400) {
+        if ((profile == EEsProfile && version >= 300) ||
+            (profile != EEsProfile && version >= 400)) {
             s.append(  "highp uint packSnorm2x16 (vec2);");
             s.append(  "highp vec2 unpackSnorm2x16 (highp uint);");
             s.append(  "highp uint packUnorm2x16 (vec2);");
@@ -587,8 +587,8 @@ void TBuiltIns::initialize(int version, EProfile profile)
         // Original-style texture Functions existing in both stages.
         // (Per-stage functions below.)
         //
-        if (profile == EEsProfile && version == 100 ||
-            profile == ECompatibilityProfile || version < FirstProfileVersion) {
+        if ((profile == EEsProfile && version == 100) ||
+            (profile == ECompatibilityProfile) || version < FirstProfileVersion) {
             s.append("vec4 texture2D(sampler2D, vec2);");
 
             s.append("vec4 texture2DProj(sampler2D, vec3);");
