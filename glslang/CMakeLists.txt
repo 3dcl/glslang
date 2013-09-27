@@ -6,7 +6,7 @@ file(GLOB ROOT_PUBLIC ./Public/*.h)
 if(WIN32)
 	file(GLOB ROOT_OSDEPENDENT ./OSDependent/Windows/*.cpp ./OSDependent/Windows/*.h)
 else()
-	file(GLOB ROOT_OSDEPENDENT ./OSDependent/Linux/*.cpp ./OSDependent/Linux/*.h)
+	file(GLOB ROOT_OSDEPENDENT ./OSDependent/Posix/*.cpp ./OSDependent/Posix/*.h)
 endif()
 
 source_group("Public Files" FILES ${ROOT_PUBLIC})

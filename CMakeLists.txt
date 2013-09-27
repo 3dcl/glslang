@@ -5,7 +5,7 @@ project(glslang)
 enable_testing()
 
 set(TARGET_GLSLANG glslang)
-set(TARGET_STANDALONE StandAlone)
+set(TARGET_STANDALONE glslangValidator)
 
 add_subdirectory(glslang)
 add_subdirectory(StandAlone)
