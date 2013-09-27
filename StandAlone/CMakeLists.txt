@@ -10,7 +10,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/glslang/public)
 add_executable(${TARGET_STANDALONE} ${ROOT_SOURCE} ${ROOT_HEADER} ${ROOT_CODEGEN} ${ROOT_OGLCOMPILIER})
 add_custom_command(
 	TARGET ${TARGET_STANDALONE} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_STANDALONE}> ${CMAKE_CURRENT_SOURCE_DIR}/../Install/${INSTALL_DIRECTORY})
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_STANDALONE}> ${CMAKE_CURRENT_SOURCE_DIR}/../Install/${INSTALL_DIRECTORY}
+	COMMENT "Copying glslangValidator into install directory")
 
 target_link_libraries(${TARGET_STANDALONE} ${TARGET_GLSLANG} ${BINARY_FILES})
 
