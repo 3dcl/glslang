@@ -37,10 +37,4 @@ add_custom_command(
 add_custom_command(
 	TARGET ${TARGET_GLSLANG} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_GLSLANG}> ${CMAKE_CURRENT_SOURCE_DIR}/../Install/${INSTALL_DIRECTORY})
-	
-if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
-endif()
-
-
 
