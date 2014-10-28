@@ -1,3 +1,5 @@
+find_package(Threads REQUIRED)
+
 file(GLOB ROOT_SOURCE *.cpp)
 file(GLOB ROOT_HEADER *.hpp *.inl *.h)
 file(GLOB ROOT_CODEGEN ../glslang/GenericCodeGen/*.cpp ../glslang/GenericCodeGen/*.h)
@@ -12,7 +14,7 @@ add_custom_command(
 	TARGET ${TARGET_STANDALONE} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_STANDALONE}> ${CMAKE_CURRENT_SOURCE_DIR}/../Install/${INSTALL_DIRECTORY})
 
-target_link_libraries(${TARGET_STANDALONE} ${TARGET_GLSLANG} ${BINARY_FILES})
+target_link_libraries(${TARGET_STANDALONE} ${TARGET_GLSLANG} ${BINARY_FILES} ${CMAKE_THREAD_LIBS_INIT})
 
 install(TARGETS ${TARGET_STANDALONE}
 	RUNTIME DESTINATION Debug/bin/${TARGET_STANDALONE}
