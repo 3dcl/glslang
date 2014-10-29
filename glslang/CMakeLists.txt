@@ -82,7 +82,8 @@ else(BISON_FOUND)
     set(BISON_GLSLParser_OUTPUT_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/glslang_tab.cpp)
 endif(BISON_FOUND)
 
-add_library(glslang STATIC ${BISON_GLSLParser_OUTPUT_SOURCE} ${SOURCES} ${HEADERS})
+add_library(glslang ${LIBRARY_TYPE} ${BISON_GLSLParser_OUTPUT_SOURCE} ${SOURCES} ${HEADERS})
+add_dependencies(glslang GLSLParser)
 
 if(WIN32)
     source_group("Public" REGULAR_EXPRESSION "Public/*")
@@ -94,6 +95,7 @@ if(WIN32)
 endif(WIN32)
 
 install(TARGETS glslang 
+        LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
 
 # find bison

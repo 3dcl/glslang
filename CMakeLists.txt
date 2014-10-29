@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(CMAKE_INSTALL_PREFIX "install" CACHE STRING "prefix" FORCE)
-
 project(glslang)
 
 if(WIN32)
@@ -12,6 +10,15 @@ elseif(UNIX)
 else(WIN32)
     message("unkown platform")
 endif(WIN32)
+
+# build option for static or dynamic add_library
+option(BUILD_STATIC "Build the glslang library as static library." OFF)
+
+if(BUILD_STATIC)
+  set(LIBRARY_TYPE STATIC)
+else()
+  set(LIBRARY_TYPE SHARED)
+endif()
 
 add_subdirectory(glslang)
 add_subdirectory(OGLCompilersDLL)

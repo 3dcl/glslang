@@ -34,6 +34,7 @@ endif(WIN32)
 install(TARGETS glslangValidator
         RUNTIME DESTINATION bin)
 
+
 #find_package(Threads REQUIRED)
 
 #file(GLOB ROOT_SOURCE *.cpp)

@@ -43,7 +43,8 @@
 
 #include "preprocessor/PpContext.h"
 
-extern int yyparse(glslang::TParseContext*);
+#include "glslang_tab.cpp.h"
+//extern int yyparse(glslang::TParseContext*);
 
 namespace glslang {
 
