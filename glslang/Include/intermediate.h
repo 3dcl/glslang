@@ -208,6 +208,12 @@ enum TOperator {
     EOpDPdx,            // Fragment only
     EOpDPdy,            // Fragment only
     EOpFwidth,          // Fragment only
+    EOpDPdxFine,        // Fragment only
+    EOpDPdyFine,        // Fragment only
+    EOpFwidthFine,      // Fragment only
+    EOpDPdxCoarse,      // Fragment only
+    EOpDPdyCoarse,      // Fragment only
+    EOpFwidthCoarse,    // Fragment only
 
     EOpMatrixTimesMatrix,
     EOpOuterProduct,
@@ -228,6 +234,15 @@ enum TOperator {
     EOpMemoryBarrierShared,  // compute only
     EOpGroupMemoryBarrier,   // compute only
 
+    EOpAtomicAdd,            // TODO: AST functionality: hook these up
+    EOpAtomicMin,
+    EOpAtomicMax,
+    EOpAtomicAnd,
+    EOpAtomicOr,
+    EOpAtomicXor,
+    EOpAtomicExchange,
+    EOpAtomicCompSwap,
+
     EOpAny,
     EOpAll,
 
@@ -247,7 +262,7 @@ enum TOperator {
     //
 
     EOpConstructGuardStart,
-    EOpConstructInt,
+    EOpConstructInt,          // these first scalar forms also identify what implicit conversion is needed
     EOpConstructUint,
     EOpConstructBool,
     EOpConstructFloat,
@@ -312,10 +327,11 @@ enum TOperator {
     // Array operators
     //
 
-    EOpArrayLength,
+    EOpArrayLength,      // "Array" distinguishes from length(v) built-in function, but it applies to vectors and matrices as well.
 };
 
 class TIntermTraverser;
+class TIntermOperator;
 class TIntermAggregate;
 class TIntermUnary;
 class TIntermBinary;
@@ -342,16 +358,29 @@ public:
     virtual glslang::TSourceLoc getLoc() const { return loc; }
     virtual void setLoc(glslang::TSourceLoc l) { loc = l; }
     virtual void traverse(glslang::TIntermTraverser*) = 0;
-    virtual glslang::TIntermTyped*     getAsTyped()         { return 0; }
-    virtual glslang::TIntermConstantUnion*     getAsConstantUnion()         { return 0; }
-    virtual glslang::TIntermAggregate* getAsAggregate()     { return 0; }
-    virtual glslang::TIntermUnary*     getAsUnaryNode()     { return 0; }
-    virtual glslang::TIntermBinary*    getAsBinaryNode()    { return 0; }
-    virtual glslang::TIntermSelection* getAsSelectionNode() { return 0; }
-    virtual glslang::TIntermSwitch*    getAsSwitchNode()    { return 0; }
-    virtual glslang::TIntermMethod*    getAsMethodNode()    { return 0; }
-    virtual glslang::TIntermSymbol*    getAsSymbolNode()    { return 0; }
-    virtual glslang::TIntermBranch*    getAsBranchNode()    { return 0; }
+    virtual       glslang::TIntermTyped*         getAsTyped()               { return 0; }
+    virtual       glslang::TIntermOperator*      getAsOperator()            { return 0; }
+    virtual       glslang::TIntermConstantUnion* getAsConstantUnion()       { return 0; }
+    virtual       glslang::TIntermAggregate*     getAsAggregate()           { return 0; }
+    virtual       glslang::TIntermUnary*         getAsUnaryNode()           { return 0; }
+    virtual       glslang::TIntermBinary*        getAsBinaryNode()          { return 0; }
+    virtual       glslang::TIntermSelection*     getAsSelectionNode()       { return 0; }
+    virtual       glslang::TIntermSwitch*        getAsSwitchNode()          { return 0; }
+    virtual       glslang::TIntermMethod*        getAsMethodNode()          { return 0; }
+    virtual       glslang::TIntermSymbol*        getAsSymbolNode()          { return 0; }
+    virtual       glslang::TIntermBranch*        getAsBranchNode()          { return 0; }
+
+    virtual const glslang::TIntermTyped*         getAsTyped()         const { return 0; }
+    virtual const glslang::TIntermOperator*      getAsOperator()      const { return 0; }
+    virtual const glslang::TIntermConstantUnion* getAsConstantUnion() const { return 0; }
+    virtual const glslang::TIntermAggregate*     getAsAggregate()     const { return 0; }
+    virtual const glslang::TIntermUnary*         getAsUnaryNode()     const { return 0; }
+    virtual const glslang::TIntermBinary*        getAsBinaryNode()    const { return 0; }
+    virtual const glslang::TIntermSelection*     getAsSelectionNode() const { return 0; }
+    virtual const glslang::TIntermSwitch*        getAsSwitchNode()    const { return 0; }
+    virtual const glslang::TIntermMethod*        getAsMethodNode()    const { return 0; }
+    virtual const glslang::TIntermSymbol*        getAsSymbolNode()    const { return 0; }
+    virtual const glslang::TIntermBranch*        getAsBranchNode()    const { return 0; }
     virtual ~TIntermNode() { }
 protected:
     glslang::TSourceLoc loc;
@@ -373,7 +402,8 @@ struct TIntermNodePair {
 class TIntermTyped : public TIntermNode {
 public:
 	TIntermTyped(const TType& t) { type.shallowCopy(t); }
-    virtual TIntermTyped* getAsTyped()         { return this; }
+    virtual       TIntermTyped* getAsTyped()       { return this; }
+    virtual const TIntermTyped* getAsTyped() const { return this; }
     virtual void setType(const TType& t) { type.shallowCopy(t); }
     virtual const TType& getType() const { return type; }
     virtual TType& getWritableType() { return type; }
@@ -389,6 +419,7 @@ public:
     virtual bool isArray()  const { return type.isArray(); }
     virtual bool isVector() const { return type.isVector(); }
     virtual bool isScalar() const { return type.isScalar(); }
+    virtual bool isStruct() const { return type.isStruct(); }
     TString getCompleteString() const { return type.getCompleteString(); }
 
 protected:
@@ -425,7 +456,8 @@ public:
     TIntermBranch(TOperator op, TIntermTyped* e) :
         flowOp(op),
         expression(e) { }
-    virtual TIntermBranch* getAsBranchNode() { return this; }
+    virtual       TIntermBranch* getAsBranchNode()       { return this; }
+    virtual const TIntermBranch* getAsBranchNode() const { return this; }
     virtual void traverse(TIntermTraverser*);
     TOperator getFlowOp() { return flowOp; }
     TIntermTyped* getExpression() { return expression; }
@@ -442,7 +474,8 @@ protected:
 class TIntermMethod : public TIntermTyped {
 public:
     TIntermMethod(TIntermTyped* o, const TType& t, const TString& m) : TIntermTyped(t), object(o), method(m) { }
-    virtual TIntermMethod* getAsMethodNode() { return this; }
+    virtual       TIntermMethod* getAsMethodNode()       { return this; }
+    virtual const TIntermMethod* getAsMethodNode() const { return this; }
     virtual const TString& getMethodName() const { return method; }
     virtual TIntermTyped* getObject() const { return object; }
     virtual void traverse(TIntermTraverser*);
@@ -457,30 +490,38 @@ protected:
 class TIntermSymbol : public TIntermTyped {
 public:
 	// if symbol is initialized as symbol(sym), the memory comes from the poolallocator of sym. If sym comes from
-	// per process globalpoolallocator, then it causes increased memory usage per compile
+	// per process threadPoolAllocator, then it causes increased memory usage per compile
 	// it is essential to use "symbol = sym" to assign to symbol
     TIntermSymbol(int i, const TString& n, const TType& t) : 
-        TIntermTyped(t), id(i)  { name = n;} 
+        TIntermTyped(t), id(i) { name = n;} 
     virtual int getId() const { return id; }
     virtual const TString& getName() const { return name; }
     virtual void traverse(TIntermTraverser*);
-    virtual TIntermSymbol* getAsSymbolNode() { return this; }
+    virtual       TIntermSymbol* getAsSymbolNode()       { return this; }
+    virtual const TIntermSymbol* getAsSymbolNode() const { return this; }
+    void setConstArray(const TConstUnionArray& c) { unionArray = c; }
+    const TConstUnionArray& getConstArray() const { return unionArray; }
 protected:
     int id;
     TString name;
+    TConstUnionArray unionArray;
 };
 
 class TIntermConstantUnion : public TIntermTyped {
 public:
-    TIntermConstantUnion(TConstUnion *unionPointer, const TType& t) : TIntermTyped(t), unionArrayPointer(unionPointer) { }
-    TConstUnion* getUnionArrayPointer() const { return unionArrayPointer; }
-    void setUnionArrayPointer(TConstUnion *c) { unionArrayPointer = c; }
-    virtual TIntermConstantUnion* getAsConstantUnion()  { return this; }
-    virtual void traverse(TIntermTraverser* );
-    virtual TIntermTyped* fold(TOperator, TIntermTyped*);
-    virtual TIntermTyped* fold(TOperator, const TType&);
+    TIntermConstantUnion(const TConstUnionArray& ua, const TType& t) : TIntermTyped(t), unionArray(ua), literal(false) { }
+    const TConstUnionArray& getConstArray() const { return unionArray; }
+    virtual       TIntermConstantUnion* getAsConstantUnion()       { return this; }
+    virtual const TIntermConstantUnion* getAsConstantUnion() const { return this; }
+    virtual void traverse(TIntermTraverser*);
+    virtual TIntermTyped* fold(TOperator, const TIntermTyped*) const;
+    virtual TIntermTyped* fold(TOperator, const TType&) const;
+    void setLiteral() { literal = true; }
+    void setExpression() { literal = false; }
+    bool isLiteral() const { return literal; }
 protected:
-    TConstUnion *unionArrayPointer;
+    const TConstUnionArray unionArray;
+    bool literal;  // true if node represents a literal in the source code
 };
 
 //
@@ -488,6 +529,8 @@ protected:
 //
 class TIntermOperator : public TIntermTyped {
 public:
+    virtual       TIntermOperator* getAsOperator()       { return this; }
+    virtual const TIntermOperator* getAsOperator() const { return this; }
     TOperator getOp() { return op; }
     bool modifiesState() const;
     bool isConstructor() const;
@@ -509,7 +552,8 @@ public:
     virtual void setRight(TIntermTyped* n) { right = n; }
     virtual TIntermTyped* getLeft() const { return left; }
     virtual TIntermTyped* getRight() const { return right; }
-    virtual TIntermBinary* getAsBinaryNode() { return this; }
+    virtual       TIntermBinary* getAsBinaryNode()       { return this; }
+    virtual const TIntermBinary* getAsBinaryNode() const { return this; }
     virtual bool promote();
     virtual void updatePrecision();
 protected:
@@ -527,7 +571,8 @@ public:
     virtual void traverse(TIntermTraverser*);
     virtual void setOperand(TIntermTyped* o) { operand = o; }
     virtual TIntermTyped* getOperand() { return operand; }
-    virtual TIntermUnary* getAsUnaryNode() { return this; }
+    virtual       TIntermUnary* getAsUnaryNode()       { return this; }
+    virtual const TIntermUnary* getAsUnaryNode() const { return this; }
     virtual bool promote();
     virtual void updatePrecision();
 protected:
@@ -544,7 +589,8 @@ public:
     TIntermAggregate() : TIntermOperator(EOpNull), userDefined(false), pragmaTable(0) { }
     TIntermAggregate(TOperator o) : TIntermOperator(o), pragmaTable(0) { }
 	~TIntermAggregate() { delete pragmaTable; }
-    virtual TIntermAggregate* getAsAggregate() { return this; }
+    virtual       TIntermAggregate* getAsAggregate()       { return this; }
+    virtual const TIntermAggregate* getAsAggregate() const { return this; }
     virtual void setOperator(TOperator o) { op = o; }
     virtual TIntermSequence& getSequence() { return sequence; }
     virtual const TIntermSequence& getSequence() const { return sequence; }
@@ -583,10 +629,11 @@ public:
     TIntermSelection(TIntermTyped* cond, TIntermNode* trueB, TIntermNode* falseB, const TType& type) :
         TIntermTyped(type), condition(cond), trueBlock(trueB), falseBlock(falseB) {}
     virtual void traverse(TIntermTraverser*);
-    virtual TIntermNode* getCondition() const { return condition; }
+    virtual TIntermTyped* getCondition() const { return condition; }
     virtual TIntermNode* getTrueBlock() const { return trueBlock; }
     virtual TIntermNode* getFalseBlock() const { return falseBlock; }
-    virtual TIntermSelection* getAsSelectionNode() { return this; }
+    virtual       TIntermSelection* getAsSelectionNode()       { return this; }
+    virtual const TIntermSelection* getAsSelectionNode() const { return this; }
 protected:
     TIntermTyped* condition;
     TIntermNode* trueBlock;
@@ -605,10 +652,18 @@ public:
     virtual void traverse(TIntermTraverser*);
     virtual TIntermNode* getCondition() const { return condition; }
     virtual TIntermAggregate* getBody() const { return body; }
-    virtual TIntermSwitch* getAsSwitchNode() { return this; }
+    virtual       TIntermSwitch* getAsSwitchNode()       { return this; }
+    virtual const TIntermSwitch* getAsSwitchNode() const { return this; }
 protected:
     TIntermTyped* condition;
     TIntermAggregate* body;
+};
+
+enum TVisit
+{
+    EvPreVisit,
+    EvInVisit,
+    EvPostVisit
 };
 
 //
@@ -619,39 +674,67 @@ protected:
 // When using this, just fill in the methods for nodes you want visited.
 // Return false from a pre-visit to skip visiting that node's subtree.
 //
+// Explicitly set postVisit to true if you want post visiting, otherwise,
+// filled in methods will only be called at pre-visit time (before processing
+// the subtree).  Similary for inVisit for in-order visiting of nodes with
+// multiple children.
+//
+// If you only want post-visits, explicitly turn off preVisit (and inVisit) 
+// and turn on postVisit.
+//
 class TIntermTraverser {
 public:
-    POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
+    POOL_ALLOCATOR_NEW_DELETE(glslang::GetThreadPoolAllocator())
+    TIntermTraverser(bool preVisit = true, bool inVisit = false, bool postVisit = false, bool rightToLeft = false) :
+            preVisit(preVisit),
+            inVisit(inVisit),
+            postVisit(postVisit),
+            rightToLeft(rightToLeft),
+            depth(0),
+            maxDepth(0) { }
+    virtual ~TIntermTraverser() { }
 
-    TIntermTraverser() : 
-        visitSymbol(0), 
-        visitConstantUnion(0),
-        visitBinary(0),
-        visitUnary(0),
-        visitSelection(0),
-        visitAggregate(0),
-        visitLoop(0),
-        visitBranch(0),
-        visitSwitch(0),
-        depth(0),
-        preVisit(true),
-        postVisit(false),
-        rightToLeft(false) {}
+    virtual void visitSymbol(TIntermSymbol*)                     { }
+    virtual void visitConstantUnion(TIntermConstantUnion*)       { }
+    virtual bool visitBinary(TVisit visit, TIntermBinary*)       { return true; }
+    virtual bool visitUnary(TVisit visit, TIntermUnary*)         { return true; }
+    virtual bool visitSelection(TVisit visit, TIntermSelection*) { return true; }
+    virtual bool visitAggregate(TVisit visit, TIntermAggregate*) { return true; }
+    virtual bool visitLoop(TVisit visit, TIntermLoop*)           { return true; }
+    virtual bool visitBranch(TVisit visit, TIntermBranch*)       { return true; }
+    virtual bool visitSwitch(TVisit, TIntermSwitch* node)        { return true; }
 
-    void (*visitSymbol)(TIntermSymbol*, TIntermTraverser*);
-    void (*visitConstantUnion)(TIntermConstantUnion*, TIntermTraverser*);
-    bool (*visitBinary)(bool preVisit, TIntermBinary*, TIntermTraverser*);
-    bool (*visitUnary)(bool preVisit, TIntermUnary*, TIntermTraverser*);
-    bool (*visitSelection)(bool preVisit, TIntermSelection*, TIntermTraverser*);
-    bool (*visitAggregate)(bool preVisit, TIntermAggregate*, TIntermTraverser*);
-    bool (*visitLoop)(bool preVisit, TIntermLoop*, TIntermTraverser*);
-    bool (*visitBranch)(bool preVisit, TIntermBranch*,  TIntermTraverser*);
-    bool (*visitSwitch)(bool preVisit, TIntermSwitch*,  TIntermTraverser*);
+    int getMaxDepth() const { return maxDepth; }
 
-    int  depth;
-    bool preVisit;
-    bool postVisit;
-    bool rightToLeft;
+    void incrementDepth(TIntermNode *current)
+    {
+        depth++;
+        maxDepth = std::max(maxDepth, depth);
+        path.push_back(current);
+    }
+
+    void decrementDepth()
+    {
+        depth--;
+        path.pop_back();
+    }
+
+    TIntermNode *getParentNode()
+    {
+        return path.size() == 0 ? NULL : path.back();
+    }
+
+    const bool preVisit;
+    const bool inVisit;
+    const bool postVisit;
+    const bool rightToLeft;
+
+protected:
+    int depth;
+    int maxDepth;
+
+    // All the nodes from root to the current node's parent during traversing.
+    TVector<TIntermNode *> path;
 };
 
 } // end namespace glslang

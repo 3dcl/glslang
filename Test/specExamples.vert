@@ -23,7 +23,7 @@ layout(location = 6) in vec4 colors[3];
 layout(location = 9) in mat4 transforms[2];
 
 layout(location = 3) struct S {
-    vec3 a;
+    vec3 a1;
     mat2 b;
     vec4 c[2];
 } s;
@@ -82,14 +82,14 @@ uniform sampler2D s17;                   // okay, s still bound at 3
 // in another compilation unit...
 //layout(binding=4) uniform sampler2D s; // ERROR: contradictory bindings
 
-layout (binding = 2, offset = 4) uniform atomic_uint a;
+layout (binding = 2, offset = 4) uniform atomic_uint a2;
 
 layout (binding = 2) uniform atomic_uint bar;
 
 layout (binding = 2, offset = 4) uniform atomic_uint;
 
 layout (binding = 2) uniform atomic_uint bar; // offset is 4
-layout (offset = 8) uniform atomic_uint bar;  // error, no default binding
+layout (offset = 8) uniform atomic_uint bar23;  // error, no default binding
 
 layout (binding=3, offset=4) uniform atomic_uint a2; // offset = 4
 layout (binding=2) uniform atomic_uint b2;           // offset = 0
@@ -108,8 +108,8 @@ flat out vec4 gl_FrontColor;  // output from geometry shader
 
 invariant gl_Position;   // make existing gl_Position be invariant
 
-out vec3 Color;
-invariant Color;         // make existing Color be invariant
+out vec3 ColorInv;
+invariant ColorIvn;      // make existing Color be invariant
 
 invariant centroid out vec3 Color4;
 precise out vec4 position;
@@ -124,9 +124,9 @@ coherent buffer Block {
     vec4 member2;
 };
 
-buffer Block2 {
-    coherent readonly vec4 member1;
-    coherent vec4 member2;
+buffer Block2a {
+    coherent readonly vec4 member1A;
+    coherent vec4 member2A;
 };
 
 shared vec4 shv;

@@ -41,8 +41,8 @@ namespace glslang {
 
 class TConstUnion {
 public:
-
     POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
+
     void setIConst(int i)
     { 
         iConst = i; 
@@ -394,9 +394,9 @@ public:
         return returnValue;
     }
 
-    TBasicType getType() { return type; }
-private:
+    TBasicType getType() const { return type; }
 
+private:
     union  {
         int iConst;          // used for ivec, scalar ints
         unsigned int uConst; // used for uvec, scalar uints
@@ -405,6 +405,81 @@ private:
     } ;
 
     TBasicType type;
+};
+
+// Encapsulate having a pointer to an array of TConstUnion,
+// which only needs to be allocated if it's size is going to be
+// bigger than 0.
+//
+// One convenience is being able to use [] to go inside the array, instead
+// of C++ assuming it as an array of pointers to vectors.
+//
+// General usage is that the size is known up front, and it is 
+// created once with the proper size.
+//
+class TConstUnionArray {
+public:
+    POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
+
+    TConstUnionArray() : unionArray(0) { }
+    virtual ~TConstUnionArray() { }
+
+    explicit TConstUnionArray(int size)
+    {
+        if (size == 0)
+            unionArray = 0;
+        else
+            unionArray =  new TConstUnionVector(size);
+    }
+    TConstUnionArray(const TConstUnionArray& a) : unionArray(a.unionArray) { }
+    TConstUnionArray(const TConstUnionArray& a, int start, int size)
+    {
+        unionArray = new TConstUnionVector(size);
+        for (int i = 0; i < size; ++i)
+            (*unionArray)[i] = a[start + i];
+    }
+
+    // Use this constructor for a smear operation
+    TConstUnionArray(int size, const TConstUnion& val)
+    {
+        unionArray = new TConstUnionVector(size, val);
+    }
+
+    int size() const { return unionArray ? (int)unionArray->size() : 0; }
+    TConstUnion& operator[](size_t index) { return (*unionArray)[index]; }
+    const TConstUnion& operator[](size_t index) const { return (*unionArray)[index]; }
+    bool operator==(const TConstUnionArray& rhs) const
+    {
+        // this includes the case that both are unallocated
+        if (unionArray == rhs.unionArray)
+            return true;
+
+        if (! unionArray || ! rhs.unionArray)
+            return false;
+
+        if (! unionArray || ! rhs.unionArray)
+            return false;
+
+        return *unionArray == *rhs.unionArray;
+    }
+    bool operator!=(const TConstUnionArray& rhs) const { return ! operator==(rhs); }
+
+    double dot(const TConstUnionArray& rhs)
+    {
+        assert(rhs.unionArray->size() == unionArray->size());
+        double sum = 0.0;
+
+        for (size_t comp = 0; comp < unionArray->size(); ++comp)
+            sum += (*this)[comp].getDConst() * rhs[comp].getDConst();
+
+        return sum;
+    }
+
+    bool empty() const { return unionArray == 0; }
+
+protected:
+    typedef TVector<TConstUnion> TConstUnionVector;
+    TConstUnionVector* unionArray;
 };
 
 } // end namespace glslang

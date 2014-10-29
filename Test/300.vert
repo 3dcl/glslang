@@ -65,4 +65,110 @@ uniform ub {
     int a[];        // ERROR
 } ubInst[];         // ERROR
 void foo(int a[]);  // ERROR
-float okayA[] = float[](3.0, 4.0);  // Okay
+float okayA[] = float[](3.0f, 4.0F);  // Okay
+
+out vec3 newV;
+void newVFun()
+{
+    newV = v3;
+}
+
+invariant newV;  // ERROR, variable already used
+in vec4 invIn;
+invariant invIn; // ERROR, in v300
+out S s2;
+invariant s2;
+invariant out S s3;
+flat out int;
+
+uniform ub2 {
+    float f;
+} a;
+
+uniform ub2 {  // ERROR redeclaration of block name (same instance name)
+    float g;
+} a;
+
+uniform ub2 {  // ERROR redeclaration of block name (different instance name)
+    float f;
+} c;
+
+uniform ub2 {  // ERROR redeclaration of block name (no instance name)
+    float f123;
+};
+
+uniform ub3 {
+    bool b23;
+};
+
+uniform ub3 {  // ERROR redeclaration of block name (no instance name in first or declared)
+    bool b234;
+};
+
+precision lowp sampler3D;
+precision lowp sampler2DShadow;
+precision lowp sampler2DArrayShadow;
+
+uniform sampler2D s2D;
+uniform sampler3D s3D;
+uniform sampler2DShadow s2DS;
+uniform sampler2DArrayShadow s2DAS;
+in vec2 c2D;
+
+void foo23()
+{
+    ivec2 x1 = textureSize(s2D, 2);
+    textureSize(s2D);        // ERROR, no lod
+    ivec3 x3 = textureSize(s2DAS, -1);
+    textureSize(s2DAS);      // ERROR, no lod
+    vec4 x4 = texture(s2D, c2D);
+    texture(s2D, c2D, 0.2);  // ERROR, bias
+    vec4 x5 = textureProjOffset(s3D, vec4(0.2), ivec3(1));
+    textureProjOffset(s3D, vec4(0.2), ivec3(1), .03);  // ERROR, bias
+    float x6 = textureProjGradOffset(s2DS, invIn, vec2(4.2), vec2(5.3), ivec2(1));
+}
+
+int fgfg(float f, mediump int i);
+int fgfg(float f, highp int i);   // ERROR, precision qualifier difference
+
+int fgfgh(float f, const in mediump int i);
+int fgfgh(float f, in mediump int i);   // ERROR, precision qualifier difference
+
+void foo2349()
+{
+    float[] x = float[] (1.0, 2.0, 3.0);
+	float[] y = x;
+    float[3] z = x;
+    float[3] w;
+    w = y;
+}
+
+int[] foo213234();        // ERROR
+int foo234234(float[]);   // ERROR
+int foo234235(vec2[] v);  // ERROR
+precision highp float[2]; // ERROR
+
+int fffg(float f);
+int fffg(float f);
+
+int gggf(float f);
+int gggf(float f) { return 2; }
+int gggf(float f);
+
+int agggf(float f) { return 2; }
+int agggf(float f);
+
+out struct Ssss { float f; } ssss;
+
+uniform Bblock {
+   int a;
+} Binst;
+int Bfoo;
+
+layout(std140) Binst;    // ERROR
+layout(std140) Bblock;   // ERROR
+layout(std140) Bfoo;     // ERROR
+
+struct SNA {
+    int a[];             // ERROR
+};

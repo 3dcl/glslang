@@ -37,7 +37,7 @@
 #ifndef _COMMON_INCLUDED_
 #define _COMMON_INCLUDED_
 
-#ifdef _WIN32
+#if defined _MSC_VER || defined MINGW_HAS_SECURE_API
     #include <basetsd.h>
     #define snprintf sprintf_s
     #define safe_vsprintf(buf,max,format,args) vsnprintf_s((buf), (max), (max), (format), (args))
@@ -62,6 +62,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <algorithm>
 #include <string>
 #include <stdio.h>
 #include <assert.h>
@@ -91,11 +92,21 @@ namespace glslang {
 // Pool version of string.
 //
 typedef pool_allocator<char> TStringAllocator;
-typedef std::basic_string <char, std::char_traits<char>, TStringAllocator > TString;
+typedef std::basic_string <char, std::char_traits<char>, TStringAllocator> TString;
 inline TString* NewPoolTString(const char* s)
 {
 	void* memory = GetThreadPoolAllocator().allocate(sizeof(TString));
 	return new(memory) TString(s);
+}
+
+template<class T> inline T* NewPoolObject(T)
+{
+    return new(GetThreadPoolAllocator().allocate(sizeof(T))) T;
+}
+
+template<class T> inline T* NewPoolObject(T, int instances)
+{
+    return new(GetThreadPoolAllocator().allocate(instances * sizeof(T))) T[instances];
 }
 
 //
@@ -103,10 +114,13 @@ inline TString* NewPoolTString(const char* s)
 //
 template <class T> class TVector : public std::vector<T, pool_allocator<T> > {
 public:
+    POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
+
     typedef typename std::vector<T, pool_allocator<T> >::size_type size_type;
     TVector() : std::vector<T, pool_allocator<T> >() {}
     TVector(const pool_allocator<T>& a) : std::vector<T, pool_allocator<T> >(a) {}
-    TVector(size_type i): std::vector<T, pool_allocator<T> >(i) {}
+    TVector(size_type i) : std::vector<T, pool_allocator<T> >(i) {}
+    TVector(size_type i, const T& val) : std::vector<T, pool_allocator<T> >(i, val) {}
 };
 
 template <class T> class TList   : public TBaseList  <T, pool_allocator<T> > {
@@ -152,11 +166,11 @@ inline const TString String(const int i, const int base = 10)
 {
     char text[16];     // 32 bit ints are at most 10 digits in base 10
     
-    #ifdef _WIN32
-        _itoa_s(i, text, base);
+    #if defined _MSC_VER || defined MINGW_HAS_SECURE_API
+        _itoa_s(i, text, sizeof(text), base);
     #else
         // we assume base 10 for all cases
-        sprintf(text, "%d", i);
+        snprintf(text, sizeof(text), "%d", i);
     #endif
 
     return text;
@@ -171,6 +185,25 @@ typedef TMap<TString, TString> TPragmaTable;
 typedef TMap<TString, TString>::tAllocator TPragmaTableAllocator;
 
 const int GlslangMaxTokenLength = 1024;
+
+template <class T> bool IsPow2(T powerOf2)
+{
+    return (powerOf2 & (powerOf2 - 1)) == 0;
+}
+
+// Round number up to a multiple of the given powerOf2, which is not
+// a power, just a number that must be a power of 2.
+template <class T> void RoundToPow2(T& number, int powerOf2)
+{
+    assert(IsPow2(powerOf2));
+    number = (number + powerOf2 - 1) & ~(powerOf2 - 1);
+}
+
+template <class T> bool IsMultipleOfPow2(T number, int powerOf2)
+{
+    assert(IsPow2(powerOf2));
+    return ! (number & (powerOf2 - 1));
+}
 
 } // end namespace glslang
 

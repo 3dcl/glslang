@@ -84,47 +84,79 @@ NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace glslang {
 
 TPpContext::TPpContext(TParseContext& pc) : 
-    parseContext(pc), preamble(0), strings(0), notAVersionToken(false),
-    ScopeList(0), CurrentScope(0), GlobalScope(0)
+    preamble(0), strings(0), parseContext(pc), inComment(false)
 {
-    InitAtomTable(&atomTable, 0);
+    InitAtomTable();
     InitScanner(this);
 
     ifdepth = 0;
     for (elsetracker = 0; elsetracker < maxIfNesting; elsetracker++)
-        elsedepth[elsetracker] = 0;
+        elseSeen[elsetracker] = false;
     elsetracker = 0;
+    
+    // The following identifies all legal characters in GLSL:
+
+    //for (int c = 0; c < 256; ++c)
+    //    languageCharacters[c] = false;
+    //for (int c = 'a'; c <= 'z'; ++c)
+    //    languageCharacters[c] = true;
+    //for (int c = 'A'; c <= 'Z'; ++c)
+    //    languageCharacters[c] = true;
+    //languageCharacters['_'] = true;
+    //for (int c = '0'; c <= '9'; ++c)
+    //    languageCharacters[c] = true;
+    //languageCharacters['.'] = true;
+    //languageCharacters['+'] = true;
+    //languageCharacters['-'] = true;
+    //languageCharacters['/'] = true;
+    //languageCharacters['*'] = true;
+    //languageCharacters['%'] = true;
+    //languageCharacters['<'] = true;
+    //languageCharacters['>'] = true;
+    //languageCharacters['['] = true;
+    //languageCharacters[']'] = true;
+    //languageCharacters['('] = true;
+    //languageCharacters[')'] = true;
+    //languageCharacters['{'] = true;
+    //languageCharacters['}'] = true;
+    //languageCharacters['^'] = true;
+    //languageCharacters['|'] = true;
+    //languageCharacters['&'] = true;
+    //languageCharacters['~'] = true;
+    //languageCharacters['='] = true;
+    //languageCharacters['!'] = true;
+    //languageCharacters[':'] = true;
+    //languageCharacters[';'] = true;
+    //languageCharacters[','] = true;
+    //languageCharacters['?'] = true;
+    //languageCharacters['#'] = true;
+
+    //// white space
+    //languageCharacters[' '] = true;
+    //for (int c = 9; c <= 13; ++c)
+    //    languageCharacters[c] = true;
 }
 
 TPpContext::~TPpContext()
 {
+    for (TSymbolMap::iterator it = symbols.begin(); it != symbols.end(); ++it)
+        delete it->second->mac.body;
+    mem_FreePool(pool);
     delete [] preamble;
-    FreeAtomTable(&atomTable);
-    FreeScanner();
+
+    // free up the inputStack
+    while (! inputStack.empty())
+        popInput();
 }
 
-void TPpContext::setPreamble(const char* p, int l)
+void TPpContext::setInput(TInputScanner& input, bool versionWillBeError)
 {
-    if (p && l > 0) {
-        // preAmble could be a hard-coded string; make writable copy
-        // TODO: efficiency PP: make it not need writable strings
-        preambleLength = l;
-        preamble = new char[preambleLength + 1];
-        memcpy(preamble, p, preambleLength + 1);  // TODO: PP: assuming nul-terminated strings
-        ScanFromString(preamble);
-        currentString = -1;
-    }
-}
+    assert(inputStack.size() == 0);
 
-void TPpContext::setShaderStrings(char* s[], int l[], int n)
-{
-    strings = s;
-    lengths = l;
-    numStrings = n;
-    if (! preamble) {
-        ScanFromString(strings[0]);
-        currentString = 0;
-    }
+    pushInput(new tStringInput(this, input));
+
+    errorOnVersion = versionWillBeError;
+    versionSeen = false;
 }
 
 } // end namespace glslang

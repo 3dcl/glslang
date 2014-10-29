@@ -18,7 +18,7 @@ void main()
     {
     }
 
-    switch(c)        // ERROR, not enough stuff after last label
+    switch(c)        // WARNING, not enough stuff after last label
     {
     case 2:
     }
@@ -87,4 +87,71 @@ void main()
     }
 
     break;            // ERROR
+
+    switch (c) {
+    case 1:
+        f = sin(x);
+        break;
+    case 2:
+        switch (d) {
+        case 1:
+            {
+                case 4:        // ERROR
+                    break;
+            }
+            f = x * x * x;
+            if (c < d) {
+                case 2:         // ERROR
+                    f = x * x;
+            }
+            if (d < c)
+                case 3:         // ERROR
+            break;
+        }
+        break;
+    case 4:
+        f = tan(x);
+        if (f < 0.0)
+            default:            // ERROR
+                break;
+    }
+
+    case 5:  // ERROR
+    default: // ERROR
+
+    switch (0) {
+        default:
+        int onlyInSwitch = 0;
+    }
+    onlyInSwitch;   // ERROR
+   
+    switch (0) {
+        default:
+            int x;  // WARNING (was "no statement" ERROR, but spec. changed because unclear what a statement is)
+    }
+
+    switch (c) {
+    case 1:
+    {
+        int nestedX;
+        break;
+    }
+    case 2:
+        nestedX;    // ERROR
+        int nestedZ;
+        float a;    // okay, hiding outer 'a'
+        break;
+    case 3:
+        int linearZ;
+        break;
+    case 4:
+        int linearY = linearZ;
+        break;
+    case 5:         // okay that branch bypassed an initializer
+        const int linearC = 4;
+        break;
+    case 6:         // okay that branch bypassed an initializer
+        linearC;
+    }
+    nestedZ;        // ERROR, no longer in scope
 }

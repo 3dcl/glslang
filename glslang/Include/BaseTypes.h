@@ -49,6 +49,7 @@ enum TBasicType {
     EbtInt,
     EbtUint,
     EbtBool,
+    EbtAtomicUint,
     EbtSampler,
     EbtStruct,
     EbtBlock,
@@ -64,17 +65,18 @@ enum TBasicType {
 enum TStorageQualifier {
     EvqTemporary,     // For temporaries (within a function), read/write
     EvqGlobal,        // For globals read/write
-    EvqConst,         // User defined constants and non-output parameters in functions
+    EvqConst,         // User-defined constant values, will be semantically constant and constant folded
     EvqVaryingIn,     // pipeline input, read only
     EvqVaryingOut,    // pipeline ouput, read/write
-    EvqUniform,       // read only, shader with app
-    EVqBuffer,        // read only, shader with app
-
+    EvqUniform,       // read only, shared with app
+    EvqBuffer,        // read/write, shared with app
+    EvqShared,        // compute shader's read/write 'shared' qualifier
+    
     // parameters
-    EvqIn,
-    EvqOut,
+    EvqIn,            // also, for 'in' in the grammar before we know if it's a pipeline input or an 'in' parameter
+    EvqOut,           // also, for 'out' in the grammar before we know if it's a pipeline output or an 'out' parameter
     EvqInOut,
-    EvqConstReadOnly,
+    EvqConstReadOnly, // input; also other read-only types having neither a constant value nor constant-value semantics
 
     // built-ins read by vertex shader
     EvqVertexId,
@@ -109,6 +111,8 @@ __inline const char* GetStorageQualifierString(TStorageQualifier q)
     case EvqVaryingIn:      return "in";             break;
     case EvqVaryingOut:     return "out";            break;
     case EvqUniform:        return "uniform";        break;
+    case EvqBuffer:         return "buffer";         break;
+    case EvqShared:         return "shared";         break;
     case EvqIn:             return "in";             break;
     case EvqOut:            return "out";            break;
     case EvqInOut:          return "inout";          break;

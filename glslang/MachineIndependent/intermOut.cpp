@@ -55,6 +55,17 @@ namespace glslang {
 class TOutputTraverser : public TIntermTraverser {
 public:
     TOutputTraverser(TInfoSink& i) : infoSink(i) { }
+
+    virtual bool visitBinary(TVisit, TIntermBinary* node);
+    virtual bool visitUnary(TVisit, TIntermUnary* node);
+    virtual bool visitAggregate(TVisit, TIntermAggregate* node);
+    virtual bool visitSelection(TVisit, TIntermSelection* node);
+    virtual void visitConstantUnion(TIntermConstantUnion* node);
+    virtual void visitSymbol(TIntermSymbol* node);
+    virtual bool visitLoop(TVisit, TIntermLoop* node);
+    virtual bool visitBranch(TVisit, TIntermBranch* node);
+    virtual bool visitSwitch(TVisit, TIntermSwitch* node);
+
     TInfoSink& infoSink;
 };
 
@@ -62,7 +73,7 @@ public:
 // Helper functions for printing, not part of traversing.
 //
 
-void OutputTreeText(TInfoSink& infoSink, TIntermNode* node, const int depth)
+void OutputTreeText(TInfoSink& infoSink, const TIntermNode* node, const int depth)
 {
     int i;
 
@@ -85,27 +96,11 @@ void OutputTreeText(TInfoSink& infoSink, TIntermNode* node, const int depth)
 // return false.
 //
 
-void OutputSymbol(TIntermSymbol* node, TIntermTraverser* it)
+bool TOutputTraverser::visitBinary(TVisit /* visit */, TIntermBinary* node)
 {
-    TOutputTraverser* oit = static_cast<TOutputTraverser*>(it);
+    TInfoSink& out = infoSink;
 
-    OutputTreeText(oit->infoSink, node, oit->depth);
-
-    const int maxSize = GlslangMaxTypeLength + GlslangMaxTokenLength;
-    char buf[maxSize];
-    snprintf(buf, maxSize, "'%s' (%s)\n",
-           node->getName().c_str(),
-           node->getCompleteString().c_str());
-
-    oit->infoSink.debug << buf;
-}
-
-bool OutputBinary(bool /* preVisit */, TIntermBinary* node, TIntermTraverser* it)
-{
-    TOutputTraverser* oit = static_cast<TOutputTraverser*>(it);
-    TInfoSink& out = oit->infoSink;
-
-    OutputTreeText(out, node, oit->depth);
+    OutputTreeText(out, node, depth);
 
     switch (node->getOp()) {
     case EOpAssign:                   out.debug << "move second child to first child";           break;
@@ -127,7 +122,7 @@ bool OutputBinary(bool /* preVisit */, TIntermBinary* node, TIntermTraverser* it
     case EOpIndexDirect:   out.debug << "direct index";   break;
     case EOpIndexIndirect: out.debug << "indirect index"; break;
     case EOpIndexDirectStruct:
-        out.debug << (*node->getLeft()->getType().getStruct())[node->getRight()->getAsConstantUnion()->getUnionArrayPointer()->getIConst()].type->getFieldName();
+        out.debug << (*node->getLeft()->getType().getStruct())[node->getRight()->getAsConstantUnion()->getConstArray()[0].getIConst()].type->getFieldName();
         out.debug << ": direct index for structure";      break;
     case EOpVectorSwizzle: out.debug << "vector swizzle"; break;
 
@@ -167,12 +162,11 @@ bool OutputBinary(bool /* preVisit */, TIntermBinary* node, TIntermTraverser* it
     return true;
 }
 
-bool OutputUnary(bool /* preVisit */, TIntermUnary* node, TIntermTraverser* it)
+bool TOutputTraverser::visitUnary(TVisit /* visit */, TIntermUnary* node)
 {
-    TOutputTraverser* oit = static_cast<TOutputTraverser*>(it);
-    TInfoSink& out = oit->infoSink;
+    TInfoSink& out = infoSink;
 
-    OutputTreeText(out, node, oit->depth);
+    OutputTreeText(out, node, depth);
 
     switch (node->getOp()) {
     case EOpNegative:       out.debug << "Negate value";         break;
@@ -256,12 +250,20 @@ bool OutputUnary(bool /* preVisit */, TIntermUnary* node, TIntermTraverser* it)
     case EOpDPdx:           out.debug << "dPdx";                 break;
     case EOpDPdy:           out.debug << "dPdy";                 break;
     case EOpFwidth:         out.debug << "fwidth";               break;
+    case EOpDPdxFine:       out.debug << "dPdxFine";             break;
+    case EOpDPdyFine:       out.debug << "dPdyFine";             break;
+    case EOpFwidthFine:     out.debug << "fwidthFine";           break;
+    case EOpDPdxCoarse:     out.debug << "dPdxCoarse";           break;
+    case EOpDPdyCoarse:     out.debug << "dPdyCoarse";           break;
+    case EOpFwidthCoarse:   out.debug << "fwidthCoarse";         break;
     case EOpDeterminant:    out.debug << "determinant";          break;
     case EOpMatrixInverse:  out.debug << "inverse";              break;
     case EOpTranspose:      out.debug << "transpose";            break;
 
     case EOpAny:            out.debug << "any";                  break;
     case EOpAll:            out.debug << "all";                  break;
+
+    case EOpArrayLength:    out.debug << "array length";         break;
 
     case EOpEmitStreamVertex:   out.debug << "EmitStreamVertex";   break;
     case EOpEndStreamPrimitive: out.debug << "EndStreamPrimitive"; break;
@@ -276,17 +278,16 @@ bool OutputUnary(bool /* preVisit */, TIntermUnary* node, TIntermTraverser* it)
     return true;
 }
 
-bool OutputAggregate(bool /* preVisit */, TIntermAggregate* node, TIntermTraverser* it)
+bool TOutputTraverser::visitAggregate(TVisit /* visit */, TIntermAggregate* node)
 {
-    TOutputTraverser* oit = static_cast<TOutputTraverser*>(it);
-    TInfoSink& out = oit->infoSink;
+    TInfoSink& out = infoSink;
 
     if (node->getOp() == EOpNull) {
         out.debug.message(EPrefixError, "node is still EOpNull!");
         return true;
     }
 
-    OutputTreeText(out, node, oit->depth);
+    OutputTreeText(out, node, depth);
 
     switch (node->getOp()) {
     case EOpSequence:      out.debug << "Sequence\n";       return true;
@@ -383,52 +384,48 @@ bool OutputAggregate(bool /* preVisit */, TIntermAggregate* node, TIntermTravers
     return true;
 }
 
-bool OutputSelection(bool /* preVisit */, TIntermSelection* node, TIntermTraverser* it)
+bool TOutputTraverser::visitSelection(TVisit /* visit */, TIntermSelection* node)
 {
-    TOutputTraverser* oit = static_cast<TOutputTraverser*>(it);
-    TInfoSink& out = oit->infoSink;
+    TInfoSink& out = infoSink;
 
-    OutputTreeText(out, node, oit->depth);
+    OutputTreeText(out, node, depth);
 
     out.debug << "Test condition and select";
     out.debug << " (" << node->getCompleteString() << ")\n";
 
-    ++oit->depth;
+    ++depth;
 
-    OutputTreeText(oit->infoSink, node, oit->depth);
+    OutputTreeText(out, node, depth);
     out.debug << "Condition\n";
-    node->getCondition()->traverse(it);
+    node->getCondition()->traverse(this);
 
-    OutputTreeText(oit->infoSink, node, oit->depth);
-	if (node->getTrueBlock()) {
-		out.debug << "true case\n";
-		node->getTrueBlock()->traverse(it);
-	} else
-		out.debug << "true case is null\n";
+    OutputTreeText(out, node, depth);
+    if (node->getTrueBlock()) {
+        out.debug << "true case\n";
+        node->getTrueBlock()->traverse(this);
+    } else
+        out.debug << "true case is null\n";
 
     if (node->getFalseBlock()) {
-        OutputTreeText(oit->infoSink, node, oit->depth);
+        OutputTreeText(out, node, depth);
         out.debug << "false case\n";
-        node->getFalseBlock()->traverse(it);
+        node->getFalseBlock()->traverse(this);
     }
 
-    --oit->depth;
+    --depth;
 
     return false;
 }
 
-void OutputConstantUnion(TIntermConstantUnion* node, TIntermTraverser* it)
+void OutputConstantUnion(TInfoSink& out, const TIntermTyped* node, const TConstUnionArray& constUnion, int depth)
 {
-    TOutputTraverser* oit = static_cast<TOutputTraverser*>(it);
-    TInfoSink& out = oit->infoSink;
-
-    int size = node->getType().getObjectSize();
+    int size = node->getType().computeNumComponents();
 
     for (int i = 0; i < size; i++) {
-        OutputTreeText(out, node, oit->depth);
-        switch (node->getUnionArrayPointer()[i].getType()) {
+        OutputTreeText(out, node, depth);
+        switch (constUnion[i].getType()) {
         case EbtBool:
-            if (node->getUnionArrayPointer()[i].getBConst())
+            if (constUnion[i].getBConst())
                 out.debug << "true";
             else
                 out.debug << "false";
@@ -440,27 +437,27 @@ void OutputConstantUnion(TIntermConstantUnion* node, TIntermTraverser* it)
         case EbtFloat:
         case EbtDouble:
             {
-				const int maxSize = 300;
+                const int maxSize = 300;
                 char buf[maxSize];
-                snprintf(buf, maxSize, "%f", node->getUnionArrayPointer()[i].getDConst());
+                snprintf(buf, maxSize, "%f", constUnion[i].getDConst());
 
                 out.debug << buf << "\n";
             }
             break;
         case EbtInt:
             {
-				const int maxSize = 300;
+                const int maxSize = 300;
                 char buf[maxSize];
-                snprintf(buf, maxSize, "%d (%s)", node->getUnionArrayPointer()[i].getIConst(), "const int");
+                snprintf(buf, maxSize, "%d (%s)", constUnion[i].getIConst(), "const int");
 
                 out.debug << buf << "\n";
             }
             break;
         case EbtUint:
             {
-				const int maxSize = 300;
+                const int maxSize = 300;
                 char buf[maxSize];
-                snprintf(buf, maxSize, "%u (%s)", node->getUnionArrayPointer()[i].getUConst(), "const uint");
+                snprintf(buf, maxSize, "%u (%s)", constUnion[i].getUConst(), "const uint");
 
                 out.debug << buf << "\n";
             }
@@ -472,51 +469,67 @@ void OutputConstantUnion(TIntermConstantUnion* node, TIntermTraverser* it)
     }
 }
 
-bool OutputLoop(bool /* preVisit */, TIntermLoop* node, TIntermTraverser* it)
+void TOutputTraverser::visitConstantUnion(TIntermConstantUnion* node)
 {
-    TOutputTraverser* oit = static_cast<TOutputTraverser*>(it);
-    TInfoSink& out = oit->infoSink;
+    OutputTreeText(infoSink, node, depth);
+    infoSink.debug << "Constant:\n";
 
-    OutputTreeText(out, node, oit->depth);
+    OutputConstantUnion(infoSink, node, node->getConstArray(), depth + 1);
+}
+
+void TOutputTraverser::visitSymbol(TIntermSymbol* node)
+{
+    OutputTreeText(infoSink, node, depth);
+
+    infoSink.debug << "'" << node->getName() << "' (" << node->getCompleteString() << ")\n";
+
+    if (! node->getConstArray().empty())
+        OutputConstantUnion(infoSink, node, node->getConstArray(), depth + 1);
+}
+
+bool TOutputTraverser::visitLoop(TVisit /* visit */, TIntermLoop* node)
+{
+    TInfoSink& out = infoSink;
+
+    OutputTreeText(out, node, depth);
 
     out.debug << "Loop with condition ";
     if (! node->testFirst())
         out.debug << "not ";
     out.debug << "tested first\n";
 
-    ++oit->depth;
+    ++depth;
 
-    OutputTreeText(oit->infoSink, node, oit->depth);
+    OutputTreeText(infoSink, node, depth);
     if (node->getTest()) {
         out.debug << "Loop Condition\n";
-        node->getTest()->traverse(it);
+        node->getTest()->traverse(this);
     } else
         out.debug << "No loop condition\n";
 
-    OutputTreeText(oit->infoSink, node, oit->depth);
+    OutputTreeText(infoSink, node, depth);
     if (node->getBody()) {
         out.debug << "Loop Body\n";
-        node->getBody()->traverse(it);
+        node->getBody()->traverse(this);
     } else
         out.debug << "No loop body\n";
 
     if (node->getTerminal()) {
-        OutputTreeText(oit->infoSink, node, oit->depth);
+        OutputTreeText(infoSink, node, depth);
         out.debug << "Loop Terminal Expression\n";
-        node->getTerminal()->traverse(it);
+        node->getTerminal()->traverse(this);
     }
 
-    --oit->depth;
+    --depth;
 
     return false;
 }
 
-bool OutputBranch(bool /* previsit*/, TIntermBranch* node, TIntermTraverser* it)
+bool TOutputTraverser::visitBranch(TVisit /* visit*/, TIntermBranch* node)
 {
-    TOutputTraverser* oit = static_cast<TOutputTraverser*>(it);
-    TInfoSink& out = oit->infoSink;
+    TInfoSink& out = infoSink;
 
-    OutputTreeText(out, node, oit->depth);
+    OutputTreeText(out, node, depth);
 
     switch (node->getFlowOp()) {
     case EOpKill:      out.debug << "Branch: Kill";           break;
@@ -530,35 +543,34 @@ bool OutputBranch(bool /* previsit*/, TIntermBranch* node, TIntermTraverser* it)
 
     if (node->getExpression()) {
         out.debug << " with expression\n";
-        ++oit->depth;
-        node->getExpression()->traverse(it);
-        --oit->depth;
+        ++depth;
+        node->getExpression()->traverse(this);
+        --depth;
     } else
         out.debug << "\n";
 
     return false;
 }
 
-bool OutputSwitch(bool /* preVisit */, TIntermSwitch* node, TIntermTraverser* it)
+bool TOutputTraverser::visitSwitch(TVisit /* visit */, TIntermSwitch* node)
 {
-    TOutputTraverser* oit = static_cast<TOutputTraverser*>(it);
-    TInfoSink& out = oit->infoSink;
+    TInfoSink& out = infoSink;
 
-    OutputTreeText(out, node, oit->depth);
+    OutputTreeText(out, node, depth);
     out.debug << "switch\n";
 
-    OutputTreeText(out, node, oit->depth);
+    OutputTreeText(out, node, depth);
     out.debug << "condition\n";
-    ++oit->depth;
-    node->getCondition()->traverse(it);
+    ++depth;
+    node->getCondition()->traverse(this);
 
-    --oit->depth;
-    OutputTreeText(out, node, oit->depth);
+    --depth;
+    OutputTreeText(out, node, depth);
     out.debug << "body\n";
-    ++oit->depth;
-    node->getBody()->traverse(it);
+    ++depth;
+    node->getBody()->traverse(this);
 
-    --oit->depth;
+    --depth;
 
     return false;
 }
@@ -568,22 +580,63 @@ bool OutputSwitch(bool /* preVisit */, TIntermSwitch* node, TIntermTraverser* it
 // Individual functions can be initialized to 0 to skip processing of that
 // type of node.  It's children will still be processed.
 //
-void TIntermediate::outputTree(TInfoSink& infoSink)
+void TIntermediate::output(TInfoSink& infoSink, bool tree)
 {
-    if (treeRoot == 0)
+    infoSink.debug << "Shader version: " << version << "\n";
+    if (requestedExtensions.size() > 0) {
+        for (std::set<std::string>::const_iterator extIt = requestedExtensions.begin(); extIt != requestedExtensions.end(); ++extIt)
+            infoSink.debug << "Requested " << *extIt << "\n";
+    }
+
+    if (xfbMode)
+        infoSink.debug << "in xfb mode\n";
+
+    switch (language) {
+    case EShLangVertex:
+        break;
+
+    case EShLangTessControl:
+        infoSink.debug << "vertices = " << vertices << "\n";
+        break;
+
+    case EShLangTessEvaluation:
+        infoSink.debug << "input primitive = " << TQualifier::getGeometryString(inputPrimitive) << "\n";
+        infoSink.debug << "vertex spacing = " << TQualifier::getVertexSpacingString(vertexSpacing) << "\n";
+        infoSink.debug << "triangle order = " << TQualifier::getVertexOrderString(vertexOrder) << "\n";
+        if (pointMode)
+            infoSink.debug << "using point mode\n";
+        break;
+
+    case EShLangGeometry:
+        infoSink.debug << "invocations = " << invocations << "\n";
+        infoSink.debug << "max_vertices = " << vertices << "\n";
+        infoSink.debug << "input primitive = " << TQualifier::getGeometryString(inputPrimitive) << "\n";
+        infoSink.debug << "output primitive = " << TQualifier::getGeometryString(outputPrimitive) << "\n";
+        break;
+
+    case EShLangFragment:
+        if (pixelCenterInteger)
+            infoSink.debug << "gl_FragCoord pixel center is integer\n";
+        if (originUpperLeft)
+            infoSink.debug << "gl_FragCoord origin is upper left\n";
+        if (earlyFragmentTests)
+            infoSink.debug << "using early_fragment_tests\n";
+        if (depthLayout != EldNone)
+            infoSink.debug << "using " << TQualifier::getLayoutDepthString(depthLayout) << "\n";
+        break;
+
+    case EShLangCompute:
+        infoSink.debug << "local_size = (" << localSize[0] << ", " << localSize[1] << ", " << localSize[2] << ")\n";
+        break;
+
+    default:
+        break;
+    }
+
+    if (treeRoot == 0 || ! tree)
         return;
 
     TOutputTraverser it(infoSink);
-
-    it.visitAggregate = OutputAggregate;
-    it.visitBinary = OutputBinary;
-    it.visitConstantUnion = OutputConstantUnion;
-    it.visitSelection = OutputSelection;
-    it.visitSymbol = OutputSymbol;
-    it.visitUnary = OutputUnary;
-    it.visitLoop = OutputLoop;
-    it.visitBranch = OutputBranch;
-    it.visitSwitch = OutputSwitch;
 
     treeRoot->traverse(&it);
 }

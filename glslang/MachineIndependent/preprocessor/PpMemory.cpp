@@ -75,7 +75,7 @@ NVIDIA SOFTWARE, HOWEVER CAUSED AND WHETHER UNDER THEORY OF CONTRACT,
 TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY OR OTHERWISE, EVEN IF
 NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \****************************************************************************/
-//
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,21 +87,10 @@ NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CHUNKSIZE       (64*1024)
 #define ALIGN           8
 
-// we need to call the `real' malloc and free, not our replacements
-#undef malloc
-#undef free
-
 namespace glslang {
 
 struct chunk {
     struct chunk        *next;
-};
-
-struct cleanup {
-    struct cleanup      *next;
-    void                (*fn)(void *, void *);
-    void                *arg1;
-    void                *arg2;
 };
 
 TPpContext::MemoryPool* TPpContext::mem_CreatePool(size_t chunksize, unsigned int align)
@@ -112,32 +101,28 @@ TPpContext::MemoryPool* TPpContext::mem_CreatePool(size_t chunksize, unsigned in
         align = ALIGN;
     if (chunksize == 0)
         chunksize = CHUNKSIZE;
-    if (align & (align-1))
+    if (align & (align - 1))
         return 0;
     if (chunksize < sizeof(MemoryPool))
         return 0;
-    if (chunksize & (align-1))
+    if (chunksize & (align - 1))
         return 0;
     if (!(pool = (MemoryPool*)malloc(chunksize)))
         return 0;
 
     pool->next = 0;
     pool->chunksize = chunksize;
-    pool->alignmask = (uintptr_t)(align)-1;  
+    pool->alignmask = (uintptr_t)(align) - 1;  
     pool->free = ((uintptr_t)(pool + 1) + pool->alignmask) & ~pool->alignmask;
     pool->end = (uintptr_t)pool + chunksize;
-    pool->cleanup = 0;
+    
     return pool;
 }
 
 void TPpContext::mem_FreePool(MemoryPool *pool)
 {
-    struct cleanup      *cleanup;
-    struct chunk        *p, *next;
+    struct chunk *p, *next;
 
-    for (cleanup = pool->cleanup; cleanup; cleanup = cleanup->next) {
-        cleanup->fn(cleanup->arg1, cleanup->arg2);
-    }
     for (p = (struct chunk *)pool; p; p = next) {
         next = p->next;
         free(p);
@@ -170,21 +155,6 @@ void* TPpContext::mem_Alloc(MemoryPool *pool, size_t size)
         rv = (void *)(((uintptr_t)(ch+1) + pool->alignmask) & ~pool->alignmask);
     }
     return rv;
-}
-
-int TPpContext::mem_AddCleanup(MemoryPool *pool, void (*fn)(void *, void*), void* arg1, void* arg2)
-{
-    struct cleanup *cleanup;
-
-    pool->free = (pool->free + sizeof(void *) - 1) & ~(sizeof(void *)-1);
-    cleanup = (struct cleanup *)(mem_Alloc(pool, sizeof(struct cleanup)));
-    if (!cleanup) return -1;
-    cleanup->next = pool->cleanup;
-    cleanup->fn = fn;
-    cleanup->arg1 = arg1;
-    cleanup->arg2 = arg2;
-    pool->cleanup = cleanup;
-    return 0;
 }
 
 } // end namespace glslang

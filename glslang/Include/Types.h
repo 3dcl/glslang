@@ -39,10 +39,17 @@
 
 #include "../Include/Common.h"
 #include "../Include/BaseTypes.h"
+#include "../Public/ShaderLang.h"
 
 namespace glslang {
 
-const int GlslangMaxTypeLength = 200;
+const int GlslangMaxTypeLength = 200;  // TODO: need to print block/struct one member per line, so this can stay bounded
+
+const char* const AnonymousPrefix = "anon@"; // for something like a block whose members can be directly accessed
+inline bool IsAnonymous(const TString& name)
+{
+    return name.compare(0, 5, AnonymousPrefix) == 0;
+}
 
 //
 // Details within a sampler type
@@ -65,6 +72,7 @@ struct TSampler {
     bool     shadow : 1;
     bool         ms : 1;
     bool      image : 1;
+    bool   external : 1;  // GL_OES_EGL_image_external
 
     void clear()
     {
@@ -74,6 +82,7 @@ struct TSampler {
         shadow = false;
         ms = false;
         image = false;
+        external = false;
     }
 
     void set(TBasicType t, TSamplerDim d, bool a = false, bool s = false, bool m = false)
@@ -84,6 +93,7 @@ struct TSampler {
         shadow = s;
         ms = m;
         image = false;
+        external = false;
     }
 
     void setImage(TBasicType t, TSamplerDim d, bool a = false, bool s = false, bool m = false)
@@ -94,6 +104,7 @@ struct TSampler {
         shadow = s;
         ms = m;
         image = true;
+        external = false;
     }
 
     bool operator==(const TSampler& right) const
@@ -103,7 +114,8 @@ struct TSampler {
             arrayed == right.arrayed &&
              shadow == right.shadow &&
                  ms == right.ms &&
-              image == right.image;
+              image == right.image &&
+           external == right.external;
     }
 
     TString getString() const
@@ -120,6 +132,10 @@ struct TSampler {
             s.append("image");
         else
             s.append("sampler");
+        if (external) {
+            s.append("ExternalOES");
+            return s;
+        }
         switch (dim) {
         case Esd1D:      s.append("1D");     break;
         case Esd2D:      s.append("2D");     break;
@@ -150,19 +166,7 @@ struct TTypeLoc {
 };
 typedef TVector<TTypeLoc> TTypeList;
 
-inline TTypeList* NewPoolTTypeList()
-{
-	void* memory = GetThreadPoolAllocator().allocate(sizeof(TTypeList));
-	return new(memory) TTypeList;
-}
-
 typedef TVector<TString*> TIdentifierList;
-
-inline TIdentifierList* NewPoolTIdentifierList()
-{
-    void* memory = GetThreadPoolAllocator().allocate(sizeof(TIdentifierList));
-    return new(memory) TIdentifierList;
-}
 
 //
 // TODO: memory: TArraySizes can be replaced by something smaller.
@@ -175,31 +179,21 @@ inline TIdentifierList* NewPoolTIdentifierList()
 // is used, it will be containing at least one size.
 
 struct TArraySizes {
-    TArraySizes() : maxArraySize(0) { }
+    POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
+
+    TArraySizes() : implicitArraySize(1) { }
     int getSize() { return sizes.front(); }  // TArraySizes only exists if there is at least one dimension
     void setSize(int s) { sizes.push_back(s); }
     bool isArrayOfArrays() { return sizes.size() > 1; }
 protected:
     TVector<int> sizes;
     friend class TType;
-    int maxArraySize; // for tracking maximum referenced index, before an explicit size is given
+    int implicitArraySize; // for tracking maximum referenced index, before an explicit size is given
 };
 
-inline TArraySizes* NewPoolTArraySizes()
-{
-    void* memory = GetThreadPoolAllocator().allocate(sizeof(TArraySizes));
-    return new(memory) TArraySizes;
-}
-
 //
-// TPublicType (coming up after some dependent declarations)
-// is a workaround for a problem with the yacc stack,  It can't have
-// types that it thinks have non-trivial constructors.  It should
-// just be used while recognizing the grammar, not anything else.  Pointers
-// could be used, but also trying to avoid lots of memory management overhead.
-//
-// Not as bad as it looks, there is no actual assumption that the fields
-// match up or are named the same or anything like that.
+// Following are a series of helper enums for managing layouts and qualifiers,
+// used for TPublicType, TType, others.
 //
 
 enum TLayoutPacking {
@@ -207,29 +201,139 @@ enum TLayoutPacking {
     ElpShared,      // default, but different than saying nothing
     ElpStd140,
     ElpStd430,
-    ElpPacked       // see bitfield width below
+    ElpPacked
+    // If expanding, see bitfield width below
 };
 
 enum TLayoutMatrix {
     ElmNone,
     ElmRowMajor,
     ElmColumnMajor  // default, but different than saying nothing
-};  // see bitfield width below
+    // If expanding, see bitfield width below
+};
+
+// Union of geometry shader and tessellation shader geometry types.
+// They don't go into TType, but rather have current state per shader or
+// active parser type (TPublicType).
+enum TLayoutGeometry {
+    ElgNone,
+    ElgPoints,
+    ElgLines,
+    ElgLinesAdjacency,
+    ElgLineStrip,
+    ElgTriangles,
+    ElgTrianglesAdjacency,
+    ElgTriangleStrip,
+    ElgQuads,
+    ElgIsolines,
+};
+
+enum TVertexSpacing {
+    EvsNone,
+    EvsEqual,
+    EvsFractionalEven,
+    EvsFractionalOdd
+};
+
+enum TVertexOrder {
+    EvoNone,
+    EvoCw,
+    EvoCcw
+};
+
+// Note: order matters, as type of format is done by comparison.
+enum TLayoutFormat {
+    ElfNone,
+
+    // Float image
+    ElfRgba32f,
+    ElfRgba16f,
+    ElfR32f,
+    ElfRgba8,
+    ElfRgba8Snorm,
+
+    ElfEsFloatGuard,    // to help with comparisons
+
+    ElfRg32f,
+    ElfRg16f,
+    ElfR11fG11fB10f,
+    ElfR16f,
+    ElfRgba16,
+    ElfRgb10A2,
+    ElfRg16,
+    ElfRg8,
+    ElfR16,
+    ElfR8,
+    ElfRgba16Snorm,
+    ElfRg16Snorm,
+    ElfRg8Snorm,
+    ElfR16Snorm,
+    ElfR8Snorm,
+
+    ElfFloatGuard,      // to help with comparisons
+
+    // Int image
+    ElfRgba32i,
+    ElfRgba16i,
+    ElfRgba8i,
+    ElfR32i,
+
+    ElfEsIntGuard,     // to help with comparisons
+
+    ElfRg32i,
+    ElfRg16i,
+    ElfRg8i,
+    ElfR16i,
+    ElfR8i,
+
+    ElfIntGuard,       // to help with comparisons
+
+    // Uint image
+    ElfRgba32ui,
+    ElfRgba16ui,
+    ElfRgba8ui,
+    ElfR32ui,
+
+    ElfEsUintGuard,    // to help with comparisons
+
+    ElfRg32ui,
+    ElfRg16ui,
+    ElfRg8ui,
+    ElfR16ui,
+    ElfR8ui,
+
+    ElfCount
+};
+
+enum TLayoutDepth {
+    EldNone,
+    EldAny,
+    EldGreater,
+    EldLess,
+    EldUnchanged,
+    
+    EldCount
+};
 
 class TQualifier {
 public:
     void clear()
     {
-        storage   = EvqTemporary;
         precision = EpqNone;
         invariant = false;
+        makeTemporary();
+    }
+
+    // drop qualifiers that don't belong in a temporary variable
+    void makeTemporary()
+    {
+        storage   = EvqTemporary;
         centroid  = false;
         smooth    = false;
         flat      = false;
         nopersp   = false;
         patch     = false;
         sample    = false;
-        shared    = false;
         coherent  = false;
         volatil   = false;
         restrict  = false;
@@ -237,7 +341,8 @@ public:
         writeonly = false;
         clearLayout();
     }
-	TStorageQualifier   storage   : 6;
+
+    TStorageQualifier   storage   : 6;
     TPrecisionQualifier precision : 3;
     bool invariant : 1;
     bool centroid  : 1;
@@ -246,7 +351,6 @@ public:
     bool nopersp   : 1;
     bool patch     : 1;
     bool sample    : 1;
-    bool shared    : 1;
     bool coherent  : 1;
     bool volatil   : 1;
     bool restrict  : 1;
@@ -255,7 +359,7 @@ public:
 
     bool isMemory() const
     {
-        return shared || coherent || volatil || restrict || readonly || writeonly;
+        return coherent || volatil || restrict || readonly || writeonly;
     }
     bool isInterpolation() const
     {
@@ -296,12 +400,73 @@ public:
         }
     }
 
-    bool isUniform() const
+    bool isParamInput() const
+    {
+        switch (storage) {
+        case EvqIn:
+        case EvqInOut:
+        case EvqConstReadOnly:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool isParamOutput() const
+    {
+        switch (storage) {
+        case EvqOut:
+        case EvqInOut:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool isUniformOrBuffer() const
     {
         switch (storage) {
         case EvqUniform:
-        case EVqBuffer:
+        case EvqBuffer:
             return true;
+        default:
+            return false;
+        }
+    }
+
+    bool isIo() const
+    {
+        switch (storage) {
+        case EvqUniform:
+        case EvqBuffer:
+        case EvqVaryingIn:
+        case EvqFragCoord:
+        case EvqPointCoord:
+        case EvqFace:
+        case EvqVertexId:
+        case EvqInstanceId:
+        case EvqPosition:
+        case EvqPointSize:
+        case EvqClipVertex:
+        case EvqVaryingOut:
+        case EvqFragColor:
+        case EvqFragDepth:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    // True if this type of IO is supposed to be arrayed with extra level for per-vertex data
+    bool isArrayedIo(EShLanguage language) const
+    {
+        switch (language) {
+        case EShLangGeometry:
+            return isPipeInput();
+        case EShLangTessControl:
+            return ! patch && (isPipeInput() || isPipeOutput());
+        case EShLangTessEvaluation:
+            return ! patch && isPipeInput();
         default:
             return false;
         }
@@ -312,21 +477,133 @@ public:
     {
         layoutMatrix = ElmNone;
         layoutPacking = ElpNone;
-        layoutSlotLocation = layoutLocationEnd;
+        layoutOffset = -1;
+        layoutAlign = -1;
+
+        layoutLocation = layoutLocationEnd;
+        layoutComponent = layoutComponentEnd;
+        layoutBinding = layoutBindingEnd;
+        layoutIndex = layoutIndexEnd;
+
+        layoutStream = layoutStreamEnd;
+
+        layoutXfbBuffer = layoutXfbBufferEnd;
+        layoutXfbStride = layoutXfbStrideEnd;
+        layoutXfbOffset = layoutXfbOffsetEnd;
+
+        layoutFormat = ElfNone;
     }
     bool hasLayout() const
     {
-        return layoutMatrix != ElmNone ||
-               layoutPacking != ElpNone ||
-               layoutSlotLocation != layoutLocationEnd;
+        return hasUniformLayout() || 
+               hasAnyLocation() ||
+               hasBinding() ||
+               hasStream() ||
+               hasXfb() ||
+               hasFormat();
     }
-    TLayoutMatrix  layoutMatrix       : 3;
-    TLayoutPacking layoutPacking      : 4;
-    unsigned int   layoutSlotLocation : 7;  // ins/outs should have small numbers, buffer offsets could be large
-    static const unsigned int layoutLocationEnd = 0x3F;
+    TLayoutMatrix  layoutMatrix  : 3;
+    TLayoutPacking layoutPacking : 4;
+    int layoutOffset;
+    int layoutAlign;
+
+                 unsigned int layoutLocation         : 7;
+    static const unsigned int layoutLocationEnd =   0x3F;
+
+                 unsigned int layoutComponent        : 3;
+    static const unsigned int layoutComponentEnd =     4;
+
+                 unsigned int layoutBinding          : 8;
+    static const unsigned int layoutBindingEnd =    0xFF;
+
+                 unsigned int layoutIndex           :  8;
+    static const unsigned int layoutIndexEnd =      0xFF;
+
+                 unsigned int layoutStream           : 8;
+    static const unsigned int layoutStreamEnd =     0xFF;
+
+                 unsigned int layoutXfbBuffer        : 4;
+    static const unsigned int layoutXfbBufferEnd =   0xF;
+
+                 unsigned int layoutXfbStride       : 10;
+    static const unsigned int layoutXfbStrideEnd = 0x3FF;
+
+                 unsigned int layoutXfbOffset       : 10;
+    static const unsigned int layoutXfbOffsetEnd = 0x3FF;
+
+    TLayoutFormat layoutFormat                      :  8;
+
+    bool hasUniformLayout() const
+    {
+        return hasMatrix() ||
+               hasPacking() ||
+               hasOffset() ||
+               hasBinding() ||
+               hasAlign();
+    }
+    bool hasMatrix() const
+    {
+        return layoutMatrix != ElmNone;
+    }
+    bool hasPacking() const
+    {
+        return layoutPacking != ElpNone;
+    }
+    bool hasOffset() const
+    {
+        return layoutOffset != -1;
+    }
+    bool hasAlign() const
+    {
+        return layoutAlign != -1;
+    }
+    bool hasAnyLocation() const
+    {
+        return hasLocation() ||
+               hasComponent() ||
+               hasIndex();
+    }
     bool hasLocation() const
     {
-        return layoutSlotLocation != layoutLocationEnd;
+        return layoutLocation  != layoutLocationEnd;
+    }
+    bool hasComponent() const
+    {
+        return layoutComponent != layoutComponentEnd;
+    }
+    bool hasIndex() const
+    {
+        return layoutIndex != layoutIndexEnd;
+    }
+    bool hasBinding() const
+    {
+        return layoutBinding != layoutBindingEnd;
+    }
+    bool hasStream() const
+    {
+        return layoutStream != layoutStreamEnd;
+    }
+    bool hasFormat() const
+    {
+        return layoutFormat != ElfNone;
+    }
+    bool hasXfb() const
+    {
+        return hasXfbBuffer() ||
+               hasXfbStride() ||
+               hasXfbOffset();
+    }
+    bool hasXfbBuffer() const
+    {
+        return layoutXfbBuffer != layoutXfbBufferEnd;
+    }
+    bool hasXfbStride() const
+    {
+        return layoutXfbStride != layoutXfbStrideEnd;
+    }
+    bool hasXfbOffset() const
+    {
+        return layoutXfbOffset != layoutXfbOffsetEnd;
     }
     static const char* getLayoutPackingString(TLayoutPacking packing)
     {
@@ -346,13 +623,184 @@ public:
         default:             return "none";
         }
     }
+    static const char* getLayoutFormatString(TLayoutFormat f)
+    {
+        switch (f) {
+        case ElfRgba32f:      return "rgba32f";
+        case ElfRgba16f:      return "rgba16f";
+        case ElfRg32f:        return "rg32f";
+        case ElfRg16f:        return "rg16f";
+        case ElfR11fG11fB10f: return "r11f_g11f_b10f";
+        case ElfR32f:         return "r32f";
+        case ElfR16f:         return "r16f";
+        case ElfRgba16:       return "rgba16";
+        case ElfRgb10A2:      return "rgb10_a2";
+        case ElfRgba8:        return "rgba8";
+        case ElfRg16:         return "rg16";
+        case ElfRg8:          return "rg8";
+        case ElfR16:          return "r16";
+        case ElfR8:           return "r8";
+        case ElfRgba16Snorm:  return "rgba16_snorm";
+        case ElfRgba8Snorm:   return "rgba8_snorm";
+        case ElfRg16Snorm:    return "rg16_snorm";
+        case ElfRg8Snorm:     return "rg8_snorm";
+        case ElfR16Snorm:     return "r16_snorm";
+        case ElfR8Snorm:      return "r8_snorm";
+
+        case ElfRgba32i:      return "rgba32i";
+        case ElfRgba16i:      return "rgba16i";
+        case ElfRgba8i:       return "rgba8i";
+        case ElfRg32i:        return "rg32i";
+        case ElfRg16i:        return "rg16i";
+        case ElfRg8i:         return "rg8i";
+        case ElfR32i:         return "r32i";
+        case ElfR16i:         return "r16i";
+        case ElfR8i:          return "r8i";
+
+        case ElfRgba32ui:     return "rgba32ui";
+        case ElfRgba16ui:     return "rgba16ui";
+        case ElfRgba8ui:      return "rgba8ui";
+        case ElfRg32ui:       return "rg32ui";
+        case ElfRg16ui:       return "rg16ui";
+        case ElfRg8ui:        return "rg8ui";
+        case ElfR32ui:        return "r32ui";
+        case ElfR16ui:        return "r16ui";
+        case ElfR8ui:         return "r8ui";
+        default:              return "none";
+        }
+    }
+    static const char* getLayoutDepthString(TLayoutDepth d)
+    {
+        switch (d) {
+        case EldAny:       return "depth_any";
+        case EldGreater:   return "depth_greater";
+        case EldLess:      return "depth_less";
+        case EldUnchanged: return "depth_unchanged";
+        default:           return "none";
+        }
+    }
+    static const char* getGeometryString(TLayoutGeometry geometry)
+    {
+        switch (geometry) {
+        case ElgPoints:             return "points";
+        case ElgLines:              return "lines";
+        case ElgLinesAdjacency:     return "lines_adjacency";
+        case ElgLineStrip:          return "line_strip";
+        case ElgTriangles:          return "triangles";
+        case ElgTrianglesAdjacency: return "triangles_adjacency";
+        case ElgTriangleStrip:      return "triangle_strip";
+        case ElgQuads:              return "quads";
+        case ElgIsolines:           return "isolines";
+        default:                    return "none";
+        }
+    }
+    static const char* getVertexSpacingString(TVertexSpacing spacing)
+    {
+        switch (spacing) {
+        case EvsEqual:              return "equal_spacing";
+        case EvsFractionalEven:     return "fractional_even_spacing";
+        case EvsFractionalOdd:      return "fractional_odd_spacing";
+        default:                    return "none";
+        }
+    }
+    static const char* getVertexOrderString(TVertexOrder order)
+    {
+        switch (order) {
+        case EvoCw:                 return "cw";
+        case EvoCcw:                return "ccw";
+        default:                    return "none";
+        }
+    }
+    static int mapGeometryToSize(TLayoutGeometry geometry)
+    {
+        switch (geometry) {
+        case ElgPoints:             return 1;
+        case ElgLines:              return 2;
+        case ElgLinesAdjacency:     return 4;
+        case ElgTriangles:          return 3;
+        case ElgTrianglesAdjacency: return 6;
+        default:                    return 0;
+        }
+    }
 };
 
+// Qualifiers that don't need to be keep per object.  They have shader scope, not object scope.
+// So, they will not be part of TType, TQualifier, etc.
+struct TShaderQualifiers {
+    TLayoutGeometry geometry; // geometry/tessellation shader in/out primitives
+    bool pixelCenterInteger;  // fragment shader
+    bool originUpperLeft;     // fragment shader
+    int invocations;          // 0 means no declaration
+    int vertices;             // both for tessellation "vertices" and geometry "max_vertices"
+    TVertexSpacing spacing;
+    TVertexOrder order;
+    bool pointMode;
+    int localSize[3];         // compute shader
+    bool earlyFragmentTests;  // fragment input
+    TLayoutDepth layoutDepth;
+
+    void init()
+    {
+        geometry = ElgNone;
+        originUpperLeft = false;
+        pixelCenterInteger = false;
+        invocations = 0;        // 0 means no declaration
+        vertices = 0;
+        spacing = EvsNone;
+        order = EvoNone;
+        pointMode = false;
+        localSize[0] = 1;
+        localSize[1] = 1;
+        localSize[2] = 1;
+        earlyFragmentTests = false;
+        layoutDepth = EldNone;
+    }
+
+    // Merge in characteristics from the 'src' qualifier.  They can override when
+    // set, but never erase when not set.
+    void merge(const TShaderQualifiers& src)
+    {
+        if (src.geometry != ElgNone)
+            geometry = src.geometry;
+        if (src.pixelCenterInteger)
+            pixelCenterInteger = src.pixelCenterInteger;
+        if (src.originUpperLeft)
+            originUpperLeft = src.originUpperLeft;
+        if (src.invocations != 0)
+            invocations = src.invocations;
+        if (src.vertices != 0)
+            vertices = src.vertices;
+        if (src.spacing != EvsNone)
+            spacing = src.spacing;
+        if (src.order != EvoNone)
+            order = src.order;
+        if (src.pointMode)
+            pointMode = true;
+        for (int i = 0; i < 3; ++i) {
+            if (src.localSize[i] > 1)
+                localSize[i] = src.localSize[i];
+        }
+        if (src.earlyFragmentTests)
+            earlyFragmentTests = true;
+        if (src.layoutDepth)
+            layoutDepth = src.layoutDepth;
+    }
+};
+
+//
+// TPublicType is just temporarily used while parsing and not quite the same
+// information kept per node in TType.  Due to the bison stack, it can't have
+// types that it thinks have non-trivial constructors.  It should
+// just be used while recognizing the grammar, not anything else.
+// Once enough is known about the situation, the proper information
+// moved into a TType, or the parse context, etc.
+//
 class TPublicType {
 public:
     TBasicType basicType;
     TSampler sampler;
     TQualifier qualifier;
+    TShaderQualifiers shaderQualifiers;
     int vectorSize : 4;
     int matrixCols : 4;
     int matrixRows : 4;
@@ -383,6 +831,7 @@ public:
         initType(loc);
         sampler.clear();
         initQualifiers(global);
+        shaderQualifiers.init();
     }
 
     void setVector(int s)
@@ -399,9 +848,14 @@ public:
         vectorSize = 0;
     }
 
-    bool isScalar()
+    bool isScalar() const
     {
         return matrixCols == 0 && vectorSize == 1 && arraySizes == 0 && userDef == 0;
+    }
+
+    bool isImage() const
+    {
+        return basicType == EbtSampler && sampler.image;
     }
 };
 
@@ -414,17 +868,20 @@ typedef std::map<TTypeList*, TTypeList*>::const_iterator TStructureMapIterator;
 class TType {
 public:
     POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
+
+    // for "empty" type (no args) or simple scalar/vector/matrix
     explicit TType(TBasicType t = EbtVoid, TStorageQualifier q = EvqTemporary, int vs = 1, int mc = 0, int mr = 0) :
                             basicType(t), vectorSize(vs), matrixCols(mc), matrixRows(mr), arraySizes(0),
-                            structure(0), structureSize(0), fieldName(0), typeName(0)
+                            structure(0), fieldName(0), typeName(0)
                             {
                                 sampler.clear();
                                 qualifier.clear();
                                 qualifier.storage = q;
                             }
+    // for explicit precision qualifier
     TType(TBasicType t, TStorageQualifier q, TPrecisionQualifier p, int vs = 1, int mc = 0, int mr = 0) :
                             basicType(t), vectorSize(vs), matrixCols(mc), matrixRows(mr), arraySizes(0),
-                            structure(0), structureSize(0), fieldName(0), typeName(0)
+                            structure(0), fieldName(0), typeName(0)
                             {
                                 sampler.clear();
                                 qualifier.clear();
@@ -432,9 +889,10 @@ public:
                                 qualifier.precision = p;
                                 assert(p >= 0 && p <= EpqHigh);
                             }
-    explicit TType(const TPublicType &p) :
+    // for turning a TPublicType into a TType
+    explicit TType(const TPublicType& p) :
                             basicType(p.basicType), vectorSize(p.vectorSize), matrixCols(p.matrixCols), matrixRows(p.matrixRows), arraySizes(p.arraySizes),
-                            structure(0), structureSize(0), fieldName(0), typeName(0)
+                            structure(0), fieldName(0), typeName(0)
                             {
                                 if (basicType == EbtSampler)
                                     sampler = p.sampler;
@@ -442,22 +900,42 @@ public:
                                     sampler.clear();
                                 qualifier = p.qualifier;
                                 if (p.userDef) {
-                                    structure = p.userDef->getStruct();
+                                    structure = p.userDef->getWritableStruct();  // public type is short-lived; there are no sharing issues
                                     typeName = NewPoolTString(p.userDef->getTypeName().c_str());
                                 }
                             }
-    TType(TTypeList* userDef, const TString& n, TStorageQualifier blockQualifier = EvqGlobal) :
-                            basicType(EbtStruct), vectorSize(1), matrixCols(0), matrixRows(0), arraySizes(0),
-                            structure(userDef), fieldName(0)
+    // to efficiently make a dereferenced type
+    // without ever duplicating the outer structure that will be thrown away
+    // and using only shallow copy
+    TType(const TType& type, int derefIndex, bool rowMajor = false)
+                            {
+                                if (! type.isArray() && (type.basicType == EbtStruct || type.basicType == EbtBlock)) {
+                                    // do a structure dereference
+                                    const TTypeList& memberList = *type.getStruct();
+                                    shallowCopy(*memberList[derefIndex].type);
+                                    return;
+                                } else {
+                                    // do an array/vector/matrix dereference
+                                    shallowCopy(type);
+                                    dereference(rowMajor);
+                                }
+                            }
+    // for making structures, ...
+    TType(TTypeList* userDef, const TString& n) :
+                            basicType(EbtStruct), vectorSize(1), matrixCols(0), matrixRows(0),
+                            arraySizes(0), structure(userDef), fieldName(0)
                             {
                                 sampler.clear();
                                 qualifier.clear();
-                                // is it an interface block?
-                                if (blockQualifier != EvqGlobal) {
-                                    qualifier.storage = blockQualifier;
-                                    basicType = EbtBlock;
-                                }
-								typeName = NewPoolTString(n.c_str());
+                                typeName = NewPoolTString(n.c_str());
+                            }
+    // For interface blocks
+    TType(TTypeList* userDef, const TString& n, const TQualifier& q) : 
+                            basicType(EbtBlock), vectorSize(1), matrixCols(0), matrixRows(0),
+                            qualifier(q), arraySizes(0), structure(userDef), fieldName(0)
+                            {
+                                sampler.clear();
+                                typeName = NewPoolTString(n.c_str());
                             }
     virtual ~TType() {}
     
@@ -466,134 +944,220 @@ public:
     // the instances are sharing the same pool. 
     void shallowCopy(const TType& copyOf)
     {
-		basicType = copyOf.basicType;
+        basicType = copyOf.basicType;
         sampler = copyOf.sampler;
-		qualifier = copyOf.qualifier;
-		vectorSize = copyOf.vectorSize;
-		matrixCols = copyOf.matrixCols;
-		matrixRows = copyOf.matrixRows;
+        qualifier = copyOf.qualifier;
+        vectorSize = copyOf.vectorSize;
+        matrixCols = copyOf.matrixCols;
+        matrixRows = copyOf.matrixRows;
         arraySizes = copyOf.arraySizes;
         structure = copyOf.structure;
-        structureSize = copyOf.structureSize;
-	    fieldName = copyOf.fieldName;
-	    typeName = copyOf.typeName;
+        fieldName = copyOf.fieldName;
+        typeName = copyOf.typeName;
     }
 
-	void deepCopy(const TType& copyOf, const TStructureMap& remapper)
-	{
+    void deepCopy(const TType& copyOf)
+    {
         shallowCopy(copyOf);
 
-        if (arraySizes) {
-            arraySizes = NewPoolTArraySizes();
+        if (copyOf.arraySizes) {
+            arraySizes = new TArraySizes;
             *arraySizes = *copyOf.arraySizes;
         }
 
-		if (structure) {
-    		TStructureMapIterator iter;
-	        if ((iter = remapper.find(structure)) == remapper.end()) {
-				// create the new structure here
-				structure = NewPoolTTypeList();
-				for (unsigned int i = 0; i < copyOf.structure->size(); ++i) {
-					TTypeLoc typeLoc;
-					typeLoc.loc = (*copyOf.structure)[i].loc;
-					typeLoc.type = (*copyOf.structure)[i].type->clone(remapper);
-					structure->push_back(typeLoc);
-				}
-			} else {
-				structure = iter->second;
-			}
-		}
+        if (copyOf.structure) {
+            structure = new TTypeList;
+            TStructureMapIterator iter;
+            for (unsigned int i = 0; i < copyOf.structure->size(); ++i) {
+                TTypeLoc typeLoc;
+                typeLoc.loc = (*copyOf.structure)[i].loc;
+                typeLoc.type = new TType();
+                typeLoc.type->deepCopy(*(*copyOf.structure)[i].type);
+                structure->push_back(typeLoc);
+            }
+        }
 
-		if (fieldName)
-			fieldName = NewPoolTString(copyOf.fieldName->c_str());
-		if (typeName)
-			typeName = NewPoolTString(copyOf.typeName->c_str());
-	}
+        if (copyOf.fieldName)
+            fieldName = NewPoolTString(copyOf.fieldName->c_str());
+        if (copyOf.typeName)
+            typeName = NewPoolTString(copyOf.typeName->c_str());
+    }
+    
+    TType* clone()
+    {
+        TType *newType = new TType();
+        newType->deepCopy(*this);
+
+        return newType;
+    }
 
     // Merge type from parent, where a parentType is at the beginning of a declaration,
-    // establishing some charastics for all subsequent names, while this type
+    // establishing some characteristics for all subsequent names, while this type
     // is on the individual names.
     void mergeType(const TPublicType& parentType)
     {
         // arrayness is currently the only child aspect that has to be preserved
-        setElementType(parentType.basicType, parentType.vectorSize, parentType.matrixCols, parentType.matrixRows, parentType.userDef);
+        basicType = parentType.basicType;
+        vectorSize = parentType.vectorSize;
+        matrixCols = parentType.matrixCols;
+        matrixRows = parentType.matrixRows;
         qualifier = parentType.qualifier;
         sampler = parentType.sampler;
         if (parentType.arraySizes)
             setArraySizes(parentType.arraySizes);
-        if (parentType.userDef)
+        if (parentType.userDef) {
+            structure = parentType.userDef->getWritableStruct();
             setTypeName(parentType.userDef->getTypeName());
+        }
     }
 
-	TType* clone(const TStructureMap& remapper)
-	{
-		TType *newType = new TType();
-		newType->deepCopy(*this, remapper);
-
-		return newType;
-	}
-
-    virtual void dereference()
+    virtual void dereference(bool rowMajor = false)
     {
         if (arraySizes)
             arraySizes = 0;
         else if (matrixCols > 0) {
-            vectorSize = matrixRows;
+            if (rowMajor)
+                vectorSize = matrixCols;
+            else
+                vectorSize = matrixRows;
             matrixCols = 0;
             matrixRows = 0;
         } else if (vectorSize > 1)
             vectorSize = 1;
     }
 
-    virtual void setElementType(TBasicType t, int s, int mc, int mr, const TType* userDef)
-    {
-        basicType = t;
-        vectorSize = s;
-        matrixCols = mc;
-        matrixRows = mr;
-        if (userDef)
-            structure = userDef->getStruct();
-        // leave array information intact.
-    }
+    virtual void hideMember() { basicType = EbtVoid; vectorSize = 1; }
+    virtual bool hiddenMember() const { return basicType == EbtVoid; }
+
     virtual void setTypeName(const TString& n) { typeName = NewPoolTString(n.c_str()); }
     virtual void setFieldName(const TString& n) { fieldName = NewPoolTString(n.c_str()); }
     virtual const TString& getTypeName() const
     {
-		assert(typeName);    		
-    	return *typeName;
+        assert(typeName);
+        return *typeName;
     }
 
     virtual const TString& getFieldName() const
     {
-    	assert(fieldName);
-		return *fieldName;
+        assert(fieldName);
+        return *fieldName;
     }
 
     virtual TBasicType getBasicType() const { return basicType; }
     virtual const TSampler& getSampler() const { return sampler; }
-    virtual TQualifier& getQualifier() { return qualifier; }
+
+    virtual       TQualifier& getQualifier()       { return qualifier; }
     virtual const TQualifier& getQualifier() const { return qualifier; }
 
     virtual int getVectorSize() const { return vectorSize; }
     virtual int getMatrixCols() const { return matrixCols; }
     virtual int getMatrixRows() const { return matrixRows; }
+    virtual int getArraySize()  const { return arraySizes->sizes.front(); }
+    virtual bool isArrayOfArrays() const { return arraySizes && arraySizes->isArrayOfArrays(); }
+    virtual int getImplicitArraySize () const { return arraySizes->implicitArraySize; }
 
-	virtual bool isMatrix() const { return matrixCols ? true : false; }
-    virtual bool isArray() const  { return arraySizes != 0; }
-    int getArraySize() const { return arraySizes->sizes.front(); }
-    void setArraySizes(TArraySizes* s) 
+    virtual bool isScalar() const { return vectorSize == 1 && ! isStruct() && ! isArray(); }
+    virtual bool isVector() const { return vectorSize > 1; }
+    virtual bool isMatrix() const { return matrixCols ? true : false; }
+    virtual bool isArray()  const { return arraySizes != 0; }
+    virtual bool isImplicitlySizedArray() const { return isArray() && ! getArraySize() && qualifier.storage != EvqBuffer; }
+    virtual bool isExplicitlySizedArray() const { return isArray() && getArraySize(); }
+    virtual bool isRuntimeSizedArray() const { return isArray() && ! getArraySize() && qualifier.storage == EvqBuffer; }
+    virtual bool isStruct() const { return structure != 0; }
+    virtual bool isImage() const { return basicType == EbtSampler && getSampler().image; }
+
+    // Recursively checks if the type contains the given basic type
+    virtual bool containsBasicType(TBasicType checkType) const
     {
-        // copy; we don't want distinct types sharing the same descriptor
-        if (! arraySizes)
-            arraySizes = NewPoolTArraySizes();
+        if (basicType == checkType)
+            return true;
+        if (! structure)
+            return false;
+        for (unsigned int i = 0; i < structure->size(); ++i) {
+            if ((*structure)[i].type->containsBasicType(checkType))
+                return true;
+        }
+        return false;
+    }
+
+    // Recursively check the structure for any arrays, needed for some error checks
+    virtual bool containsArray() const
+    {
+        if (isArray())
+            return true;
+        if (! structure)
+            return false;
+        for (unsigned int i = 0; i < structure->size(); ++i) {
+            if ((*structure)[i].type->containsArray())
+                return true;
+        }
+        return false;
+    }
+
+    // Check the structure for any structures, needed for some error checks
+    virtual bool containsStructure() const
+    {
+        if (! structure)
+            return false;
+        for (unsigned int i = 0; i < structure->size(); ++i) {
+            if ((*structure)[i].type->structure)
+                return true;
+        }
+        return false;
+    }
+
+    // Recursively check the structure for any implicitly-sized arrays, needed for triggering a copyUp().
+    virtual bool containsImplicitlySizedArray() const
+    {
+        if (isImplicitlySizedArray())
+            return true;
+        if (! structure)
+            return false;
+        for (unsigned int i = 0; i < structure->size(); ++i) {
+            if ((*structure)[i].type->containsImplicitlySizedArray())
+                return true;
+        }
+        return false;
+    }
+
+    // Array editing methods.  Array descriptors can be shared across
+    // type instances.  This allows all uses of the same array
+    // to be updated at once.  E.g., all nodes can be explicitly sized
+    // by tracking and correcting one implicit size.  Or, all nodes
+    // can get the explicit size on a redeclaration that gives size.
+    //
+    // N.B.:  Don't share with the shared symbol tables (symbols are
+    // marked as isReadOnly().  Such symbols with arrays that will be
+    // edited need to copyUp() on first use, so that 
+    // A) the edits don't effect the shared symbol table, and
+    // B) the edits are shared across all users.
+    void updateArraySizes(const TType& type)
+    {
+        // For when we may already be sharing existing array descriptors,
+        // keeping the pointers the same, just updating the contents.
+        *arraySizes = *type.arraySizes;
+    }
+    void setArraySizes(TArraySizes* s)
+    {
+        // For setting a fresh new set of array sizes, not yet worrying about sharing.
+        arraySizes = new TArraySizes;
         *arraySizes = *s;
     }
-    
+    void setArraySizes(const TType& type) { setArraySizes(type.arraySizes); }
     void changeArraySize(int s) { arraySizes->sizes.front() = s; }
-    void setMaxArraySize (int s) { arraySizes->maxArraySize = s; }
-    int getMaxArraySize () const { return arraySizes->maxArraySize; }
-    virtual bool isVector() const { return vectorSize > 1; }
-    virtual bool isScalar() const { return vectorSize == 1; }
+    void setImplicitArraySize (int s) { arraySizes->implicitArraySize = s; }
+
+    // Recursively make the implicit array size the explicit array size, through the type tree.
+    void adoptImplicitArraySizes()
+    {
+        if (isImplicitlySizedArray())
+            changeArraySize(getImplicitArraySize());
+        if (isStruct()) {
+            for (int i = 0; i < (int)structure->size(); ++i)
+                (*structure)[i].type->adoptImplicitArraySizes();
+        }
+    }
+
     const char* getBasicString() const 
     {
         return TType::getBasicString(basicType);
@@ -608,6 +1172,7 @@ public:
         case EbtInt:               return "int";
         case EbtUint:              return "uint";
         case EbtBool:              return "bool";
+        case EbtAtomicUint:        return "atomic_uint";
         case EbtSampler:           return "sampler/image";
         case EbtStruct:            return "structure";
         case EbtBlock:             return "block";
@@ -619,18 +1184,45 @@ public:
     {
         const int maxSize = GlslangMaxTypeLength;
         char buf[maxSize];
-        char *p = &buf[0];
-	    char *end = &buf[maxSize];
+        char* p = &buf[0];
+        char* end = &buf[maxSize];
 
         if (qualifier.hasLayout()) {
-            p += snprintf(p, end - p, "layout(");
-            if (qualifier.hasLocation())
-                p += snprintf(p, end - p, "location=%d ", qualifier.layoutSlotLocation);
-            if (qualifier.layoutMatrix != ElmNone)
-                p += snprintf(p, end - p, "%s ", TQualifier::getLayoutMatrixString(qualifier.layoutMatrix));
-            if (qualifier.layoutPacking != ElpNone)
-                p += snprintf(p, end - p, "%s ", TQualifier::getLayoutPackingString(qualifier.layoutPacking));
-            p += snprintf(p, end - p, ") ");
+            // To reduce noise, skip this if the only layout is an xfb_buffer
+            // with no triggering xfb_offset.
+            TQualifier noXfbBuffer = qualifier;
+            noXfbBuffer.layoutXfbBuffer = TQualifier::layoutXfbBufferEnd;
+            if (noXfbBuffer.hasLayout()) {
+                p += snprintf(p, end - p, "layout(");
+                if (qualifier.hasAnyLocation()) {
+                    p += snprintf(p, end - p, "location=%d ", qualifier.layoutLocation);
+                    if (qualifier.hasComponent())
+                        p += snprintf(p, end - p, "component=%d ", qualifier.layoutComponent);
+                    if (qualifier.hasIndex())
+                        p += snprintf(p, end - p, "index=%d ", qualifier.layoutIndex);
+                }
+                if (qualifier.hasBinding())
+                    p += snprintf(p, end - p, "binding=%d ", qualifier.layoutBinding);
+                if (qualifier.hasStream())
+                    p += snprintf(p, end - p, "stream=%d ", qualifier.layoutStream);
+                if (qualifier.hasMatrix())
+                    p += snprintf(p, end - p, "%s ", TQualifier::getLayoutMatrixString(qualifier.layoutMatrix));
+                if (qualifier.hasPacking())
+                    p += snprintf(p, end - p, "%s ", TQualifier::getLayoutPackingString(qualifier.layoutPacking));
+                if (qualifier.hasOffset())
+                    p += snprintf(p, end - p, "offset=%d ", qualifier.layoutOffset);
+                if (qualifier.hasAlign())
+                    p += snprintf(p, end - p, "align=%d ", qualifier.layoutAlign);
+                if (qualifier.hasFormat())
+                    p += snprintf(p, end - p, "%s ", TQualifier::getLayoutFormatString(qualifier.layoutFormat));
+                if (qualifier.hasXfbBuffer() && qualifier.hasXfbOffset())
+                    p += snprintf(p, end - p, "xfb_buffer=%d ", qualifier.layoutXfbBuffer);
+                if (qualifier.hasXfbOffset())
+                    p += snprintf(p, end - p, "xfb_offset=%d ", qualifier.layoutXfbOffset);
+                if (qualifier.hasXfbStride())
+                    p += snprintf(p, end - p, "xfb_stride=%d ", qualifier.layoutXfbStride);
+                p += snprintf(p, end - p, ") ");
+            }
         }
 
         if (qualifier.invariant)
@@ -647,8 +1239,6 @@ public:
             p += snprintf(p, end - p, "patch ");
         if (qualifier.sample)
             p += snprintf(p, end - p, "sample ");
-        if (qualifier.shared)
-            p += snprintf(p, end - p, "shared ");
         if (qualifier.coherent)
             p += snprintf(p, end - p, "coherent ");
         if (qualifier.volatil)
@@ -663,7 +1253,7 @@ public:
             p += snprintf(p, end - p, "%s ", getStorageQualifierString());
         if (arraySizes) {
             if (arraySizes->sizes.front() == 0)
-                p += snprintf(p, end - p, "unsized array of ");
+                p += snprintf(p, end - p, "implicitly-sized array of ");
             else
                 p += snprintf(p, end - p, "%d-element array of ", arraySizes->sizes.front());
         }
@@ -676,12 +1266,27 @@ public:
 
         *p = 0;
         TString s(buf);
-        s.append(getCompleteTypeString());
+        s.append(getBasicTypeString());
+
+        // Add struct/block members
+        if (structure) {
+            s.append("{");
+            for (size_t i = 0; i < structure->size(); ++i) {
+                if (! (*structure)[i].type->hiddenMember()) {
+                    s.append((*structure)[i].type->getCompleteString());
+                    s.append(" ");
+                    s.append((*structure)[i].type->getFieldName());
+                    if (i < structure->size() - 1)
+                        s.append(", ");
+                }
+            }
+            s.append("}");
+        }
 
         return s;
     }
 
-    TString getCompleteTypeString() const
+    TString getBasicTypeString() const
     {
         if (basicType == EbtSampler)
             return sampler.getString();
@@ -691,26 +1296,28 @@ public:
 
     const char* getStorageQualifierString() const { return GetStorageQualifierString(qualifier.storage); }
     const char* getPrecisionQualifierString() const { return GetPrecisionQualifierString(qualifier.precision); }
-    TTypeList* getStruct() { return structure; }
-    TTypeList* getStruct() const { return structure; }
+    const TTypeList* getStruct() const { return structure; }
+    TTypeList* getWritableStruct() const { return structure; }  // This should only be used when known to not be sharing with other threads
 
-    int getObjectSize() const
+    int computeNumComponents() const
     {
-        int totalSize;
+        int components = 0;
 
-        if (getBasicType() == EbtStruct || getBasicType() == EbtBlock)
-            totalSize = getStructSize();
-        else if (matrixCols)
-            totalSize = matrixCols * matrixRows;
+        if (getBasicType() == EbtStruct || getBasicType() == EbtBlock) {
+            for (TTypeList::const_iterator tl = getStruct()->begin(); tl != getStruct()->end(); tl++)
+                components += ((*tl).type)->computeNumComponents();
+        } else if (matrixCols)
+            components = matrixCols * matrixRows;
         else
-            totalSize = vectorSize;
+            components = vectorSize;
 
-        if (isArray())
-            totalSize *= Max(getArraySize(), getMaxArraySize());
+        if (isArray()) {
+            // this function can only be used in paths that have a known array size
+            assert(isExplicitlySizedArray());
+            components *= getArraySize();
+        }
 
-        // TODO: desktop arrays: it should be ill-defined to get object size if the array is not sized, so the max() above maybe should be an assert
-
-        return totalSize;
+        return components;
     }
 
     // append this type's mangled name to the passed in 'name'
@@ -720,27 +1327,73 @@ public:
         name += ';' ;
     }
 
+    // Do two structure types match?  They could be declared independently,
+    // in different places, but still might satisfy the definition of matching.
+    // From the spec:
+    //
+    // "Structures must have the same name, sequence of type names, and 
+    //  type definitions, and member names to be considered the same type. 
+    //  This rule applies recursively for nested or embedded types."
+    //
+    bool sameStructType(const TType& right) const
+    {
+        // Most commonly, they are both 0, or the same pointer to the same actual structure
+        if (structure == right.structure)
+            return true;
+
+        // Both being 0 was caught above, now they both have to be structures of the same number of elements
+        if (structure == 0 || right.structure == 0 ||
+            structure->size() != right.structure->size())
+            return false;
+
+        // Structure names have to match
+        if (*typeName != *right.typeName)
+            return false;
+
+        // Compare the names and types of all the members, which have to match
+        for (unsigned int i = 0; i < structure->size(); ++i) {
+            if ((*structure)[i].type->getFieldName() != (*right.structure)[i].type->getFieldName())
+                return false;
+
+            if (*(*structure)[i].type != *(*right.structure)[i].type)
+                return false;
+        }
+
+        return true;
+    }
+
+    // See if two types match, in all aspects except arrayness
     bool sameElementType(const TType& right) const
     {
-        return  basicType == right.basicType  &&
-                  sampler == right.sampler    &&
+        return basicType == right.basicType && sameElementShape(right);
+    }
+
+    // See if two type's arrayness match
+    bool sameArrayness(const TType& right) const
+    {
+        return ((arraySizes == 0 && right.arraySizes == 0) ||
+                (arraySizes && right.arraySizes && arraySizes->sizes == right.arraySizes->sizes));
+    }
+
+    // See if two type's elements match in all ways except basic type
+    bool sameElementShape(const TType& right) const
+    {
+        return    sampler == right.sampler    &&
                vectorSize == right.vectorSize &&
                matrixCols == right.matrixCols &&
                matrixRows == right.matrixRows &&
-                structure == right.structure;
+               sameStructType(right);
     }
 
+    // See if two types match in all ways (just the actual type, not qualification)
     bool operator==(const TType& right) const
     {
-        return sameElementType(right) &&
-               (arraySizes == 0 && right.arraySizes == 0 ||
-                (arraySizes && right.arraySizes && arraySizes->sizes == right.arraySizes->sizes));
-        // don't check the qualifier, it's not ever what's being sought after
+        return sameElementType(right) && sameArrayness(right);
     }
 
     bool operator!=(const TType& right) const
     {
-        return !operator==(right);
+        return ! operator==(right);
     }
 
 protected:
@@ -749,21 +1402,18 @@ protected:
     TType& operator=(const TType& type);
 
     void buildMangledName(TString&);
-    int getStructSize() const;
 
-	TBasicType basicType : 8;
+    TBasicType basicType : 8;
     int vectorSize       : 4;
     int matrixCols       : 4;
     int matrixRows       : 4;
     TSampler sampler;
     TQualifier qualifier;
 
-    TArraySizes* arraySizes;
-
-    TTypeList* structure;       // 0 unless this is a struct
-    mutable int structureSize;  // a cache, updated on first access
-	TString *fieldName;         // for structure field names
-	TString *typeName;          // for structure field type name
+    TArraySizes* arraySizes;    // 0 unless this is an array; can be shared across types
+    TTypeList* structure;       // 0 unless this is a struct; can be shared across types
+    TString *fieldName;         // for structure field names
+    TString *typeName;          // for structure type name
 };
 
 } // end namespace glslang

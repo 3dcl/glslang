@@ -46,7 +46,9 @@
 #define SH_IMPORT_EXPORT
 #else
 #define SH_IMPORT_EXPORT
+#ifndef __fastcall
 #define __fastcall
+#endif
 #define C_DECL
 #endif
 
@@ -96,7 +98,7 @@ typedef enum {
 
 namespace glslang {
 
-extern const char* StageName[EShLangCount];
+const char* StageName(EShLanguage);
 
 } // end namespace glslang
 
@@ -163,8 +165,8 @@ SH_IMPORT_EXPORT ShHandle ShConstructUniformMap();                 // one per un
 SH_IMPORT_EXPORT void ShDestruct(ShHandle);
 
 //
-// The return value of ShCompile is boolean, indicating
-// success or failure.
+// The return value of ShCompile is boolean, non-zero indicating
+// success.
 //
 // The info-log should be written by ShCompile into 
 // ShHandle, so it can answer future queries.
@@ -188,7 +190,7 @@ SH_IMPORT_EXPORT int ShLink(
     const int numHandles,
     ShHandle uniformMap,          // updated with new uniforms
     short int** uniformsAccessed,  // returned with indexes of uniforms accessed
-    int* numUniformsAccessed); 	
+    int* numUniformsAccessed);
 
 SH_IMPORT_EXPORT int ShLinkExt(
     const ShHandle,               // linker object
@@ -221,21 +223,6 @@ SH_IMPORT_EXPORT int ShExcludeAttributes(const ShHandle, int *attributes, int co
 //
 SH_IMPORT_EXPORT int ShGetUniformLocation(const ShHandle uniformMap, const char* name);
 
-// These are currently unused in the front end, but consumers of the front-end still 
-// be rely on them:
-enum TDebugOptions {
-    EDebugOpNone               = 0x000,
-    EDebugOpIntermediate       = 0x001,
-    EDebugOpAssembly           = 0x002,
-    EDebugOpObjectCode         = 0x004,
-    EDebugOpLinkMaps           = 0x008,
-    EDebugOpSuppressInfolog    = 0x010,
-    EDebugOpMemoryLeakMode     = 0x020,
-    EDebugOpTexturePrototypes  = 0x040,
-    EDebugOpRelaxedErrors      = 0x080,
-    EDebugOpGiveWarnings       = 0x100,
-};
-
 #ifdef __cplusplus
     }  // end extern "C"
 #endif
@@ -263,24 +250,46 @@ class TInfoSink;
 
 namespace glslang {
 
+const char* GetEsslVersionString();
+const char* GetGlslVersionString();
+
 class TIntermediate;
 class TProgram;
+class TPoolAllocator;
 
+// Call this exactly once per process before using anything else
+bool InitializeProcess();
+
+// Call once per process to tear down everything
+void FinalizeProcess();
+
+// Make one TShader per shader that you will link into a program.  Then
+// provide the shader through setStrings(), then call parse(), then query
+// the info logs.
+//
+// N.B.: Does not yet support having the same TShader instance being linked into multiple programs.
+//
+// N.B.: Destruct a linked program *before* destructing the shaders linked into it.
+//
 class TShader {
 public:
     explicit TShader(EShLanguage);
     virtual ~TShader();
-    void setStrings(char** s, int n) { strings = s; numStrings = n; }
+    void setStrings(const char* const* s, int n) { strings = s; numStrings = n; }
     bool parse(const TBuiltInResource*, int defaultVersion, bool forwardCompatible, EShMessages);
+
     const char* getInfoLog();
     const char* getInfoDebugLog();
 
+    EShLanguage getStage() const { return stage; }
+
 protected:
+    TPoolAllocator* pool;
     EShLanguage stage;
     TCompiler* compiler;
     TIntermediate* intermediate;
     TInfoSink* infoSink;
-    char** strings;
+    const char* const* strings;
     int numStrings;
 
     friend class TProgram;
@@ -289,27 +298,56 @@ private:
     TShader& operator=(TShader&);
 };
 
+class TReflection;
+
+// Make one TProgram per set of shaders that will get linked together.  Add all 
+// the shaders that are to be linked together.  After calling shader.parse()
+// for all shaders, call link().
+//
+// N.B.: Destruct a linked program *before* destructing the shaders linked into it.
+//
 class TProgram {
 public:
     TProgram();
     virtual ~TProgram();
     void addShader(TShader* shader) { stages[shader->stage].push_back(shader); }
+
+    // Link Validation interface
     bool link(EShMessages);
     const char* getInfoLog();
     const char* getInfoDebugLog();
+
+    TIntermediate* getIntermediate(EShLanguage stage) const { return intermediate[stage]; }
+
+    // Reflection Interface
+    bool buildReflection();                          // call first, to do liveness analysis, index mapping, etc.; returns false on failure
+    int getNumLiveUniformVariables();                // can be used for glGetProgramiv(GL_ACTIVE_UNIFORMS)
+    int getNumLiveUniformBlocks();                   // can be used for glGetProgramiv(GL_ACTIVE_UNIFORM_BLOCKS)
+    const char* getUniformName(int index);           // can be used for "name" part of glGetActiveUniform()
+    const char* getUniformBlockName(int blockIndex); // can be used for glGetActiveUniformBlockName()
+    int getUniformBlockSize(int blockIndex);         // can be used for glGetActiveUniformBlockiv(UNIFORM_BLOCK_DATA_SIZE)
+    int getUniformIndex(const char* name);           // can be used for glGetUniformIndices()
+    int getUniformBlockIndex(int index);             // can be used for glGetActiveUniformsiv(GL_UNIFORM_BLOCK_INDEX)
+    int getUniformType(int index);                   // can be used for glGetActiveUniformsiv(GL_UNIFORM_TYPE)
+    int getUniformBufferOffset(int index);           // can be used for glGetActiveUniformsiv(GL_UNIFORM_OFFSET)
+    int getUniformArraySize(int index);              // can be used for glGetActiveUniformsiv(GL_UNIFORM_SIZE)
+    void dumpReflection();
+
 protected:
     bool linkStage(EShLanguage, EShMessages);
 
-protected:
+    TPoolAllocator* pool;
     std::list<TShader*> stages[EShLangCount];
     TIntermediate* intermediate[EShLangCount];
+    bool newedIntermediate[EShLangCount];      // track which intermediate were "new" versus reusing a singleton unit in a stage
     TInfoSink* infoSink;
+    TReflection* reflection;
+    bool linked;
 
 private:
     TProgram& operator=(TProgram&);
 };
 
 } // end namespace glslang
-
 
 #endif // _COMPILER_INTERFACE_INCLUDED_

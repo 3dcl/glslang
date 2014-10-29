@@ -88,23 +88,7 @@ NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PpContext.h"
 #include "PpTokens.h"
-
-namespace {
-
-using namespace glslang;
-
-int eof_scan(TPpContext*, TPpContext::InputSrc*, TPpToken*)
-{
-    return EOF;
-}
-
-void noop(TPpContext*, TPpContext::InputSrc *in, int ch, TPpToken * yylvalpp)
-{
-}
-
-TPpContext::InputSrc eof_inputsrc = { 0, &eof_scan, &eof_scan, &noop };
-
-} // end anonymous namespace
+#include "Scan.h"
 
 namespace glslang {
 
@@ -114,85 +98,10 @@ int TPpContext::InitScanner(TPpContext *cpp)
     if (!InitCPP())
         return 0;
 
-    mostRecentToken = 0;
-    currentInput = &eof_inputsrc;
     previous_token = '\n';
-    notAVersionToken = false;
-
-    return 1;
-} // InitScanner
-
-int TPpContext::FreeScanner(void)
-{
-    return (FreeCPP());
-}
-
-/*
-* str_getch()
-* takes care of reading from multiple strings.
-* returns the next-char from the input stream.
-* returns EOF when the complete shader is parsed.
-*/
-int TPpContext::str_getch(TPpContext* pp, StringInputSrc *in)
-{
-    for(;;) {
-        if (*in->p) {
-            if (*in->p == '\n') {
-                in->base.line++;
-                ++pp->parseContext.currentLoc.line;
-            }
-            return *in->p++;
-        }
-        if (pp->currentString < 0) {
-            // we only parsed the built-in pre-amble; start with clean slate for user code
-            pp->notAVersionToken = false;
-        }
-        if (++(pp->currentString) < pp->numStrings) {
-            free(in);
-            pp->parseContext.currentLoc.string = pp->currentString;
-            pp->parseContext.currentLoc.line = 1;
-            pp->ScanFromString(pp->strings[pp->currentString]);
-            in=(StringInputSrc*)pp->currentInput;
-            continue;             
-        } else {
-            pp->currentInput = in->base.prev;
-            pp->currentString = 0;
-            free(in);
-            return EOF;
-        }  
-    }
-} // str_getch
-
-void TPpContext::str_ungetch(TPpContext* pp, StringInputSrc *in, int ch, TPpToken *type)
-{
-    if (in->p[-1] == ch)in->p--;
-    else {
-        *(in->p)='\0'; //this would take care of shifting to the previous string.
-        pp->currentString--;
-        pp->parseContext.currentLoc.string = pp->currentString;
-    }  
-    if (ch == '\n') {
-        in->base.line--;
-        --pp->parseContext.currentLoc.line;
-    }
-} // str_ungetch
-
-int TPpContext::ScanFromString(char *s)
-{
-
-    StringInputSrc *in = (StringInputSrc *)malloc(sizeof(StringInputSrc));
-    memset(in, 0, sizeof(StringInputSrc));
-    in->p = s;
-    in->base.line = 1;
-    in->base.scan = byte_scan;
-    in->base.getch = (int (*)(TPpContext*, InputSrc *, TPpToken *))str_getch;
-    in->base.ungetch = (void (*)(TPpContext*, InputSrc *, int, TPpToken *))str_ungetch;
-    in->base.prev = currentInput;
-    currentInput = &in->base;
 
     return 1;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// Floating point constants: /////////////////////////////////
@@ -204,7 +113,7 @@ int TPpContext::ScanFromString(char *s)
 *         letter 'e', or a precision ending (e.g., F or LF).
 */
 
-int TPpContext::lFloatConst(char *str, int len, int ch, TPpToken * yylvalpp)
+int TPpContext::lFloatConst(int len, int ch, TPpToken* ppToken)
 {
     bool HasDecimalOrExponent = false;
     int declen, exp, ExpSign;
@@ -215,10 +124,11 @@ int TPpContext::lFloatConst(char *str, int len, int ch, TPpToken * yylvalpp)
     exp = 0;
 
     str_len=len;
+    char* str = ppToken->name;
     if (ch == '.') {
         HasDecimalOrExponent = true;
         str[len++]=ch;
-        ch = currentInput->getch(this, currentInput, yylvalpp);
+        ch = getChar();
         while (ch >= '0' && ch <= '9') {
             if (len < TPpToken::maxTokenLength) {
                 declen++;
@@ -226,9 +136,9 @@ int TPpContext::lFloatConst(char *str, int len, int ch, TPpToken * yylvalpp)
                     str[len] = ch;
                     len++;str_len++;
                 }
-                ch = currentInput->getch(this, currentInput, yylvalpp);
+                ch = getChar();
             } else {
-                parseContext.error(yylvalpp->loc, "float literal too long", "", "");
+                parseContext.error(ppToken->loc, "float literal too long", "", "");
                 len = 1,str_len=1;
             }
         }
@@ -239,111 +149,114 @@ int TPpContext::lFloatConst(char *str, int len, int ch, TPpToken * yylvalpp)
     if (ch == 'e' || ch == 'E') {
         HasDecimalOrExponent = true;
         if (len >= TPpToken::maxTokenLength) {
-            parseContext.error(yylvalpp->loc, "float literal too long", "", "");
+            parseContext.error(ppToken->loc, "float literal too long", "", "");
             len = 1,str_len=1;
         } else {
             ExpSign = 1;
             str[len++]=ch;
-            ch = currentInput->getch(this, currentInput, yylvalpp);
+            ch = getChar();
             if (ch == '+') {
                 str[len++]=ch;  
-                ch = currentInput->getch(this, currentInput, yylvalpp);
+                ch = getChar();
             } else if (ch == '-') {
                 ExpSign = -1;
                 str[len++]=ch;
-                ch = currentInput->getch(this, currentInput, yylvalpp);
+                ch = getChar();
             }
             if (ch >= '0' && ch <= '9') {
                 while (ch >= '0' && ch <= '9') {
                     if (len < TPpToken::maxTokenLength) {
                         exp = exp*10 + ch - '0';
                         str[len++]=ch;
-                        ch = currentInput->getch(this, currentInput, yylvalpp);
+                        ch = getChar();
                     } else {
-                        parseContext.error(yylvalpp->loc, "float literal too long", "", "");
+                        parseContext.error(ppToken->loc, "float literal too long", "", "");
                         len = 1,str_len=1;
                     }
                 }
             } else {
-                parseContext.error(yylvalpp->loc, "bad character in float exponent", "", "");
+                parseContext.error(ppToken->loc, "bad character in float exponent", "", "");
             }
             exp *= ExpSign;
         }
     }
 
     if (len == 0) {
-        yylvalpp->dval = 0.0;
+        ppToken->dval = 0.0;
         strcpy(str, "0.0");
     } else {
         if (ch == 'l' || ch == 'L') {
+            parseContext.doubleCheck(ppToken->loc, "double floating-point suffix");
             if (! HasDecimalOrExponent)
-                parseContext.error(yylvalpp->loc, "float literal needs a decimal point or exponent", "", "");
-            int ch2 = currentInput->getch(this, currentInput, yylvalpp);
+                parseContext.error(ppToken->loc, "float literal needs a decimal point or exponent", "", "");
+            int ch2 = getChar();
             if (ch2 != 'f' && ch2 != 'F') {
-                currentInput->ungetch(this, currentInput, ch2, yylvalpp);
-                currentInput->ungetch(this, currentInput, ch, yylvalpp);
+                ungetChar();
+                ungetChar();
             } else {
                 if (len < TPpToken::maxTokenLength) {
                     str[len++] = ch;
                     str[len++] = ch2;
                     isDouble = 1;
                 } else {
-                    parseContext.error(yylvalpp->loc, "float literal too long", "", "");
+                    parseContext.error(ppToken->loc, "float literal too long", "", "");
                     len = 1,str_len=1;
                 }
             }
         } else if (ch == 'f' || ch == 'F') {
+            parseContext.profileRequires(ppToken->loc,  EEsProfile, 300, 0, "floating-point suffix");
+            if ((parseContext.messages & EShMsgRelaxedErrors) == 0)
+                parseContext.profileRequires(ppToken->loc, ~EEsProfile, 120, 0, "floating-point suffix");
             if (! HasDecimalOrExponent)
-                parseContext.error(yylvalpp->loc, "float literal needs a decimal point or exponent", "", "");
+                parseContext.error(ppToken->loc, "float literal needs a decimal point or exponent", "", "");
             if (len < TPpToken::maxTokenLength)
                 str[len++] = ch;
             else {
-                parseContext.error(yylvalpp->loc, "float literal too long", "", "");
+                parseContext.error(ppToken->loc, "float literal too long", "", "");
                 len = 1,str_len=1;
             }
         } else 
-            currentInput->ungetch(this, currentInput, ch, yylvalpp);
+            ungetChar();
 
-        str[len]='\0';      
+        str[len]='\0';
 
-        yylvalpp->dval = strtod(str, 0);
+        ppToken->dval = strtod(str, 0);
     }
-    // Suffix:
-    strcpy(yylvalpp->name, str);
 
     if (isDouble)
         return CPP_DOUBLECONSTANT;
     else
         return CPP_FLOATCONSTANT;
-} // lFloatConst
+}
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////// Normal Scanner //////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-int TPpContext::byte_scan(TPpContext* pp, InputSrc *in, TPpToken * yylvalpp)
+//
+// Scanner used to tokenize source stream.
+//
+int TPpContext::tStringInput::scan(TPpToken* ppToken)
 {
     char tokenText[TPpToken::maxTokenLength + 1];
     int AlreadyComplained = 0;
     int len, ch, ii;
     unsigned ival = 0;
 
+    ppToken->ival = 0;
+    ppToken->space = false;
+    ch = pp->getChar();
     for (;;) {
-        yylvalpp->ival = 0;
-        ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
-
-        while (ch == ' ' || ch == '\t' || ch == '\r') {
-            yylvalpp->ival = 1;
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+        while (ch == ' ' || ch == '\t') {
+            ppToken->space = true;
+            ch = pp->getChar();
         }
 
-        yylvalpp->loc = pp->parseContext.currentLoc;
+        ppToken->loc = pp->parseContext.getCurrentLoc();
         len = 0;
         switch (ch) {
         default:
-            return ch; // Single character token
+            return ch; // Single character token, including '#' and '\' (escaped newlines are handled at a lower level, so this is just a '\' token)
+
         case EOF:
-            return EOF;
+            return endOfInput;
+
         case 'A': case 'B': case 'C': case 'D': case 'E':
         case 'F': case 'G': case 'H': case 'I': case 'J':
         case 'K': case 'L': case 'M': case 'N': case 'O':
@@ -355,57 +268,49 @@ int TPpContext::byte_scan(TPpContext* pp, InputSrc *in, TPpToken * yylvalpp)
         case 'k': case 'l': case 'm': case 'n': case 'o':
         case 'p': case 'q': case 'r': case 's': case 't':
         case 'u': case 'v': case 'w': case 'x': case 'y':
-        case 'z':            
+        case 'z':
             do {
-                if (ch == '\\') {
-                    // escaped character
-                    ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
-                    if (ch == '\r' || ch == '\n') {
-                        int nextch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
-                        if (ch == '\r' && nextch == '\n')
-                            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
-                        else
-                            ch = nextch;
-                    } else
-                        pp->parseContext.error(yylvalpp->loc, "can only escape newlines", "\\", "");
-                } else if (len < TPpToken::maxTokenLength) {
+                if (len < TPpToken::maxTokenLength) {
                     tokenText[len++] = ch;
-                    ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);					
+                    ch = pp->getChar();					
                 } else {
                     if (! AlreadyComplained) {
-                        pp->parseContext.error(yylvalpp->loc, "name too long", "", "");
+                        pp->parseContext.error(ppToken->loc, "name too long", "", "");
                         AlreadyComplained = 1;
                     }
-                    ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);					
+                    ch = pp->getChar();
                 }
             } while ((ch >= 'a' && ch <= 'z') ||
                 (ch >= 'A' && ch <= 'Z') ||
                 (ch >= '0' && ch <= '9') ||
-                ch == '_' ||
-                ch == '\\');
+                ch == '_');
+
+            // line continuation with no token before or after makes len == 0, and need to start over skipping white space, etc.
+            if (len == 0)
+                continue;
 
             tokenText[len] = '\0';
-            pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
-            yylvalpp->atom = pp->LookUpAddString(&pp->atomTable, tokenText);
+            pp->ungetChar();
+            ppToken->atom = pp->LookUpAddString(tokenText);
 
             return CPP_IDENTIFIER;
         case '0':
-            yylvalpp->name[len++] = ch;
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ppToken->name[len++] = ch;
+            ch = pp->getChar();
             if (ch == 'x' || ch == 'X') {
                 // must be hexidecimal
 
                 bool isUnsigned = false;
-                yylvalpp->name[len++] = ch;
-                ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+                ppToken->name[len++] = ch;
+                ch = pp->getChar();
                 if ((ch >= '0' && ch <= '9') ||
                     (ch >= 'A' && ch <= 'F') ||
-                    (ch >= 'a' && ch <= 'f'))
-                {
+                    (ch >= 'a' && ch <= 'f')) {
+
                     ival = 0;
                     do {
                         if (ival <= 0x0fffffff) {
-                            yylvalpp->name[len++] = ch;
+                            ppToken->name[len++] = ch;
                             if (ch >= '0' && ch <= '9') {
                                 ii = ch - '0';
                             } else if (ch >= 'A' && ch <= 'F') {
@@ -413,30 +318,30 @@ int TPpContext::byte_scan(TPpContext* pp, InputSrc *in, TPpToken * yylvalpp)
                             } else if (ch >= 'a' && ch <= 'f') {
                                 ii = ch - 'a' + 10;
                             } else
-                                pp->parseContext.error(yylvalpp->loc, "bad digit in hexidecimal literal", "", "");
+                                pp->parseContext.error(ppToken->loc, "bad digit in hexidecimal literal", "", "");
                             ival = (ival << 4) | ii;
                         } else {
                             if (! AlreadyComplained) {
-                                pp->parseContext.error(yylvalpp->loc, "hexidecimal literal too big", "", "");
+                                pp->parseContext.error(ppToken->loc, "hexidecimal literal too big", "", "");
                                 AlreadyComplained = 1;
                             }
                             ival = 0xffffffff;
                         }
-                        ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+                        ch = pp->getChar();
                     } while ((ch >= '0' && ch <= '9') ||
                         (ch >= 'A' && ch <= 'F') ||
                         (ch >= 'a' && ch <= 'f'));
                 } else {
-                    pp->parseContext.error(yylvalpp->loc, "bad digit in hexidecimal literal", "", "");
+                    pp->parseContext.error(ppToken->loc, "bad digit in hexidecimal literal", "", "");
                 }
                 if (ch == 'u' || ch == 'U') {
                     if (len < TPpToken::maxTokenLength)
-                        yylvalpp->name[len++] = ch;
+                        ppToken->name[len++] = ch;
                     isUnsigned = true;
                 } else
-                    pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
-                yylvalpp->name[len] = '\0';
-                yylvalpp->ival = (int)ival;
+                    pp->ungetChar();
+                ppToken->name[len] = '\0';
+                ppToken->ival = (int)ival;
 
                 if (isUnsigned)
                     return CPP_UINTCONSTANT;
@@ -453,9 +358,9 @@ int TPpContext::byte_scan(TPpContext* pp, InputSrc *in, TPpToken * yylvalpp)
                 // see how much octal-like stuff we can read
                 while (ch >= '0' && ch <= '7') {
                     if (len < TPpToken::maxTokenLength)
-                        yylvalpp->name[len++] = ch;
+                        ppToken->name[len++] = ch;
                     else if (! AlreadyComplained) {
-                        pp->parseContext.error(yylvalpp->loc, "numeric literal too long", "", "");
+                        pp->parseContext.error(ppToken->loc, "numeric literal too long", "", "");
                         AlreadyComplained = 1;
                     }
                     if (ival <= 0x1fffffff) {
@@ -463,7 +368,7 @@ int TPpContext::byte_scan(TPpContext* pp, InputSrc *in, TPpToken * yylvalpp)
                         ival = (ival << 3) | ii;
                     } else
                         octalOverflow = true;
-                    ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+                    ch = pp->getChar();
                 }
 
                 // could be part of a float...
@@ -471,33 +376,33 @@ int TPpContext::byte_scan(TPpContext* pp, InputSrc *in, TPpToken * yylvalpp)
                     nonOctal = true;
                     do {
                         if (len < TPpToken::maxTokenLength)
-                            yylvalpp->name[len++] = ch;
+                            ppToken->name[len++] = ch;
                         else if (! AlreadyComplained) {
-                            pp->parseContext.error(yylvalpp->loc, "numeric literal too long", "", "");
+                            pp->parseContext.error(ppToken->loc, "numeric literal too long", "", "");
                             AlreadyComplained = 1;
                         }
-                        ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+                        ch = pp->getChar();
                     } while (ch >= '0' && ch <= '9');
                 }
                 if (ch == '.' || ch == 'e' || ch == 'f' || ch == 'E' || ch == 'F' || ch == 'l' || ch == 'L') 
-                    return pp->lFloatConst(yylvalpp->name, len, ch, yylvalpp);
+                    return pp->lFloatConst(len, ch, ppToken);
                 
                 // wasn't a float, so must be octal...
                 if (nonOctal)
-                    pp->parseContext.error(yylvalpp->loc, "octal literal digit too large", "", "");
+                    pp->parseContext.error(ppToken->loc, "octal literal digit too large", "", "");
 
                 if (ch == 'u' || ch == 'U') {
                     if (len < TPpToken::maxTokenLength)
-                        yylvalpp->name[len++] = ch;
+                        ppToken->name[len++] = ch;
                     isUnsigned = true;
                 } else
-                    pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
-                yylvalpp->name[len] = '\0';
+                    pp->ungetChar();
+                ppToken->name[len] = '\0';
 
                 if (octalOverflow)
-                    pp->parseContext.error(yylvalpp->loc, "octal literal too big", "", "");
+                    pp->parseContext.error(ppToken->loc, "octal literal too big", "", "");
 
-                yylvalpp->ival = (int)ival;
+                ppToken->ival = (int)ival;
 
                 if (isUnsigned)
                     return CPP_UINTCONSTANT;
@@ -511,38 +416,38 @@ int TPpContext::byte_scan(TPpContext* pp, InputSrc *in, TPpToken * yylvalpp)
 
             do {
                 if (len < TPpToken::maxTokenLength)
-                    yylvalpp->name[len++] = ch;
+                    ppToken->name[len++] = ch;
                 else if (! AlreadyComplained) {
-                    pp->parseContext.error(yylvalpp->loc, "numeric literal too long", "", "");
+                    pp->parseContext.error(ppToken->loc, "numeric literal too long", "", "");
                     AlreadyComplained = 1;
                 }
-                ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+                ch = pp->getChar();
             } while (ch >= '0' && ch <= '9');
             if (ch == '.' || ch == 'e' || ch == 'f' || ch == 'E' || ch == 'F' || ch == 'l' || ch == 'L') {
-                return pp->lFloatConst(yylvalpp->name, len, ch, yylvalpp);
+                return pp->lFloatConst(len, ch, ppToken);
             } else {
                 // Finish handling signed and unsigned integers
                 int numericLen = len;
                 int uint = 0;
                 if (ch == 'u' || ch == 'U') {
                     if (len < TPpToken::maxTokenLength)
-                        yylvalpp->name[len++] = ch;
+                        ppToken->name[len++] = ch;
                     uint = 1;
                 } else
-                    pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                    pp->ungetChar();
 
-                yylvalpp->name[len] = '\0';				
+                ppToken->name[len] = '\0';				
                 ival = 0;
                 for (ii = 0; ii < numericLen; ii++) {
-                    ch = yylvalpp->name[ii] - '0';
+                    ch = ppToken->name[ii] - '0';
                     if ((ival > 429496729) || (ival == 429496729 && ch >= 6)) {
-                        pp->parseContext.error(yylvalpp->loc, "numeric literal too big", "", "");
+                        pp->parseContext.error(ppToken->loc, "numeric literal too big", "", "");
                         ival = -1;
                         break;
                     } else
                         ival = ival * 10 + ch;
                 }
-                yylvalpp->ival = (int)ival;
+                ppToken->ival = (int)ival;
 
                 if (uint)
                     return CPP_UINTCONSTANT;
@@ -551,112 +456,112 @@ int TPpContext::byte_scan(TPpContext* pp, InputSrc *in, TPpToken * yylvalpp)
             }
             break;
         case '-':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '-') {
                 return CPP_DEC_OP;
             } else if (ch == '=') {
                 return CPP_SUB_ASSIGN;
             } else {
-                pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                pp->ungetChar();
                 return '-';
             }
         case '+':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '+') {
                 return CPP_INC_OP;
             } else if (ch == '=') {
                 return CPP_ADD_ASSIGN;
             } else {
-                pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                pp->ungetChar();
                 return '+';
             }
         case '*':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '=') {
                 return CPP_MUL_ASSIGN;
             } else {
-                pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                pp->ungetChar();
                 return '*';
             }
         case '%':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '=') {
                 return CPP_MOD_ASSIGN;
             } else if (ch == '>'){
                 return CPP_RIGHT_BRACE;
             } else {
-                pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                pp->ungetChar();
                 return '%';
             }
         case ':':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '>') {
                 return CPP_RIGHT_BRACKET;
             } else {
-                pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                pp->ungetChar();
                 return ':';
             }
         case '^':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '^') {
                 return CPP_XOR_OP;
             } else {
                 if (ch == '=')
                     return CPP_XOR_ASSIGN;
                 else{
-                    pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                    pp->ungetChar();
                     return '^';
                 }
             }
 
         case '=':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '=') {
                 return CPP_EQ_OP;
             } else {
-                pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                pp->ungetChar();
                 return '=';
             }
         case '!':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '=') {
                 return CPP_NE_OP;
             } else {
-                pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                pp->ungetChar();
                 return '!';
             }
         case '|':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '|') {
                 return CPP_OR_OP;
             } else {
                 if (ch == '=')
                     return CPP_OR_ASSIGN;
                 else{
-                    pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                    pp->ungetChar();
                     return '|';
                 }
             }
         case '&':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '&') {
                 return CPP_AND_OP;
             } else {
                 if (ch == '=')
                     return CPP_AND_ASSIGN;
                 else{
-                    pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                    pp->ungetChar();
                     return '&';
                 }
             }
         case '<':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '<') {
-                ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+                ch = pp->getChar();
                 if (ch == '=')
                     return CPP_LEFT_ASSIGN;
                 else{
-                    pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                    pp->ungetChar();
                     return CPP_LEFT_OP;
                 }
             } else {
@@ -668,136 +573,131 @@ int TPpContext::byte_scan(TPpContext* pp, InputSrc *in, TPpToken * yylvalpp)
                     else if (ch == ':')
                         return CPP_LEFT_BRACKET;
                     else{
-                        pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                        pp->ungetChar();
                         return '<';
                     }
                 }
             }
         case '>':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '>') {
-                ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+                ch = pp->getChar();
                 if (ch == '=')
                     return CPP_RIGHT_ASSIGN;
                 else{
-                    pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                    pp->ungetChar();
                     return CPP_RIGHT_OP;
                 }
             } else {
                 if (ch == '=') {
                     return CPP_GE_OP;
                 } else {
-                    pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                    pp->ungetChar();
                     return '>';
                 }
             }
         case '.':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch >= '0' && ch <= '9') {
-                pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
-                return pp->lFloatConst(yylvalpp->name, 0, '.', yylvalpp);
+                pp->ungetChar();
+                return pp->lFloatConst(0, '.', ppToken);
             } else {
-                pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                pp->ungetChar();
                 return '.';
             }
         case '/':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             if (ch == '/') {
+                pp->inComment = true;
                 do {
-                    ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
-                    if (ch == '\\') {
-                        // allow an escaped newline, otherwise escapes in comments are meaningless
-                        ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
-                        if (ch == '\r' || ch == '\n') {
-                            int nextch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
-                            if (ch == '\r' && nextch == '\n')
-                                ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
-                            else
-                                ch = nextch;
-                        }
-                    }
+                    ch = pp->getChar();
                 } while (ch != '\n' && ch != EOF);
+                ppToken->space = true;
+                pp->inComment = false;
+
                 if (ch == EOF)
-                    return EOF;
-                return '\n';
+                    return endOfInput;
+
+                return ch;
             } else if (ch == '*') {
-                int nlcount = 0;
-                ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+                ch = pp->getChar();
                 do {
                     while (ch != '*') {
-                        if (ch == '\n')
-                            nlcount++;
                         if (ch == EOF) {
-                            pp->parseContext.error(yylvalpp->loc, "EOF in comment", "comment", "");
-
-                            return EOF;
+                            pp->parseContext.error(ppToken->loc, "EOF in comment", "comment", "");
+                            return endOfInput;
                         }
-                        ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+                        ch = pp->getChar();
                     }
-                    ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+                    ch = pp->getChar();
                     if (ch == EOF) {
-                        pp->parseContext.error(yylvalpp->loc, "EOF in comment", "comment", "");
-
-                        return EOF;
+                        pp->parseContext.error(ppToken->loc, "EOF in comment", "comment", "");
+                        return endOfInput;
                     }
                 } while (ch != '/');
-                if (nlcount)
-                    return '\n';
-                // Go try it again...
+                ppToken->space = true;
+                // loop again to get the next token...
+                break;
             } else if (ch == '=') {
                 return CPP_DIV_ASSIGN;
             } else {
-                pp->currentInput->ungetch(pp, pp->currentInput, ch, yylvalpp);
+                pp->ungetChar();
                 return '/';
             }
             break;
         case '"':
-            ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+            ch = pp->getChar();
             while (ch != '"' && ch != '\n' && ch != EOF) {
-                if (ch == '\\') {
-                    ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
-                    if (ch == '\n' || ch == EOF) {
-                        break;
-                    }
-                }
                 if (len < TPpToken::maxTokenLength) {
                     tokenText[len] = ch;
                     len++;
-                    ch = pp->currentInput->getch(pp, pp->currentInput, yylvalpp);
+                    ch = pp->getChar();
                 } else
                     break;
             };
             tokenText[len] = '\0';
             if (ch == '"') {
-                yylvalpp->atom = pp->LookUpAddString(&pp->atomTable, tokenText);
+                ppToken->atom = pp->LookUpAddString(tokenText);
                 return CPP_STRCONSTANT;
             } else {
-                pp->parseContext.error(yylvalpp->loc, "end of line in string", "string", "");
+                pp->parseContext.error(ppToken->loc, "end of line in string", "string", "");
                 return CPP_ERROR_SY;
             }
         }
-    }
-} // byte_scan
 
-const char* TPpContext::tokenize(TPpToken* yylvalpp)
+        ch = pp->getChar();
+    }
+}
+
+//
+// The main functional entry-point into the preprocessor, which will
+// scan the source strings to figure out and return the next processing token.
+//
+// Return string pointer to next token.
+// Return 0 when no more tokens.
+//
+const char* TPpContext::tokenize(TPpToken* ppToken)
 {    
     int token = '\n';
 
     for(;;) {
-
-        char* tokenString = 0;
-        token = currentInput->scan(this, currentInput, yylvalpp);
-        yylvalpp->ppToken = token;
-        if (check_EOF(token))
+        const char* tokenString = 0;
+        token = scanToken(ppToken);
+        ppToken->token = token;
+        if (token == EOF) {
+            missingEndifCheck();
             return 0;
+        }
         if (token == '#') {
-            if (previous_token == '\n' || previous_token == 0) {
-                token = readCPPline(yylvalpp);
-                if (check_EOF(token))
+            if (previous_token == '\n') {
+                token = readCPPline(ppToken);
+                if (token == EOF) {
+                    missingEndifCheck();
                     return 0;
+                }
                 continue;
             } else {
-                parseContext.error(yylvalpp->loc, "preprocessor directive cannot be preceded by another token", "#", "");
+                parseContext.error(ppToken->loc, "preprocessor directive cannot be preceded by another token", "#", "");
                 return 0;
             }
         }
@@ -806,19 +706,23 @@ const char* TPpContext::tokenize(TPpToken* yylvalpp)
         if (token == '\n')
             continue;
 
-        notAVersionToken = true;
-
         // expand macros
-        if (token == CPP_IDENTIFIER && MacroExpand(yylvalpp->atom, yylvalpp, 0) == 1)
+        if (token == CPP_IDENTIFIER && MacroExpand(ppToken->atom, ppToken, false, true) != 0)
             continue;
 
         if (token == CPP_IDENTIFIER)
-            tokenString = GetStringOfAtom(&atomTable, yylvalpp->atom);
+            tokenString = GetAtomString(ppToken->atom);
         else if (token == CPP_INTCONSTANT || token == CPP_UINTCONSTANT ||
                  token == CPP_FLOATCONSTANT || token == CPP_DOUBLECONSTANT)
-            tokenString = yylvalpp->name;
-        else
-            tokenString = GetStringOfAtom(&atomTable, token);
+            tokenString = ppToken->name;
+        else if (token == CPP_STRCONSTANT) {
+            parseContext.error(ppToken->loc, "string literals not supported", "\"\"", "");
+            tokenString = 0;
+        } else if (token == '\'') {
+            parseContext.error(ppToken->loc, "character literals not supported", "\'", "");
+            tokenString = 0;
+        } else
+            tokenString = GetAtomString(token);
 
         if (tokenString) {
             if (tokenString[0] != 0)
@@ -827,19 +731,13 @@ const char* TPpContext::tokenize(TPpToken* yylvalpp)
             return tokenString;
         }
     }
+}
 
-    return 0;
-} // PpTokenize
-
-//Checks if the token just read is EOF or not.
-int TPpContext::check_EOF(int token)
+// Checks if we've seen balanced #if...#endif
+void TPpContext::missingEndifCheck()
 {
-    if (token == EOF) {
-        if (ifdepth > 0)
-            parseContext.error(parseContext.currentLoc, "missing #endif", "#if", "");
-        return 1;
-    }
-    return 0;
+    if (ifdepth > 0)
+        parseContext.error(parseContext.getCurrentLoc(), "missing #endif", "", "");
 }
 
 } // end namespace glslang

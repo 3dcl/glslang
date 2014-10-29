@@ -36,7 +36,7 @@ void main()
     f += a;
     f = a - f;
     v3 *= iv3;
-    v3 = iv3 / 2.0;
+    v3 = iv3 / 2.0f;
     v3 = 3.0 * iv3;
     v3 = 2 * v3;
     v3 = v3 - 2;
@@ -102,7 +102,7 @@ int foo(out float a)    // ERROR
 
 bool gen(vec3 v)
 {
-    if (abs(v[0]) < 1e-4 && abs(v[1]) < 1e-4)
+    if (abs(v[0]) < 1e-4F && abs(v[1]) < 1e-4)
         return true;
 }
 
@@ -123,3 +123,116 @@ void atest()
 
 varying vec4 gl_TexCoord[6];  // okay, assigning a size
 varying vec4 gl_TexCoord[5];  // ERROR, changing size
+
+mat2x2 m22;
+mat2x3 m23;
+mat2x4 m24;
+
+mat3x2 m32;
+mat3x3 m33;
+mat3x4 m34;
+
+mat4x2 m42;
+mat4x3 m43;
+mat4x4 m44;
+
+void foo123()
+{
+    mat2 r2 = matrixCompMult(m22, m22);
+    mat3 r3 = matrixCompMult(m33, m33);
+    mat4 r4 = matrixCompMult(m44, m44);
+
+    mat2x3 r23 = matrixCompMult(m23, m23);
+    mat2x4 r24 = matrixCompMult(m24, m24);
+    mat3x2 r32 = matrixCompMult(m32, m32);
+    mat3x4 r34 = matrixCompMult(m34, m34);
+    mat4x2 r42 = matrixCompMult(m42, m42);
+    mat4x3 r43 = matrixCompMult(m43, m43);
+
+    mat3x2 rfoo1 = matrixCompMult(m23, m32);  // ERROR
+    mat3x4 rfoo2 = matrixCompMult(m34, m44);  // ERROR    
+}
+
+void matConst()
+{
+    vec2 v2;
+    vec3 v3;
+    mat4 m4b1 = mat4(v2, v3);                      // ERROR, not enough
+    mat4 m4b2 = mat4(v2, v3, v3, v3, v3, v2, v2);  // ERROR, too much
+    mat4 m4g = mat4(v2, v3, v3, v3, v3, v3);
+    mat4 m4 = mat4(v2, v3, v3, v3, v3, v2);
+    mat3 m3 = mat3(m4);
+    mat3 m3b1 = mat3(m4, v2);                      // ERROR, extra arg
+    mat3 m3b2 = mat3(m4, m4);                      // ERROR, extra arg
+    mat3x2 m32 = mat3x2(m4);
+    mat4 m4c = mat4(m32);
+    mat3 m3s = mat3(v2.x);
+
+    mat3 m3a1[2] = mat3[2](m3s, m3s);
+    mat3 m3a2[2] = mat3[2](m3s, m3s, m3s);         // ERROR, too many args
+}
+
+uniform sampler3D s3D;
+uniform sampler1D s1D;
+uniform sampler2DShadow s2DS;
+
+void foo2323()
+{
+    vec4 v;
+    vec2 v2;
+    float f;
+    v = texture2DLod(s2D, v2, f);    // ERROR
+    v = texture3DProjLod(s3D, v, f); // ERROR
+    v = texture1DProjLod(s1D, v, f); // ERROR
+    v = shadow2DProjLod(s2DS, v, f); // ERROR
+
+    v = texture1DGradARB(s1D, f, f, f);         // ERROR
+    v = texture2DProjGradARB(s2D, v, v2, v2);   // ERROR
+    v = shadow2DProjGradARB(s2DS, v, v2, v2);   // ERROR
+}
+
+#extension GL_ARB_shader_texture_lod : require
+
+void foo2324()
+{
+    vec4 v;
+    vec2 v2;
+    float f;
+    v = texture2DLod(s2D, v2, f);
+    v = texture3DProjLod(s3D, v, f);
+    v = texture1DProjLod(s1D, v, f);
+    v = shadow2DProjLod(s2DS, v, f);
+
+    v = texture1DGradARB(s1D, f, f, f);
+    v = texture2DProjGradARB(s2D, v, v2, v2);
+    v = shadow2DProjGradARB(s2DS, v, v2, v2);
+    v = shadow2DRectProjGradARB(s2DS, v, v2, v2);  // ERROR
+}
+
+uniform sampler2DRect s2DRbad;  // ERROR
+
+void foo121111()
+{
+    vec2 v2;
+    vec4 v = texture2DRect(s2DRbad, v2);
+}
+
+#extension GL_ARB_texture_rectangle : enable
+
+uniform sampler2DRect s2DR;
+uniform sampler2DRectShadow s2DRS;
+
+void foo12111()
+{
+    vec2 v2;
+    vec3 v3;
+    vec4 v4;
+    vec4 v;
+    v = texture2DRect(s2DR, v2);
+    v = texture2DRectProj(s2DR, v3);
+    v = texture2DRectProj(s2DR, v4);
+    v = shadow2DRect(s2DRS, v3);
+    v = shadow2DRectProj(s2DRS, v4);
+
+    v = shadow2DRectProjGradARB(s2DRS, v, v2, v2);
+}

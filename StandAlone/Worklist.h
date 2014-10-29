@@ -35,7 +35,7 @@
 #ifndef WORKLIST_H_INCLUDED
 #define WORKLIST_H_INCLUDED
 
-#include "../glslang/OSDependent/osinclude.h"
+#include "osinclude.h"
 #include <string>
 #include <list>
 
@@ -48,6 +48,7 @@ namespace glslang {
             name(s) { }
         std::string name;
         std::string results;
+        std::string resultsIndex;
     };
 
     class TWorklist {
@@ -78,9 +79,9 @@ namespace glslang {
             return true;
         }
 
-        std::size_t size()
+        int size()
         {
-            return worklist.size();
+            return (int)worklist.size();
         }
 
         bool empty()

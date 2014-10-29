@@ -40,15 +40,9 @@
 #include "../Include/ShHandle.h"
 #include "SymbolTable.h"
 #include "localintermediate.h"
+#include "Scan.h"
 
 namespace glslang {
-
-typedef enum {
-    EBhRequire,
-    EBhEnable,
-    EBhWarn,
-    EBhDisable
-} TBehavior;
 
 struct TPragma {
 	TPragma(bool o, bool d) : optimize(o), debug(d) { }
@@ -60,6 +54,8 @@ struct TPragma {
 class TScanContext;
 class TPpContext;
 
+typedef std::set<int> TIdSetType;
+
 //
 // The following are extra variables needed during parsing, grouped together so
 // they can be passed to the parser without needing a global.
@@ -68,26 +64,48 @@ class TParseContext {
 public:
     TParseContext(TSymbolTable&, TIntermediate&, bool parsingBuiltins, int version, EProfile, EShLanguage, TInfoSink&,
                   bool forwardCompatible = false, EShMessages messages = EShMsgDefault);
+    virtual ~TParseContext();
 
-public:
-    bool parseShaderStrings(TPpContext&, char* strings[], int strLen[], int numStrings);
-    void initializeExtensionBehavior();
-    void parserError(const char *s);     // for bison's yyerror
+    void setLimits(const TBuiltInResource&);
+    bool parseShaderStrings(TPpContext&, TInputScanner& input, bool versionWillBeError = false);
+    void parserError(const char* s);     // for bison's yyerror
+    const char* getPreamble();
 
-    void C_DECL error(TSourceLoc, const char *szReason, const char *szToken,
-                      const char *szExtraInfoFormat, ...);
-    void C_DECL  warn(TSourceLoc, const char *szReason, const char *szToken,
-                      const char *szExtraInfoFormat, ...);
-    bool reservedErrorCheck(TSourceLoc, const TString& identifier);
+    void C_DECL error(TSourceLoc, const char* szReason, const char* szToken,
+                      const char* szExtraInfoFormat, ...);
+    void C_DECL  warn(TSourceLoc, const char* szReason, const char* szToken,
+                      const char* szExtraInfoFormat, ...);
+    void reservedErrorCheck(TSourceLoc, const TString&);
+    void reservedPpErrorCheck(TSourceLoc, const char* name, const char* op);
+    bool lineContinuationCheck(TSourceLoc, bool endOfComment);
+    bool builtInName(const TString&);
 
-    void updateExtensionBehavior(const char* extName, const char* behavior);
-    void handlePragma(const char **tokens, int numTokens);
+    void handlePragma(TSourceLoc, const TVector<TString>&);
     TIntermTyped* handleVariable(TSourceLoc, TSymbol* symbol, TString* string);
     TIntermTyped* handleBracketDereference(TSourceLoc, TIntermTyped* base, TIntermTyped* index);
+    void checkIndex(TSourceLoc, const TType&, int& index);
+    void handleIndexLimits(TSourceLoc, TIntermTyped* base, TIntermTyped* index);
+
+    void makeEditable(TSymbol*&);
+    bool isIoResizeArray(const TType&) const;
+    void fixIoArraySize(TSourceLoc, TType&);
+    void ioArrayCheck(TSourceLoc, const TType&, const TString& identifier);
+    void handleIoResizeArrayAccess(TSourceLoc, TIntermTyped* base);
+    void checkIoArraysConsistency(TSourceLoc, bool tailOnly = false);
+    int getIoArrayImplicitSize() const;
+    void checkIoArrayConsistency(TSourceLoc, int requiredSize, const char* feature, TType&, const TString&);
+
+    TIntermTyped* handleBinaryMath(TSourceLoc, const char* str, TOperator op, TIntermTyped* left, TIntermTyped* right);
+    TIntermTyped* handleUnaryMath(TSourceLoc, const char* str, TOperator op, TIntermTyped* childNode);
     TIntermTyped* handleDotDereference(TSourceLoc, TIntermTyped* base, TString& field);
-    TIntermAggregate* handleFunctionPrototype(TSourceLoc, TFunction&);
-    TIntermTyped* handleFunctionCall(TSourceLoc, TFunction*, TIntermNode*, TIntermAggregate*);
-    TFunction* handleConstructorCall(TSourceLoc, TPublicType&);
+    TFunction* handleFunctionDeclarator(TSourceLoc loc, TFunction& function, bool prototype);
+    TIntermAggregate* handleFunctionDefinition(TSourceLoc, TFunction&);
+    TIntermTyped* handleFunctionCall(TSourceLoc, TFunction*, TIntermNode*);
+    TIntermTyped* handleLengthMethod(TSourceLoc, TFunction*, TIntermNode*);
+    void addInputArgumentConversions(const TFunction&, TIntermNode*&) const;
+    TIntermTyped* addOutputArgumentConversions(const TFunction&, TIntermAggregate&) const;
+    void nonOpBuiltInCheck(TSourceLoc, const TFunction&, TIntermAggregate&);
+    TFunction* handleConstructorCall(TSourceLoc, const TPublicType&);
 
     bool parseVectorFields(TSourceLoc, const TString&, int vecSize, TVectorFields&);
     void assignError(TSourceLoc, const char* op, TString left, TString right);
@@ -95,70 +113,80 @@ public:
     void binaryOpError(TSourceLoc, const char* op, TString left, TString right);
     void variableCheck(TIntermTyped*& nodePtr);
     bool lValueErrorCheck(TSourceLoc, const char* op, TIntermTyped*);
-    void constCheck(TIntermTyped* node, const char* token);
-    void integerCheck(TIntermTyped* node, const char* token);
-    void globalCheck(TSourceLoc, bool global, const char* token);
+    void rValueErrorCheck(TSourceLoc, const char* op, TIntermTyped*);
+    void constantValueCheck(TIntermTyped* node, const char* token);
+    void integerCheck(const TIntermTyped* node, const char* token);
+    void globalCheck(TSourceLoc, const char* token);
     bool constructorError(TSourceLoc, TIntermNode*, TFunction&, TOperator, TType&);
     void arraySizeCheck(TSourceLoc, TIntermTyped* expr, int& size);
-    bool arrayQualifierError(TSourceLoc, const TPublicType&);
+    bool arrayQualifierError(TSourceLoc, const TQualifier&);
+    bool arrayError(TSourceLoc, const TType&);
     void arraySizeRequiredCheck(TSourceLoc, int size);
+    void structArrayCheck(TSourceLoc, TType* structure);
     void arrayDimError(TSourceLoc);
     void arrayDimCheck(TSourceLoc, TArraySizes* sizes1, TArraySizes* sizes2);
     void arrayDimCheck(TSourceLoc, const TType*, TArraySizes*);
-    void arrayCheck(TSourceLoc, TString& identifier, const TPublicType&, TVariable*& variable);
-    bool voidErrorCheck(TSourceLoc, const TString&, const TPublicType&);
+    bool voidErrorCheck(TSourceLoc, const TString&, TBasicType);
     void boolCheck(TSourceLoc, const TIntermTyped*);
     void boolCheck(TSourceLoc, const TPublicType&);
-    bool samplerErrorCheck(TSourceLoc, const TPublicType& pType, const char* reason);
-    void globalQualifierFix(TSourceLoc, TQualifier&, const TPublicType&);
+    void samplerCheck(TSourceLoc, const TType&, const TString& identifier);
+    void atomicUintCheck(TSourceLoc, const TType&, const TString& identifier);
+    void globalQualifierFixCheck(TSourceLoc, TQualifier&);
+    void globalQualifierTypeCheck(TSourceLoc, const TQualifier&, const TPublicType&);
     bool structQualifierErrorCheck(TSourceLoc, const TPublicType& pType);
     void mergeQualifiers(TSourceLoc, TQualifier& dst, const TQualifier& src, bool force);
     void setDefaultPrecision(TSourceLoc, TPublicType&, TPrecisionQualifier);
     int computeSamplerTypeIndex(TSampler&);
     TPrecisionQualifier getDefaultPrecision(TPublicType&);
     void precisionQualifierCheck(TSourceLoc, TPublicType&);
-    void parameterSamplerCheck(TSourceLoc, TStorageQualifier qualifier, const TType& type);
-    bool containsSampler(const TType& type);
-    void nonInitConstCheck(TSourceLoc, TString& identifier, TPublicType& type);
-    void nonInitCheck(TSourceLoc, TString& identifier, TPublicType& type);
-    TVariable* redeclare(TSourceLoc, const TString&, const TType&, bool& newDeclaration);
-    void paramCheck(TSourceLoc, TStorageQualifier qualifier, TType* type);
+    void parameterTypeCheck(TSourceLoc, TStorageQualifier qualifier, const TType& type);
+    bool containsFieldWithBasicType(const TType& type ,TBasicType basicType);
+    TSymbol* redeclareBuiltinVariable(TSourceLoc, const TString&, const TQualifier&, const TShaderQualifiers&, bool& newDeclaration);
+    void redeclareBuiltinBlock(TSourceLoc, TTypeList& typeList, const TString& blockName, const TString* instanceName, TArraySizes* arraySizes);
+    void paramCheckFix(TSourceLoc, const TStorageQualifier&, TType& type);
+    void paramCheckFix(TSourceLoc, const TQualifier&, TType& type);
     void nestedBlockCheck(TSourceLoc);
     void nestedStructCheck(TSourceLoc);
+    void arrayObjectCheck(TSourceLoc, const TType&, const char* op);
+    void opaqueCheck(TSourceLoc, const TType&, const char* op);
+    void structTypeCheck(TSourceLoc, TPublicType&);
+    void inductiveLoopCheck(TSourceLoc, TIntermNode* init, TIntermLoop* loop);
+    void arrayLimitCheck(TSourceLoc, const TString&, int size);
+    void limitCheck(TSourceLoc, int value, const char* limit, const char* feature);
+
+    void inductiveLoopBodyCheck(TIntermNode*, int loopIndexId, TSymbolTable&);
+    void constantIndexExpressionCheck(TIntermNode*);
 
     void setLayoutQualifier(TSourceLoc, TPublicType&, TString&);
-    void setLayoutQualifier(TSourceLoc, TPublicType&, TString&, int);
-    void mergeLayoutQualifiers(TSourceLoc, TQualifier& dest, const TQualifier& src);
+    void setLayoutQualifier(TSourceLoc, TPublicType&, TString&, const TIntermTyped*);
+    void mergeObjectLayoutQualifiers(TSourceLoc, TQualifier& dest, const TQualifier& src, bool inheritOnly);
+    void layoutObjectCheck(TSourceLoc, const TSymbol&);
+    void layoutTypeCheck(TSourceLoc, const TType&);
+    void layoutQualifierCheck(TSourceLoc, const TQualifier&);
+    void checkNoShaderLayouts(TSourceLoc, const TShaderQualifiers&);
+    void fixOffset(TSourceLoc, TSymbol&);
 
-    const TFunction* findFunction(TSourceLoc, TFunction* pfnCall, bool *builtIn = 0);
-    bool executeInitializerError(TSourceLoc, TString& identifier, TPublicType& pType,
-                                 TIntermTyped* initializer, TIntermNode*& intermNode, TVariable* variable = 0);
-    TIntermTyped* addConstructor(TIntermNode*, const TType&, TOperator, TFunction*, TSourceLoc);
+    const TFunction* findFunction(TSourceLoc loc, const TFunction& call, bool& builtIn);
+    const TFunction* findFunctionExact(TSourceLoc loc, const TFunction& call, bool& builtIn);
+    const TFunction* findFunction120(TSourceLoc loc, const TFunction& call, bool& builtIn);
+    const TFunction* findFunction400(TSourceLoc loc, const TFunction& call, bool& builtIn);
+    void declareTypeDefaults(TSourceLoc, const TPublicType&);
+    TIntermNode* declareVariable(TSourceLoc, TString& identifier, const TPublicType&, TArraySizes* typeArray = 0, TIntermTyped* initializer = 0);
+    TIntermTyped* addConstructor(TSourceLoc, TIntermNode*, const TType&, TOperator);
     TIntermTyped* constructStruct(TIntermNode*, const TType&, int, TSourceLoc);
-    TIntermTyped* constructBuiltIn(const TType&, TOperator, TIntermNode*, TSourceLoc, bool subset);
-    void addBlock(TSourceLoc, TTypeList& typeList, const TString* instanceName = 0, TArraySizes* arraySizes = 0);
+    TIntermTyped* constructBuiltIn(const TType&, TOperator, TIntermTyped*, TSourceLoc, bool subset);
+    void declareBlock(TSourceLoc, TTypeList& typeList, const TString* instanceName = 0, TArraySizes* arraySizes = 0);
+    void fixBlockLocations(TSourceLoc, TQualifier&, TTypeList&, bool memberWithLocation, bool memberWithoutLocation);
+    void fixBlockXfbOffsets(TSourceLoc, TQualifier&, TTypeList&);
+    void fixBlockUniformOffsets(TSourceLoc, TQualifier&, TTypeList&);
     void addQualifierToExisting(TSourceLoc, TQualifier, const TString& identifier);
     void addQualifierToExisting(TSourceLoc, TQualifier, TIdentifierList&);
-    void updateQualifierDefaults(TQualifier);
-    void updateQualifierDefaults(TSourceLoc, TQualifier);
-    void updateTypedDefaults(TSourceLoc, TQualifier, const TString* id);
+    void invariantCheck(TSourceLoc, const TQualifier&);
+    void updateStandaloneQualifierDefaults(TSourceLoc, const TPublicType&);
     void wrapupSwitchSubsequence(TIntermAggregate* statements, TIntermNode* branchNode);
     TIntermNode* addSwitch(TSourceLoc, TIntermTyped* expression, TIntermAggregate* body);
-    TIntermTyped* addConstVectorNode(TVectorFields&, TIntermTyped*, TSourceLoc);
-    TIntermTyped* addConstMatrixNode(int , TIntermTyped*, TSourceLoc);
-    TIntermTyped* addConstArrayNode(int index, TIntermTyped* node, TSourceLoc);
-    TIntermTyped* addConstStruct(TString& , TIntermTyped*, TSourceLoc);
 
-    bool arraySetMaxSize(TSourceLoc, TIntermSymbol*, int);
-
-    void requireProfile(TSourceLoc, EProfileMask profileMask, const char *featureDesc);
-    void requireStage(TSourceLoc, EShLanguageMask languageMask, const char *featureDesc);
-    void profileRequires(TSourceLoc, EProfile callingProfile, int minVersion, int numExtensions, const char* extensions[], const char *featureDesc);
-    void profileRequires(TSourceLoc, EProfile callingProfile, int minVersion, const char* extension, const char *featureDesc);
-    void checkDeprecated(TSourceLoc, EProfile callingProfile, int depVersion, const char *featureDesc);
-    void requireNotRemoved(TSourceLoc, EProfile callingProfile, int removedVersion, const char *featureDesc);
-    void fullIntegerCheck(TSourceLoc, const char* op);
-    void doubleCheck(TSourceLoc, const char* op);
+    void updateImplicitArraySize(TSourceLoc, TIntermNode*, int index);
 
     void setScanContext(TScanContext* c) { scanContext = c; }
     TScanContext* getScanContext() const { return scanContext; }
@@ -166,10 +194,36 @@ public:
     TPpContext* getPpContext() const { return ppContext; }
     void addError() { ++numErrors; }
     int getNumErrors() const { return numErrors; }
+    const TSourceLoc& getCurrentLoc() const { return currentScanner->getSourceLoc(); }
+    void setCurrentLine(int line) { currentScanner->setLine(line); }
+    void setCurrentString(int string) { currentScanner->setString(string); }
+
+    // The following are implemented in Versions.cpp to localize version/profile/stage/extensions control
+    void initializeExtensionBehavior();
+    void requireProfile(TSourceLoc, int queryProfiles, const char* featureDesc);
+    void profileRequires(TSourceLoc, int queryProfiles, int minVersion, int numExtensions, const char* const extensions[], const char* featureDesc);
+    void profileRequires(TSourceLoc, int queryProfiles, int minVersion, const char* const extension, const char* featureDesc);
+    void requireStage(TSourceLoc, EShLanguageMask, const char* featureDesc);
+    void requireStage(TSourceLoc, EShLanguage, const char* featureDesc);
+    void checkDeprecated(TSourceLoc, int queryProfiles, int depVersion, const char* featureDesc);
+    void requireNotRemoved(TSourceLoc, int queryProfiles, int removedVersion, const char* featureDesc);
+    void requireExtensions(TSourceLoc, int numExtensions, const char* const extensions[], const char* featureDesc);
+    TExtensionBehavior getExtensionBehavior(const char*);
+    bool extensionsTurnedOn(int numExtensions, const char* const extensions[]);
+    void updateExtensionBehavior(const char* const extension, const char* behavior);
+    void fullIntegerCheck(TSourceLoc, const char* op);
+    void doubleCheck(TSourceLoc, const char* op);
 
 protected:
-    const char* getPreamble();
-    TBehavior getExtensionBehavior(const char* behavior);
+    void nonInitConstCheck(TSourceLoc, TString& identifier, TType& type);
+	void inheritGlobalDefaults(TQualifier& dst) const;
+    TVariable* makeInternalVariable(const char* name, const TType&) const;
+    TVariable* declareNonArray(TSourceLoc, TString& identifier, TType&, bool& newDeclaration);
+    void declareArray(TSourceLoc, TString& identifier, const TType&, TSymbol*&, bool& newDeclaration);
+    TIntermNode* executeInitializer(TSourceLoc, TString& identifier, TIntermTyped* initializer, TVariable* variable);
+    TIntermTyped* convertInitializerList(TSourceLoc, const TType&, TIntermTyped* initializer);
+    TOperator mapTypeToConstructorOp(const TType&) const;
+    void finalErrorCheck();
 
 public:
     //
@@ -191,29 +245,72 @@ public:
     struct TPragma contextPragma;
     int loopNestingLevel;        // 0 if outside all loops
     int structNestingLevel;      // 0 if outside blocks and structures
+    int controlFlowNestingLevel; // 0 if outside all flow control or compound statements; also counts compound statements
     TList<TIntermSequence*> switchSequenceStack;  // case, node, case, case, node, ...; ensure only one node between cases;   stack of them for nesting
+    TList<int> switchLevel;      // the controlFlowNestingLevel the current switch statement is at, which must match the level of its case statements
     const TType* currentFunctionType;  // the return type of the function that's currently being parsed
     bool functionReturnsValue;   // true if a non-void function has a return
     const TString* blockName;
-    TQualifier currentBlockDefaults;
+    TQualifier currentBlockQualifier;
     TIntermAggregate *linkage;   // aggregate node of objects the linker may need, if not referenced by the rest of the AST
     TPrecisionQualifier defaultPrecision[EbtNumTypes];
-    TSourceLoc currentLoc;
     bool tokensBeforeEOF;
+    TBuiltInResource resources;
+    TLimits& limits;
 
 protected:
     TScanContext* scanContext;
     TPpContext* ppContext;
+    TInputScanner* currentScanner;
     int numErrors;               // number of compile-time errors encountered
     bool parsingBuiltins;        // true if parsing built-in symbols/functions
-    TMap<TString, TBehavior> extensionBehavior;    // for each extension string, what it's current enablement is
-    static const int maxSamplerIndex = EsdNumDims * (EbtNumTypes * (2 * 2)); // see computeSamplerTypeIndex()
+    TMap<TString, TExtensionBehavior> extensionBehavior;    // for each extension string, what its current behavior is set to
+    static const int maxSamplerIndex = EsdNumDims * (EbtNumTypes * (2 * 2 * 2)); // see computeSamplerTypeIndex()
     TPrecisionQualifier defaultSamplerPrecision[maxSamplerIndex];
     bool afterEOF;
+    TQualifier globalBufferDefaults;
     TQualifier globalUniformDefaults;
     TQualifier globalInputDefaults;
     TQualifier globalOutputDefaults;
-    // TODO: desktop functionality: track use of gl_FragDepth before redeclaration
+    int* atomicUintOffsets;       // to become an array of the right size to hold an offset per binding point
+    TString currentCaller;
+    TIdSetType inductiveLoopIds;
+    bool anyIndexLimits;
+    TVector<TIntermTyped*> needsIndexLimitationChecking;
+
+    //
+    // Geometry shader input arrays:
+    //  - array sizing is based on input primitive and/or explicit size
+    //
+    // Tessellation control output arrays:
+    //  - array sizing is based on output layout(vertices=...) and/or explicit size
+    //
+    // Both:
+    //  - array sizing is retroactive
+    //  - built-in block redeclarations interact with this
+    //
+    // Design:
+    //  - use a per-context "resize-list", a list of symbols whose array sizes
+    //    can be fixed
+    //
+    //  - the resize-list starts empty at beginning of user-shader compilation, it does
+    //    not have built-ins in it
+    //
+    //  - on built-in array use: copyUp() symbol and add it to the resize-list
+    //
+    //  - on user array declaration: add it to the resize-list
+    //
+    //  - on block redeclaration: copyUp() symbol and add it to the resize-list
+    //     * note, that appropriately gives an error if redeclaring a block that
+    //       was already used and hence already copied-up
+    //
+    //  - on seeing a layout declaration that sizes the array, fix everything in the 
+    //    resize-list, giving errors for mismatch
+    //
+    //  - on seeing an array size declaration, give errors on mismatch between it and previous
+    //    array-sizing declarations
+    //
+    TVector<TSymbol*> ioArraySymbolResizeList;
 };
 
 } // end namespace glslang

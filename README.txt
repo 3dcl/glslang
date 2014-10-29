@@ -7,10 +7,13 @@ There are two components:
 2) A standalone wrapper, glslangValidator, that can be used as a shader 
    validation tool. 
 
+How to add a feature protected by a version/extension/stage/profile:  See the
+comment in glslang/MachineIndependent/Versions.cpp.
+
 Things left to do:  See Todo.txt
 
-Execution
----------
+Execution of Standalone Wrapper
+-------------------------------
 
 There are binaries in the Install/Windows and Install/Linux directories.
 
@@ -26,7 +29,10 @@ The applied stage-specific rules are based on the file extension:
     .frag for a fragment shader
     .comp for a compute shader
 
-Source: Build and run on linux
+There is also a non-shader extension
+    .conf for a configuration file of limits, see usage statement for example
+
+Source: Build and run on Linux
 -------------------------------
 
 A simple bash script "BuildLinux.sh" is provided at the root directory
@@ -60,22 +66,54 @@ shell.
 Note: Despite appearances, the use of a DLL is currently disabled; it
 simply makes a standalone executable from a statically linked library.
 
-Basic external programmatic interface
--------------------------------------
+Programmatic Interfaces
+-----------------------
 
 Another piece of software can programmatically translate shaders to an AST 
-using the C-style ShInitialize(), ShCompile(), et. al. interface.  The main() in 
-StandAlone/StandAlone.cpp shows an example way of using these.
+using one of two different interfaces: 
+    - A new C++ class-oriented interface, or
+    - The original C functional interface
 
-The Sh*() interface takes a "compiler" call-back object, which it calls after 
-building call back that is passed the AST and can then execute a backend on it.
+The main() in StandAlone/StandAlone.cpp shows examples using both styles.
 
-The following is a simplified resulting run-time call stack:
+C++ Class Interface (new, preferred):
 
-    ShCompile(shader, compiler) -> compiler(AST) -> <back end>
+    This interface is in roughly the last 1/3 of ShaderLang.h.  It is in the 
+    glslang namespace and contains the following.
 
-In practice, ShCompile() takes shader strings, default version, and
-warning/error and other options for controling compilation.
+        const char* GetEsslVersionString();
+        const char* GetGlslVersionString();
+        bool InitializeProcess();
+        void FinalizeProcess();
+
+        class TShader
+            bool parse(...);
+            void setStrings(...);
+            const char* getInfoLog();
+
+        class TProgram
+            void addShader(...);
+            bool link(...);
+            const char* getInfoLog();
+            Reflection queries
+
+    See ShaderLang.h and the usage of it in StandAlone/StandAlone.cpp for more
+    details.
+            
+C Functional Interface (orginal):
+
+    This interface is in roughly the first 2/3 of ShaderLang.h, and referred to
+    as the Sh*() interface, as all the entry points start "Sh".
+
+    The Sh*() interface takes a "compiler" call-back object, which it calls after 
+    building call back that is passed the AST and can then execute a backend on it.
+
+    The following is a simplified resulting run-time call stack:
+
+        ShCompile(shader, compiler) -> compiler(AST) -> <back end>
+
+    In practice, ShCompile() takes shader strings, default version, and
+    warning/error and other options for controling compilation.
 
 Testing
 -------
@@ -94,7 +132,7 @@ missing, those tests just won't run.
 Basic Internal Operation
 ------------------------
 
- -  Initial lexical analysis is done be the preprocessor in
+ -  Initial lexical analysis is done by the preprocessor in
     MachineIndependent/Preprocessor, and then refined by a GLSL scanner
     in MachineIndependent/Scan.cpp.  There is currently no use of flex.
 
@@ -121,4 +159,20 @@ Basic Internal Operation
  -  Reduction of the tree to a linear byte-code style low-level intermediate
     representation is likely a good way to generate fully optimized code.
 
- -  There is currently some dead linker-type code still lying around.
+ -  There is currently some dead old-style linker-type code still lying around.
+
+ - Memory pool: parsing uses types derived from C++ std types, using a 
+   custom allocator that puts them in a memory pool.  This makes allocation
+   of individual container/contents just few cycles and deallocation free.
+   This pool is popped after the AST is made and processed.
+
+   The use is simple: if you are going to call "new", there are three cases:
+
+    - the object comes from the pool (its base class has the macro
+      POOL_ALLOCATOR_NEW_DELETE in it) and you do not have to call delete
+
+    - it is a TString, in which case call NewPoolTString(), which gets 
+      it from the pool, and there is no corresponding delete
+
+    - the object does not come from the pool, and you have to do normal
+      C++ memory management of what you 'new'

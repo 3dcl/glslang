@@ -40,12 +40,12 @@
 
 #include <string.h>
 
-#include "Scan.h"
 #include "../Include/Types.h"
 #include "SymbolTable.h"
-#include "glslang_tab.cpp.h"
 #include "ParseHelper.h"
+#include "glslang_tab.cpp.h"
 #include "ScanContext.h"
+#include "Scan.h"
 
 // preprocessor includes
 #include "preprocessor/PpContext.h"
@@ -54,68 +54,68 @@
 namespace glslang {
     
 // read past any white space
-void ConsumeWhiteSpace(TInputScanner& input, bool& foundNonSpaceTab)
+void TInputScanner::consumeWhiteSpace(bool& foundNonSpaceTab)
 {
-    char c = input.peek();  // don't accidentally consume anything other than whitespace
+    int c = peek();  // don't accidentally consume anything other than whitespace
     while (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
         if (c == '\r' || c == '\n')
             foundNonSpaceTab = true;
-        input.get();
-        c = input.peek();
+        get();
+        c = peek();
     }
 }
 
 // return true if a comment was actually consumed
-bool ConsumeComment(TInputScanner& input)
+bool TInputScanner::consumeComment()
 {
-    if (input.peek() != '/')
+    if (peek() != '/')
         return false;
 
-    input.get();  // consume the '/'
-    char c = input.peek();
+    get();  // consume the '/'
+    int c = peek();
     if (c == '/') {
 
         // a '//' style comment
-        input.get();  // consume the second '/'
-        c = input.get();
+        get();  // consume the second '/'
+        c = get();
         do {
             while (c > 0 && c != '\\' && c != '\r' && c != '\n')
-                c = input.get();
+                c = get();
 
             if (c <= 0 || c == '\r' || c == '\n') {
                 while (c == '\r' || c == '\n')
-                    c = input.get();
+                    c = get();
 
                 // we reached the end of the comment
                 break;
             } else {
                 // it's a '\', so we need to keep going, after skipping what's escaped
-                    
+
                 // read the skipped character
-                c = input.get();
+                c = get();
 
                 // if it's a two-character newline, skip both characters
-                if (c == '\r' && input.peek() == '\n')
-                    input.get();
-                c = input.get();
+                if (c == '\r' && peek() == '\n')
+                    get();
+                c = get();
             }
         } while (true);
 
         // put back the last non-comment character
         if (c > 0)
-            input.unget();
+            unget();
 
         return true;
     } else if (c == '*') {
 
         // a '/*' style comment
-        input.get();  // consume the '*'
-        c = input.get();
+        get();  // consume the '*'
+        c = get();
         do {
             while (c > 0 && c != '*')
-                c = input.get();
+                c = get();
             if (c == '*') {
-                c = input.get();
+                c = get();
                 if (c == '/')
                     break;  // end of comment
                 // not end of comment
@@ -126,26 +126,26 @@ bool ConsumeComment(TInputScanner& input)
         return true;
     } else {
         // it's not a comment, put the '/' back
-        input.unget();
+        unget();
 
         return false;
     }
 }
 
 // skip whitespace, then skip a comment, rinse, repeat
-void ConsumeWhitespaceComment(TInputScanner& input, bool& foundNonSpaceTab)
+void TInputScanner::consumeWhitespaceComment(bool& foundNonSpaceTab)
 {
     do {
-        ConsumeWhiteSpace(input, foundNonSpaceTab);
+        consumeWhiteSpace(foundNonSpaceTab);
  
         // if not starting a comment now, then done
-        char c = input.peek();
+        int c = peek();
         if (c != '/' || c < 0)
             return;
 
         // skip potential comment 
         foundNonSpaceTab = true;
-        if (! ConsumeComment(input))
+        if (! consumeComment())
             return;
 
     } while (true);
@@ -155,79 +155,117 @@ void ConsumeWhitespaceComment(TInputScanner& input, bool& foundNonSpaceTab)
 // or no #version was found; otherwise, returns false.  There is no error case, it always
 // succeeds, but will leave version == 0 if no #version was found.
 //
+// Sets versionNotFirstToken based on whether tokens (beyond white space and comments)
+// appeared before the #version.
+//
 // N.B. does not attempt to leave input in any particular known state.  The assumption
 // is that scanning will start anew, following the rules for the chosen version/profile,
 // and with a corresponding parsing context.
 //
-bool ScanVersion(TInputScanner& input, int& version, EProfile& profile)
+bool TInputScanner::scanVersion(int& version, EProfile& profile, bool& notFirstToken)
 {
-    // This function doesn't have to get all the semantics correct, 
+    // This function doesn't have to get all the semantics correct,
     // just find the #version if there is a correct one present.
     // The preprocessor will have the responsibility of getting all the semantics right.
 
+    bool versionNotFirst = false;  // means not first WRT comments and white space, nothing more
+    notFirstToken = false;         // means not first WRT to real tokens
     version = 0;  // means not found
     profile = ENoProfile;
 
     bool foundNonSpaceTab = false;
-    ConsumeWhitespaceComment(input, foundNonSpaceTab);
-
-    // #
-    if (input.get() != '#')
-        return true;
-
-    // whitespace
-    char c;
+    bool lookingInMiddle = false;
+    int c;
     do {
-        c = input.get();
-    } while (c == ' ' || c == '\t');
+        if (lookingInMiddle) {
+            notFirstToken = true;
+            // make forward progress by finishing off the current line plus extra new lines
+            if (peek() == '\n' || peek() == '\r') {
+                while (peek() == '\n' || peek() == '\r')
+                    get();
+            } else
+                do {
+                    c = get();
+                } while (c > 0 && c != '\n' && c != '\r');
+                while (peek() == '\n' || peek() == '\r')
+                    get();
+                if (peek() < 0)
+                    return true;
+        }
+        lookingInMiddle = true;
 
-    if (          c != 'v' ||
-        input.get() != 'e' ||
-        input.get() != 'r' ||
-        input.get() != 's' ||
-        input.get() != 'i' ||
-        input.get() != 'o' ||
-        input.get() != 'n')
-        return true;
+        // Nominal start, skipping the desktop allowed comments and white space, but tracking if 
+        // something else was found for ES:
+        consumeWhitespaceComment(foundNonSpaceTab);
+        if (foundNonSpaceTab) 
+            versionNotFirst = true;
 
-    // whitespace
-    do {
-        c = input.get();
-    } while (c == ' ' || c == '\t');
+        // "#"
+        if (get() != '#') {
+            versionNotFirst = true;
+            continue;
+        }
 
-    // version number
-    while (c >= '0' && c <= '9') {
-        version = 10 * version + (c - '0');
-        c = input.get();
-    }
-    if (version == 0)
-        return true;
-    
-    // whitespace
-    while (c == ' ' || c == '\t')
-        c = input.get();
+        // whitespace
+        do {
+            c = get();
+        } while (c == ' ' || c == '\t');
 
-    // profile
-    const int maxProfileLength = 13;  // not including any 0
-    char profileString[maxProfileLength];
-    int profileLength;
-    for (profileLength = 0; profileLength < maxProfileLength; ++profileLength) {
-        if (c < 0 || c == ' ' || c == '\t' || c == '\n' || c == '\r')
-            break;
-        profileString[profileLength] = c;
-        c = input.get();
-    }
-    if (c > 0 && c != ' ' && c != '\t' && c != '\n' && c != '\r')
-        return true;
+        // "version"
+        if (    c != 'v' ||
+            get() != 'e' ||
+            get() != 'r' ||
+            get() != 's' ||
+            get() != 'i' ||
+            get() != 'o' ||
+            get() != 'n') {
+            versionNotFirst = true;
+            continue;
+        }
 
-    if (profileLength == 2 && strncmp(profileString, "es", profileLength) == 0)
-        profile = EEsProfile;
-    else if (profileLength == 4 && strncmp(profileString, "core", profileLength) == 0)
-        profile = ECoreProfile;
-    else if (profileLength == 13 && strncmp(profileString, "compatibility", profileLength) == 0)
-        profile = ECompatibilityProfile;
+        // whitespace
+        do {
+            c = get();
+        } while (c == ' ' || c == '\t');
 
-    return foundNonSpaceTab;
+        // version number
+        while (c >= '0' && c <= '9') {
+            version = 10 * version + (c - '0');
+            c = get();
+        }
+        if (version == 0) {
+            versionNotFirst = true;
+            continue;
+        }
+
+        // whitespace
+        while (c == ' ' || c == '\t')
+            c = get();
+
+        // profile
+        const int maxProfileLength = 13;  // not including any 0
+        char profileString[maxProfileLength];
+        int profileLength;
+        for (profileLength = 0; profileLength < maxProfileLength; ++profileLength) {
+            if (c < 0 || c == ' ' || c == '\t' || c == '\n' || c == '\r')
+                break;
+            profileString[profileLength] = c;
+            c = get();
+        }
+        if (c > 0 && c != ' ' && c != '\t' && c != '\n' && c != '\r') {
+            versionNotFirst = true;
+            continue;
+        }
+
+        if (profileLength == 2 && strncmp(profileString, "es", profileLength) == 0)
+            profile = EEsProfile;
+        else if (profileLength == 4 && strncmp(profileString, "core", profileLength) == 0)
+            profile = ECoreProfile;
+        else if (profileLength == 13 && strncmp(profileString, "compatibility", profileLength) == 0)
+            profile = ECompatibilityProfile;
+
+        return versionNotFirst;
+    } while (true);
 }
 
 // Fill this in when doing glslang-level scanning, to hand back to the parser.
@@ -424,6 +462,7 @@ void TScanContext::fillInKeywordMap()
     (*KeywordMap)["sampler2DRect"] =           SAMPLER2DRECT;
     (*KeywordMap)["sampler2DRectShadow"] =     SAMPLER2DRECTSHADOW;
     (*KeywordMap)["sampler1DArray"] =          SAMPLER1DARRAY;
+    (*KeywordMap)["samplerExternalOES"] =      SAMPLEREXTERNALOES; // GL_OES_EGL_image_external
     (*KeywordMap)["noperspective"] =           NOPERSPECTIVE;
     (*KeywordMap)["smooth"] =                  SMOOTH;
     (*KeywordMap)["flat"] =                    FLAT;
@@ -477,72 +516,82 @@ void TScanContext::fillInKeywordMap()
 
 int TScanContext::tokenize(TPpContext* pp, TParserToken& token)
 {
-    parserToken = &token;
-    TPpToken ppToken;
-    tokenText = pp->tokenize(&ppToken);
+    do {
+        parserToken = &token;
+        TPpToken ppToken;
+        tokenText = pp->tokenize(&ppToken);
+        if (tokenText == 0)
+            return 0;
 
-    loc = ppToken.loc;
-    parserToken->sType.lex.loc = loc;
-    switch (ppToken.ppToken) {
-    case ';':  afterType = false;   return SEMICOLON;
-    case ',':  afterType = false;   return COMMA;
-    case ':':                       return COLON;
-    case '=':  afterType = false;   return EQUAL;
-    case '(':  afterType = false;   return LEFT_PAREN;
-    case ')':  afterType = false;   return RIGHT_PAREN;
-    case '.':  field = true;        return DOT;
-    case '!':                       return BANG;
-    case '-':                       return DASH;
-    case '~':                       return TILDE;
-    case '+':                       return PLUS;
-    case '*':                       return STAR;
-    case '/':                       return SLASH;
-    case '%':                       return PERCENT;
-    case '<':                       return LEFT_ANGLE;
-    case '>':                       return RIGHT_ANGLE;
-    case '|':                       return VERTICAL_BAR;
-    case '^':                       return CARET;
-    case '&':                       return AMPERSAND;
-    case '?':                       return QUESTION;
-    case '[':                       return LEFT_BRACKET;
-    case ']':                       return RIGHT_BRACKET;
-    case '{':                       return LEFT_BRACE;
-    case '}':                       return RIGHT_BRACE;
+        loc = ppToken.loc;
+        parserToken->sType.lex.loc = loc;
+        switch (ppToken.token) {
+        case ';':  afterType = false;   return SEMICOLON;
+        case ',':  afterType = false;   return COMMA;
+        case ':':                       return COLON;
+        case '=':  afterType = false;   return EQUAL;
+        case '(':  afterType = false;   return LEFT_PAREN;
+        case ')':  afterType = false;   return RIGHT_PAREN;
+        case '.':  field = true;        return DOT;
+        case '!':                       return BANG;
+        case '-':                       return DASH;
+        case '~':                       return TILDE;
+        case '+':                       return PLUS;
+        case '*':                       return STAR;
+        case '/':                       return SLASH;
+        case '%':                       return PERCENT;
+        case '<':                       return LEFT_ANGLE;
+        case '>':                       return RIGHT_ANGLE;
+        case '|':                       return VERTICAL_BAR;
+        case '^':                       return CARET;
+        case '&':                       return AMPERSAND;
+        case '?':                       return QUESTION;
+        case '[':                       return LEFT_BRACKET;
+        case ']':                       return RIGHT_BRACKET;
+        case '{':                       return LEFT_BRACE;
+        case '}':                       return RIGHT_BRACE;
+        case '\\':
+            parseContext.error(loc, "illegal use of escape character", "\\", "");
+            break;
 
-    case CPP_AND_OP:                return AND_OP;
-    case CPP_SUB_ASSIGN:            return SUB_ASSIGN;
-    case CPP_MOD_ASSIGN:            return MOD_ASSIGN;
-    case CPP_ADD_ASSIGN:            return ADD_ASSIGN;
-    case CPP_DIV_ASSIGN:            return DIV_ASSIGN;
-    case CPP_MUL_ASSIGN:            return MUL_ASSIGN;
-    case CPP_EQ_OP:                 return EQ_OP;
-    case CPP_XOR_OP:                return XOR_OP;
-    case CPP_GE_OP:                 return GE_OP;
-    case CPP_RIGHT_OP:              return RIGHT_OP;
-    case CPP_LE_OP:                 return LE_OP;
-    case CPP_LEFT_OP:               return LEFT_OP;
-    case CPP_DEC_OP:                return DEC_OP;
-    case CPP_NE_OP:                 return NE_OP;
-    case CPP_OR_OP:                 return OR_OP;
-    case CPP_INC_OP:                return INC_OP;
-    case CPP_RIGHT_ASSIGN:          return RIGHT_ASSIGN;
-    case CPP_LEFT_ASSIGN:           return LEFT_ASSIGN;
-    case CPP_AND_ASSIGN:            return AND_ASSIGN;
-    case CPP_OR_ASSIGN:             return OR_ASSIGN;
-    case CPP_XOR_ASSIGN:            return XOR_ASSIGN;
+        case CPP_AND_OP:                return AND_OP;
+        case CPP_SUB_ASSIGN:            return SUB_ASSIGN;
+        case CPP_MOD_ASSIGN:            return MOD_ASSIGN;
+        case CPP_ADD_ASSIGN:            return ADD_ASSIGN;
+        case CPP_DIV_ASSIGN:            return DIV_ASSIGN;
+        case CPP_MUL_ASSIGN:            return MUL_ASSIGN;
+        case CPP_EQ_OP:                 return EQ_OP;
+        case CPP_XOR_OP:                return XOR_OP;
+        case CPP_GE_OP:                 return GE_OP;
+        case CPP_RIGHT_OP:              return RIGHT_OP;
+        case CPP_LE_OP:                 return LE_OP;
+        case CPP_LEFT_OP:               return LEFT_OP;
+        case CPP_DEC_OP:                return DEC_OP;
+        case CPP_NE_OP:                 return NE_OP;
+        case CPP_OR_OP:                 return OR_OP;
+        case CPP_INC_OP:                return INC_OP;
+        case CPP_RIGHT_ASSIGN:          return RIGHT_ASSIGN;
+        case CPP_LEFT_ASSIGN:           return LEFT_ASSIGN;
+        case CPP_AND_ASSIGN:            return AND_ASSIGN;
+        case CPP_OR_ASSIGN:             return OR_ASSIGN;
+        case CPP_XOR_ASSIGN:            return XOR_ASSIGN;
                                    
-    case CPP_INTCONSTANT:           parserToken->sType.lex.i = ppToken.ival;        return INTCONSTANT;
-    case CPP_UINTCONSTANT:          parserToken->sType.lex.i = ppToken.ival;        return UINTCONSTANT;
-    case CPP_FLOATCONSTANT:         parserToken->sType.lex.d = ppToken.dval;       return FLOATCONSTANT;
-    case CPP_DOUBLECONSTANT:        parserToken->sType.lex.d = ppToken.dval;       return DOUBLECONSTANT;
-    case CPP_IDENTIFIER:            return tokenizeIdentifier();
+        case CPP_INTCONSTANT:           parserToken->sType.lex.i = ppToken.ival;       return INTCONSTANT;
+        case CPP_UINTCONSTANT:          parserToken->sType.lex.i = ppToken.ival;       return UINTCONSTANT;
+        case CPP_FLOATCONSTANT:         parserToken->sType.lex.d = ppToken.dval;       return FLOATCONSTANT;
+        case CPP_DOUBLECONSTANT:        parserToken->sType.lex.d = ppToken.dval;       return DOUBLECONSTANT;
+        case CPP_IDENTIFIER:            return tokenizeIdentifier();
 
-    case EOF:                       return 0;
+        case EOF:                       return 0;
                                    
-    default:
-        parseContext.infoSink.info.message(EPrefixInternalError, "Unknown PP token", loc);
-        return 0;
-    }
+        default:
+            char buf[2];
+            buf[0] = ppToken.token;
+            buf[1] = 0;
+            parseContext.error(loc, "unexpected token", buf, "");
+            break;
+        }
+    } while (true);
 }
 
 int TScanContext::tokenizeIdentifier()
@@ -619,23 +668,39 @@ int TScanContext::tokenizeIdentifier()
         return keyword;
 
     case BUFFER:
-        if (parseContext.version < 430)
+        if ((parseContext.profile == EEsProfile && parseContext.version < 310) || 
+            (parseContext.profile != EEsProfile && parseContext.version < 430))
             return identifierOrType();
         return keyword;
+
+    case ATOMIC_UINT:
+        if (parseContext.profile == EEsProfile && parseContext.version >= 310 ||
+            parseContext.extensionsTurnedOn(1, &GL_ARB_shader_atomic_counters))
+            return keyword;
+        return es30ReservedFromGLSL(420);
 
     case COHERENT:
     case RESTRICT:
     case READONLY:
     case WRITEONLY:
-    case ATOMIC_UINT:
-        return es30ReservedFromGLSL(420);
+        if (parseContext.profile == EEsProfile && parseContext.version >= 310)
+            return keyword;
+        return es30ReservedFromGLSL(parseContext.extensionsTurnedOn(1, &GL_ARB_shader_image_load_store) ? 130 : 420);
 
     case VOLATILE:
-        if (parseContext.profile == EEsProfile || parseContext.version < 420)
+        if (parseContext.profile == EEsProfile && parseContext.version >= 310)
+            return keyword;
+        if (! parseContext.symbolTable.atBuiltInLevel() && (parseContext.profile == EEsProfile || (parseContext.version < 420 && ! parseContext.extensionsTurnedOn(1, &GL_ARB_shader_image_load_store))))
             reservedWord();
         return keyword;
 
     case LAYOUT:
+        if ((parseContext.profile == EEsProfile && parseContext.version < 300) ||
+            (parseContext.profile != EEsProfile && parseContext.version < 140 &&
+            ! parseContext.extensionsTurnedOn(1, &GL_ARB_shading_language_420pack)))
+            return identifierOrType();
+        return keyword;
+
     case SHARED:
         if ((parseContext.profile == EEsProfile && parseContext.version < 300) ||
             (parseContext.profile != EEsProfile && parseContext.version < 140))
@@ -643,6 +708,11 @@ int TScanContext::tokenizeIdentifier()
         return keyword;
 
     case PATCH:
+        if (parseContext.symbolTable.atBuiltInLevel() || parseContext.extensionsTurnedOn(1, &GL_ARB_tessellation_shader))
+            return es30ReservedFromGLSL(150);
+        else
+            return es30ReservedFromGLSL(400);
+
     case SAMPLE:
     case SUBROUTINE:
         return es30ReservedFromGLSL(400);
@@ -681,32 +751,34 @@ int TScanContext::tokenizeIdentifier()
     case IMAGE1D:
     case IIMAGE1D:
     case UIMAGE1D:
+    case IMAGE1DARRAY:
+    case IIMAGE1DARRAY:
+    case UIMAGE1DARRAY:
+    case IMAGE2DRECT:
+    case IIMAGE2DRECT:
+    case UIMAGE2DRECT:
+    case IMAGEBUFFER:
+    case IIMAGEBUFFER:
+    case UIMAGEBUFFER:
+        return firstGenerationImage(false);
+
     case IMAGE2D:
     case IIMAGE2D:
     case UIMAGE2D:
     case IMAGE3D:
     case IIMAGE3D:
     case UIMAGE3D:
-    case IMAGE2DRECT:
-    case IIMAGE2DRECT:
-    case UIMAGE2DRECT:
     case IMAGECUBE:
     case IIMAGECUBE:
     case UIMAGECUBE:
-    case IMAGEBUFFER:
-    case IIMAGEBUFFER:
-    case UIMAGEBUFFER:
-    case IMAGE1DARRAY:
-    case IIMAGE1DARRAY:
-    case UIMAGE1DARRAY:
     case IMAGE2DARRAY:
     case IIMAGE2DARRAY:
     case UIMAGE2DARRAY:
-        return firstGenerationImage();
+        return firstGenerationImage(true);
 
     case IMAGECUBEARRAY:
     case IIMAGECUBEARRAY:
-    case UIMAGECUBEARRAY:
+    case UIMAGECUBEARRAY:        
     case IMAGE2DMS:
     case IIMAGE2DMS:
     case UIMAGE2DMS:
@@ -719,12 +791,17 @@ int TScanContext::tokenizeIdentifier()
     case DVEC2:
     case DVEC3:
     case DVEC4:
+        afterType = true;
+        if (parseContext.profile == EEsProfile || parseContext.version < 400)
+            reservedWord();
+        return keyword;
+
     case SAMPLERCUBEARRAY:
     case SAMPLERCUBEARRAYSHADOW:
     case ISAMPLERCUBEARRAY:
     case USAMPLERCUBEARRAY:
         afterType = true;
-        if (parseContext.profile == EEsProfile || parseContext.version < 400)
+        if (parseContext.profile == EEsProfile || (parseContext.version < 400 && ! parseContext.extensionsTurnedOn(1, &GL_ARB_texture_cube_map_array)))
             reservedWord();
         return keyword;
 
@@ -765,6 +842,11 @@ int TScanContext::tokenizeIdentifier()
     case SAMPLER2DMS:
     case ISAMPLER2DMS:
     case USAMPLER2DMS:
+        afterType = true;
+        if (parseContext.profile == EEsProfile && parseContext.version >= 310)
+            return keyword;
+        return es30ReservedFromGLSL(150);
+
     case SAMPLER2DMSARRAY:
     case ISAMPLER2DMSARRAY:
     case USAMPLER2DMSARRAY:
@@ -779,6 +861,13 @@ int TScanContext::tokenizeIdentifier()
         return keyword;
 
     case SAMPLER3D:
+        afterType = true;
+        if (parseContext.profile == EEsProfile && parseContext.version < 300) {
+            if (! parseContext.extensionsTurnedOn(1, &GL_OES_texture_3D))
+                reservedWord();
+        }
+        return keyword;
+
     case SAMPLER2DSHADOW:
         afterType = true;
         if (parseContext.profile == EEsProfile && parseContext.version < 300)
@@ -788,9 +877,14 @@ int TScanContext::tokenizeIdentifier()
     case SAMPLER2DRECT:
     case SAMPLER2DRECTSHADOW:
         afterType = true;
-        if ((parseContext.profile == EEsProfile) ||
-            (parseContext.profile != EEsProfile && parseContext.version < 140))
+        if (parseContext.profile == EEsProfile)
             reservedWord();
+        else if (parseContext.version < 140 && ! parseContext.symbolTable.atBuiltInLevel() && ! parseContext.extensionsTurnedOn(1, &GL_ARB_texture_rectangle)) {
+            if (parseContext.messages & EShMsgRelaxedErrors)
+                parseContext.requireExtensions(loc, 1, &GL_ARB_texture_rectangle, "texture-rectangle sampler keyword");
+            else
+                reservedWord();
+        }
         return keyword;
 
     case SAMPLER1DARRAY:
@@ -801,6 +895,12 @@ int TScanContext::tokenizeIdentifier()
                  (parseContext.profile != EEsProfile && parseContext.version < 130))
             return identifierOrType();
         return keyword;
+
+    case SAMPLEREXTERNALOES:
+        afterType = true;
+        if (parseContext.symbolTable.atBuiltInLevel() || parseContext.extensionsTurnedOn(1, &GL_OES_EGL_image_external))
+            return keyword;
+        return identifierOrType();
 
     case NOPERSPECTIVE:
         return es30ReservedFromGLSL(130);
@@ -824,7 +924,9 @@ int TScanContext::tokenizeIdentifier()
         return keyword;
 
     case PRECISE:
-        if ((parseContext.profile == EEsProfile) ||
+        if (parseContext.profile == EEsProfile && parseContext.version >= 310)
+            reservedWord();
+        else if (parseContext.profile == EEsProfile ||
             (parseContext.profile != EEsProfile && parseContext.version < 400))
             return identifierOrType();
         return keyword;
@@ -848,7 +950,7 @@ int TScanContext::tokenizeIdentifier()
     }
     case SUPERP:
     {
-        bool reserved = (parseContext.profile == EEsProfile) || (parseContext.version >= 130);
+        bool reserved = parseContext.profile == EEsProfile || parseContext.version >= 130;
         return identifierOrReserved(reserved);
     }
     
@@ -881,9 +983,13 @@ int TScanContext::identifierOrType()
     return IDENTIFIER;
 }
 
+// Give an error for use of a reserved symbol.
+// However, allow built-in declarations to use reserved words, to allow
+// extension support before the extension is enabled.
 int TScanContext::reservedWord()
 {
-    parseContext.error(loc, "Reserved word.", tokenText, "", "");
+    if (! parseContext.symbolTable.atBuiltInLevel())
+        parseContext.error(loc, "Reserved word.", tokenText, "", "");
 
     return 0;
 }
@@ -906,6 +1012,9 @@ int TScanContext::identifierOrReserved(bool reserved)
 // but then got reserved by ES 3.0.
 int TScanContext::es30ReservedFromGLSL(int version)
 {
+    if (parseContext.symbolTable.atBuiltInLevel())
+        return keyword;
+
     if ((parseContext.profile == EEsProfile && parseContext.version < 300) ||
         (parseContext.profile != EEsProfile && parseContext.version < version)) {
             if (parseContext.forwardCompatible)
@@ -976,11 +1085,13 @@ int TScanContext::dMat()
     return identifierOrType();
 }
 
-int TScanContext::firstGenerationImage()
+int TScanContext::firstGenerationImage(bool inEs310)
 {
     afterType = true;
 
-    if (parseContext.profile != EEsProfile && parseContext.version >= 420)
+    if (parseContext.symbolTable.atBuiltInLevel() || 
+        (parseContext.profile != EEsProfile && (parseContext.version >= 420 || parseContext.extensionsTurnedOn(1, &GL_ARB_shader_image_load_store))) ||                                                     
+        (inEs310 && parseContext.profile == EEsProfile && parseContext.version >= 310))
         return keyword;
 
     if ((parseContext.profile == EEsProfile && parseContext.version >= 300) ||
@@ -1000,7 +1111,12 @@ int TScanContext::secondGenerationImage()
 {
     afterType = true;
 
-    if (parseContext.profile != EEsProfile && parseContext.version >= 420)
+    if (parseContext.profile == EEsProfile && parseContext.version >= 310) {
+        reservedWord();
+        return keyword;
+    }
+
+    if (parseContext.symbolTable.atBuiltInLevel() || parseContext.profile != EEsProfile && (parseContext.version >= 420 || parseContext.extensionsTurnedOn(1, &GL_ARB_shader_image_load_store)))
         return keyword;
 
     if (parseContext.forwardCompatible)

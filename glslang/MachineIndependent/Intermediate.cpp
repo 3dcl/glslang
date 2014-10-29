@@ -39,7 +39,6 @@
 //
 
 #include "localintermediate.h"
-#include "QualifierAlive.h"
 #include "RemoveTree.h"
 #include "SymbolTable.h"
 
@@ -68,6 +67,11 @@ TIntermSymbol* TIntermediate::addSymbol(int id, const TString& name, const TType
     return node;
 }
 
+TIntermSymbol* TIntermediate::addSymbol(const TVariable& variable, TSourceLoc loc)
+{
+    return addSymbol(variable.getUniqueId(), variable.getName(), variable.getType(), loc);
+}
+
 //
 // Connect two nodes with a new parent that does a binary operation on the nodes.
 //
@@ -92,7 +96,7 @@ TIntermTyped* TIntermediate::addBinaryMath(TOperator op, TIntermTyped* left, TIn
     }
     
     //
-    // Need a new node holding things together then.  Make
+    // Need a new node holding things together.  Make
     // one and promote it to the right type.
     //
     TIntermBinary* node = new TIntermBinary(op);
@@ -109,6 +113,7 @@ TIntermTyped* TIntermediate::addBinaryMath(TOperator op, TIntermTyped* left, TIn
         
     //
     // If they are both constants, they must be folded.
+    // (Unless it's the sequence (comma) operator, but that's handled in addComma().)
     //
 
     TIntermConstantUnion *leftTempConstant = left->getAsConstantUnion();
@@ -182,10 +187,8 @@ TIntermTyped* TIntermediate::addIndex(TOperator op, TIntermTyped* base, TIntermT
 //
 // Returns the added node.
 //
-TIntermTyped* TIntermediate::addUnaryMath(TOperator op, TIntermNode* childNode, TSourceLoc loc)
+TIntermTyped* TIntermediate::addUnaryMath(TOperator op, TIntermTyped* child, TSourceLoc loc)
 {
-    TIntermTyped* child = childNode->getAsTyped();
-
     if (child->getType().getBasicType() == EbtBlock)
         return 0;
 
@@ -300,18 +303,21 @@ TIntermTyped* TIntermediate::addBuiltInFunctionCall(TSourceLoc loc, TOperator op
         // setAggregateOperater() calls fold() for constant folding
         TIntermTyped* node = setAggregateOperator(childNode, op, returnType, loc);
         
-        TPrecisionQualifier correctPrecision = returnType.getQualifier().precision;
-        if (correctPrecision == EpqNone && profile == EEsProfile) {
-            // find the maximum precision from the arguments, for the built-in's return precision
-            TIntermSequence& sequence = node->getAsAggregate()->getSequence();
-            for (unsigned int arg = 0; arg < sequence.size(); ++arg)
-                correctPrecision = std::max(correctPrecision, sequence[arg]->getAsTyped()->getQualifier().precision);
-        }
+        // if not folded, we'll still have an aggregate node to propagate precision with
+        if (node->getAsAggregate()) {
+            TPrecisionQualifier correctPrecision = returnType.getQualifier().precision;
+            if (correctPrecision == EpqNone && profile == EEsProfile) {
+                // find the maximum precision from the arguments, for the built-in's return precision
+                TIntermSequence& sequence = node->getAsAggregate()->getSequence();
+                for (unsigned int arg = 0; arg < sequence.size(); ++arg)
+                    correctPrecision = std::max(correctPrecision, sequence[arg]->getAsTyped()->getQualifier().precision);
+            }
         
-        // Propagate precision through this node and its children. That algorithm stops
-        // when a precision is found, so start by clearing this subroot precision
-        node->getQualifier().precision = EpqNone;
-        node->propagatePrecision(correctPrecision);
+            // Propagate precision through this node and its children. That algorithm stops
+            // when a precision is found, so start by clearing this subroot precision
+            node->getQualifier().precision = EpqNone;
+            node->propagatePrecision(correctPrecision);
+        }
 
         return node;
     }
@@ -321,7 +327,7 @@ TIntermTyped* TIntermediate::addBuiltInFunctionCall(TSourceLoc loc, TOperator op
 // This is the safe way to change the operator on an aggregate, as it
 // does lots of error checking and fixing.  Especially for establishing
 // a function call's operation on it's set of parameters.  Sequences
-// of instructions are also aggregates, but they just direnctly set
+// of instructions are also aggregates, but they just directly set
 // their operator to EOpSequence.
 //
 // Returns an aggregate node, which could be the one passed in if
@@ -361,23 +367,30 @@ TIntermTyped* TIntermediate::setAggregateOperator(TIntermNode* node, TOperator o
 }
 
 //
-// Convert one type to another.
+// Convert the node's type to the given type, as allowed by the operation involved: 'op'.
+// For implicit conversions, 'op' is not the requested conversion, it is the explicit 
+// operation requiring the implicit conversion.
 //
-// Returns the node representing the conversion, which could be the same
+// Returns a node representing the conversion, which could be the same
 // node passed in if no conversion was needed.
 //
 // Return 0 if a conversion can't be done.
 //
-TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TIntermTyped* node)
+TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TIntermTyped* node) const
 {
     //
     // Does the base type allow operation?
     //
     switch (node->getBasicType()) {
     case EbtVoid:
-    case EbtSampler:
         return 0;
-    default: break;
+    case EbtAtomicUint:
+    case EbtSampler:
+        if (op != EOpFunctionCall)
+            return 0;
+        break;
+    default:
+        break;
     }
 
     //
@@ -389,7 +402,7 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
     //
     // If one's a structure, then no conversions.
     //
-    if (type.getStruct() || node->getType().getStruct())
+    if (type.isStruct() || node->isStruct())
         return 0;
 
     //
@@ -441,6 +454,8 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
     case EOpMatrixTimesVector:
     case EOpMatrixTimesScalar:
 
+    case EOpFunctionCall:
+    case EOpReturn:
     case EOpAssign:
     case EOpAddAssign:
     case EOpSubAssign:
@@ -488,91 +503,89 @@ TIntermTyped* TIntermediate::addConversion(TOperator op, const TType& type, TInt
             return 0;
     }
     
-    if (node->getAsConstantUnion()) {
-
+    if (node->getAsConstantUnion())
         return promoteConstantUnion(promoteTo, node->getAsConstantUnion());
-    } else {    
-        //
-        // Add a new newNode for the conversion.
-        //
-        TIntermUnary* newNode = 0;
 
-        TOperator newOp = EOpNull;
+    //
+    // Add a new newNode for the conversion.
+    //
+    TIntermUnary* newNode = 0;
 
-        // This is 'mechanism' here, it does any conversion told.  The policy comes
-        // from the shader or the above code.
-        switch (promoteTo) {
-        case EbtDouble:
-            //switch (node->getBasicType()) {
-            //case EbtInt:   newOp = EOpConvIntToDouble;   break;
-            //case EbtUint:  newOp = EOpConvUintToDouble;  break;
-            //case EbtBool:  newOp = EOpConvBoolToDouble;  break;
-            //case EbtFloat: newOp = EOpConvFloatToDouble; break;
-            //default:
-                return 0;
-            //}
-            break;
-        case EbtFloat:
-            switch (node->getBasicType()) {
-            case EbtInt:    newOp = EOpConvIntToFloat;  break;
-            case EbtUint:   newOp = EOpConvUintToFloat; break;
-            case EbtBool:   newOp = EOpConvBoolToFloat; break;
-            case EbtDouble: newOp = EOpConvDoubleToFloat; break;
-            default:
-                return 0;
-            }
-            break;
-        case EbtBool:
-            switch (node->getBasicType()) {
-            case EbtInt:    newOp = EOpConvIntToBool;   break;
-            case EbtUint:   newOp = EOpConvUintToBool; break;
-            case EbtFloat:  newOp = EOpConvFloatToBool; break;
-            case EbtDouble: newOp = EOpConvDoubleToBool; break;
-            default:
-                return 0;
-            }
-            break;
-        case EbtInt:
-            switch (node->getBasicType()) {
-            case EbtUint:   newOp = EOpConvUintToInt;  break;
-            case EbtBool:   newOp = EOpConvBoolToInt;  break;
-            case EbtFloat:  newOp = EOpConvFloatToInt; break;
-            case EbtDouble: newOp = EOpConvDoubleToInt; break;
-            default:
-                return 0;
-            }
-            break;
-        case EbtUint:
-            switch (node->getBasicType()) {
-            case EbtInt:    newOp = EOpConvIntToUint;   break;
-            case EbtBool:   newOp = EOpConvBoolToUint;  break;
-            case EbtFloat:  newOp = EOpConvFloatToUint; break;
-            case EbtDouble: newOp = EOpConvDoubleToUint; break;
-            default:
-                return 0;
-            }
-            break;
-        default: 
+    TOperator newOp = EOpNull;
+
+    // This is 'mechanism' here, it does any conversion told.  The policy comes
+    // from the shader or the above code.
+    switch (promoteTo) {
+    case EbtDouble:
+        switch (node->getBasicType()) {
+        case EbtInt:   newOp = EOpConvIntToDouble;   break;
+        case EbtUint:  newOp = EOpConvUintToDouble;  break;
+        case EbtBool:  newOp = EOpConvBoolToDouble;  break;
+        case EbtFloat: newOp = EOpConvFloatToDouble; break;
+        default:
             return 0;
         }
-
-        TType type(promoteTo, EvqTemporary, node->getVectorSize(), node->getMatrixCols(), node->getMatrixRows());
-        newNode = new TIntermUnary(newOp, type);
-        newNode->setLoc(node->getLoc());
-        newNode->setOperand(node);
-
-        return newNode;
+        break;
+    case EbtFloat:
+        switch (node->getBasicType()) {
+        case EbtInt:    newOp = EOpConvIntToFloat;    break;
+        case EbtUint:   newOp = EOpConvUintToFloat;   break;
+        case EbtBool:   newOp = EOpConvBoolToFloat;   break;
+        case EbtDouble: newOp = EOpConvDoubleToFloat; break;
+        default:
+            return 0;
+        }
+        break;
+    case EbtBool:
+        switch (node->getBasicType()) {
+        case EbtInt:    newOp = EOpConvIntToBool;    break;
+        case EbtUint:   newOp = EOpConvUintToBool;   break;
+        case EbtFloat:  newOp = EOpConvFloatToBool;  break;
+        case EbtDouble: newOp = EOpConvDoubleToBool; break;
+        default:
+            return 0;
+        }
+        break;
+    case EbtInt:
+        switch (node->getBasicType()) {
+        case EbtUint:   newOp = EOpConvUintToInt;   break;
+        case EbtBool:   newOp = EOpConvBoolToInt;   break;
+        case EbtFloat:  newOp = EOpConvFloatToInt;  break;
+        case EbtDouble: newOp = EOpConvDoubleToInt; break;
+        default:
+            return 0;
+        }
+        break;
+    case EbtUint:
+        switch (node->getBasicType()) {
+        case EbtInt:    newOp = EOpConvIntToUint;    break;
+        case EbtBool:   newOp = EOpConvBoolToUint;   break;
+        case EbtFloat:  newOp = EOpConvFloatToUint;  break;
+        case EbtDouble: newOp = EOpConvDoubleToUint; break;
+        default:
+            return 0;
+        }
+        break;
+    default: 
+        return 0;
     }
+
+    TType newType(promoteTo, EvqTemporary, node->getVectorSize(), node->getMatrixCols(), node->getMatrixRows());
+    newNode = new TIntermUnary(newOp, newType);
+    newNode->setLoc(node->getLoc());
+    newNode->setOperand(node);
+
+    return newNode;
 }
 
 //
 // See if the 'from' type is allowed to be implicitly converted to the 
 // 'to' type.  This is not about vector/array/struct, only about basic type.
 //
-bool TIntermediate::canImplicitlyPromote(TBasicType from, TBasicType to)
+bool TIntermediate::canImplicitlyPromote(TBasicType from, TBasicType to) const
 {
     if (profile == EEsProfile || version == 110)
-        return 0;
+        return false;
 
     switch (to) {
     case EbtDouble:
@@ -597,6 +610,7 @@ bool TIntermediate::canImplicitlyPromote(TBasicType from, TBasicType to)
     case EbtUint:
         switch (from) {
         case EbtInt:
+            return version >= 400;
         case EbtUint:
             return true;
         default:
@@ -629,7 +643,7 @@ TIntermAggregate* TIntermediate::growAggregate(TIntermNode* left, TIntermNode* r
     TIntermAggregate* aggNode = 0;
     if (left)
         aggNode = left->getAsAggregate();
-    if (!aggNode || aggNode->getOp() != EOpNull) {
+    if (! aggNode || aggNode->getOp() != EOpNull) {
         aggNode = new TIntermAggregate;
         if (left)
             aggNode->getSequence().push_back(left);
@@ -644,7 +658,8 @@ TIntermAggregate* TIntermediate::growAggregate(TIntermNode* left, TIntermNode* r
 TIntermAggregate* TIntermediate::growAggregate(TIntermNode* left, TIntermNode* right, TSourceLoc loc)
 {
     TIntermAggregate* aggNode = growAggregate(left, right);
-    aggNode->setLoc(loc);
+    if (aggNode)
+        aggNode->setLoc(loc);
 
     return aggNode;
 }
@@ -701,19 +716,21 @@ TIntermNode* TIntermediate::addSelection(TIntermTyped* cond, TIntermNodePair nod
 
 TIntermTyped* TIntermediate::addComma(TIntermTyped* left, TIntermTyped* right, TSourceLoc loc)
 {
-    if (left->getType().getQualifier().storage == EvqConst && 
-        right->getType().getQualifier().storage == EvqConst) {
+    // However, the lowest precedence operators of the sequence operator ( , ) and the assignment operators 
+    // ... are not included in the operators that can create a constant expression.
+    //
+    //if (left->getType().getQualifier().storage == EvqConst && 
+    //    right->getType().getQualifier().storage == EvqConst) {
 
-        return right;
-    } else {
-        TIntermTyped *commaAggregate = growAggregate(left, right, loc);
-        commaAggregate->getAsAggregate()->setOperator(EOpComma);
-        commaAggregate->setType(right->getType());
-        commaAggregate->getWritableType().getQualifier().storage = EvqTemporary;
-        commaAggregate->getWritableType().getQualifier().precision = right->getType().getQualifier().precision;
+    //    return right;
+    //}
 
-        return commaAggregate;
-    }
+    TIntermTyped *commaAggregate = growAggregate(left, right, loc);
+    commaAggregate->getAsAggregate()->setOperator(EOpComma);
+    commaAggregate->setType(right->getType());
+    commaAggregate->getWritableType().getQualifier().makeTemporary();
+
+    return commaAggregate;
 }
 
 TIntermTyped* TIntermediate::addMethod(TIntermTyped* object, const TType& type, const TString* name, TSourceLoc loc)
@@ -756,7 +773,7 @@ TIntermTyped* TIntermediate::addSelection(TIntermTyped* cond, TIntermTyped* true
     //
 
     if (cond->getAsConstantUnion() && trueBlock->getAsConstantUnion() && falseBlock->getAsConstantUnion()) {
-        if (cond->getAsConstantUnion()->getUnionArrayPointer()->getBConst())
+        if (cond->getAsConstantUnion()->getConstArray()[0].getBConst())
             return trueBlock;
         else
             return falseBlock;
@@ -766,6 +783,7 @@ TIntermTyped* TIntermediate::addSelection(TIntermTyped* cond, TIntermTyped* true
     // Make a selection node.
     //
     TIntermSelection* node = new TIntermSelection(cond, trueBlock, falseBlock, trueBlock->getType());
+    node->getQualifier().storage = EvqTemporary;
     node->setLoc(loc);
     node->getQualifier().precision = std::max(trueBlock->getQualifier().precision, falseBlock->getQualifier().precision);
 
@@ -778,12 +796,48 @@ TIntermTyped* TIntermediate::addSelection(TIntermTyped* cond, TIntermTyped* true
 // Returns the constant union node created.
 //
 
-TIntermConstantUnion* TIntermediate::addConstantUnion(TConstUnion* unionArrayPointer, const TType& t, TSourceLoc loc)
+TIntermConstantUnion* TIntermediate::addConstantUnion(const TConstUnionArray& unionArray, const TType& t, TSourceLoc loc, bool literal) const
 {
-    TIntermConstantUnion* node = new TIntermConstantUnion(unionArrayPointer, t);
+    TIntermConstantUnion* node = new TIntermConstantUnion(unionArray, t);
     node->setLoc(loc);
+    if (literal)
+        node->setLiteral();
 
     return node;
+}
+
+TIntermConstantUnion* TIntermediate::addConstantUnion(int i, TSourceLoc loc, bool literal) const
+{
+    TConstUnionArray unionArray(1);
+    unionArray[0].setIConst(i);
+
+    return addConstantUnion(unionArray, TType(EbtInt, EvqConst), loc, literal);
+}
+
+TIntermConstantUnion* TIntermediate::addConstantUnion(unsigned int u, TSourceLoc loc, bool literal) const
+{
+    TConstUnionArray unionArray(1);
+    unionArray[0].setUConst(u);
+
+    return addConstantUnion(unionArray, TType(EbtUint, EvqConst), loc, literal);
+}
+
+TIntermConstantUnion* TIntermediate::addConstantUnion(bool b, TSourceLoc loc, bool literal) const
+{
+    TConstUnionArray unionArray(1);
+    unionArray[0].setBConst(b);
+
+    return addConstantUnion(unionArray, TType(EbtBool, EvqConst), loc, literal);
+}
+
+TIntermConstantUnion* TIntermediate::addConstantUnion(double d, TBasicType baseType, TSourceLoc loc, bool literal) const
+{
+    assert(baseType == EbtFloat || baseType == EbtDouble);
+
+    TConstUnionArray unionArray(1);
+    unionArray[0].setDConst(d);
+
+    return addConstantUnion(unionArray, TType(baseType, EvqConst), loc, literal);
 }
 
 TIntermTyped* TIntermediate::addSwizzle(TVectorFields& fields, TSourceLoc loc)
@@ -794,12 +848,9 @@ TIntermTyped* TIntermediate::addSwizzle(TVectorFields& fields, TSourceLoc loc)
     node->setLoc(loc);
     TIntermConstantUnion* constIntNode;
     TIntermSequence &sequenceVector = node->getSequence();
-    TConstUnion* unionArray;
 
     for (int i = 0; i < fields.num; i++) {
-        unionArray = new TConstUnion[1];
-        unionArray->setIConst(fields.offsets[i]);
-        constIntNode = addConstantUnion(unionArray, TType(EbtInt, EvqConst), loc);
+        constIntNode = addConstantUnion(fields.offsets[i], loc);
         sequenceVector.push_back(constIntNode);
     }
 
@@ -809,11 +860,11 @@ TIntermTyped* TIntermediate::addSwizzle(TVectorFields& fields, TSourceLoc loc)
 //
 // Create loop nodes.
 //
-TIntermNode* TIntermediate::addLoop(TIntermNode* body, TIntermTyped* test, TIntermTyped* terminal, bool testFirst, TSourceLoc loc)
+TIntermLoop* TIntermediate::addLoop(TIntermNode* body, TIntermTyped* test, TIntermTyped* terminal, bool testFirst, TSourceLoc loc)
 {
-    TIntermNode* node = new TIntermLoop(body, test, terminal, testFirst);
+    TIntermLoop* node = new TIntermLoop(body, test, terminal, testFirst);
     node->setLoc(loc);
-    
+
     return node;
 }
 
@@ -857,10 +908,10 @@ void TIntermediate::addSymbolLinkageNodes(TIntermAggregate*& linkage, EShLanguag
     // by the AST.
     //
     // Almost entirely, translation of symbols is driven by what's present 
-    // in the AST traversal, not by translating the symbol table.  
+    // in the AST traversal, not by translating the symbol table.
     //
     // However, there are some special cases:
-    //  - From the specification: "Special built-in inputs gl_VertexID and 
+    //  - From the specification: "Special built-in inputs gl_VertexID and
     //    gl_InstanceID are also considered active vertex attributes."
     //  - Linker-based type mismatch error reporting needs to see all 
     //    uniforms/ins/outs variables and blocks.
@@ -868,7 +919,7 @@ void TIntermediate::addSymbolLinkageNodes(TIntermAggregate*& linkage, EShLanguag
     //
 
     //if (ftransformUsed) {
-        // TODO: desktop: track ftransform() usage
+        // TODO: 1.1 lowering functionality: track ftransform() usage
     //    addSymbolLinkageNode(root, symbolTable, "gl_Vertex");
     //    addSymbolLinkageNode(root, symbolTable, "gl_ModelViewProjectionMatrix");
     //}
@@ -885,6 +936,11 @@ void TIntermediate::addSymbolLinkageNodes(TIntermAggregate*& linkage, EShLanguag
     treeRoot = growAggregate(treeRoot, linkage);
 }
 
+//
+// Add the given name or symbol to the list of nodes at the end of the tree used
+// for link-time checking and external linkage.
+//
+
 void TIntermediate::addSymbolLinkageNode(TIntermAggregate*& linkage, TSymbolTable& symbolTable, const TString& name)
 {
     TSymbol* symbol = symbolTable.find(name);
@@ -892,183 +948,35 @@ void TIntermediate::addSymbolLinkageNode(TIntermAggregate*& linkage, TSymbolTabl
         addSymbolLinkageNode(linkage, *symbol->getAsVariable());
 }
 
-void TIntermediate::addSymbolLinkageNode(TIntermAggregate*& linkage, const TVariable& variable)
+void TIntermediate::addSymbolLinkageNode(TIntermAggregate*& linkage, const TSymbol& symbol)
 {
-    TIntermSymbol* node = new TIntermSymbol(variable.getUniqueId(), variable.getName(), variable.getType());
+    const TVariable* variable = symbol.getAsVariable();
+    if (! variable) {
+        // This must be a member of an anonymous block, and we need to add the whole block
+        const TAnonMember* anon = symbol.getAsAnonMember();
+        variable = &anon->getAnonContainer();
+    }
+    TIntermSymbol* node = new TIntermSymbol(variable->getUniqueId(), variable->getName(), variable->getType());
+    node->setConstArray(variable->getConstArray());
     linkage = growAggregate(linkage, node);
 }
 
 //
-// Merge the information from 'unit' into 'this'
+// Add a caller->callee relationship to the call graph.
+// Assumes the strings are unique per signature.
 //
-void TIntermediate::merge(TInfoSink& infoSink, TIntermediate& unit)
+void TIntermediate::addToCallGraph(TInfoSink& infoSink, const TString& caller, const TString& callee)
 {
-    numMains += unit.numMains;
-
-    if ((profile != EEsProfile && unit.profile == EEsProfile) ||
-        (profile == EEsProfile && unit.profile != EEsProfile))
-        error(infoSink, "Cannot mix ES profile with non-ES profile shaders\n");
-
-    if (unit.treeRoot == 0)
-        return;
-
-    if (treeRoot == 0) {
-        version = unit.version;
-        treeRoot = unit.treeRoot;
-        return;
-    } else
-        version = std::max(version, unit.version);
-
-    // Get the top-level globals of each level
-    TIntermSequence& globals = treeRoot->getAsAggregate()->getSequence();
-    TIntermSequence& unitGlobals = unit.treeRoot->getAsAggregate()->getSequence();
-
-    // Get the last members of the sequences, expected to be the linker-object lists
-    assert(globals.back()->getAsAggregate()->getOp() == EOpLinkerObjects);
-    assert(unitGlobals.back()->getAsAggregate()->getOp() == EOpLinkerObjects);
-    TIntermSequence& linkerObjects = globals.back()->getAsAggregate()->getSequence();
-    TIntermSequence& unitLinkerObjects = unitGlobals.back()->getAsAggregate()->getSequence();
-
-    mergeBodies(infoSink, globals, unitGlobals);
-    mergeLinkerObjects(infoSink, linkerObjects, unitLinkerObjects);
-}
-
-//
-// Merge the function bodies and global-level initalizers from unitGlobals into globals.
-// Will error check duplication of function bodies for the same signature.
-//
-void TIntermediate::mergeBodies(TInfoSink& infoSink, TIntermSequence& globals, const TIntermSequence& unitGlobals)
-{
-    // TODO: Performance: Processing in alphabetical order will be faster
-
-    // Error check the global objects, not including the linker objects
-    for (unsigned int child = 0; child < globals.size() - 1; ++child) {
-        for (unsigned int unitChild = 0; unitChild < unitGlobals.size() - 1; ++unitChild) {
-            TIntermAggregate* body = globals[child]->getAsAggregate();
-            TIntermAggregate* unitBody = unitGlobals[unitChild]->getAsAggregate();
-            if (body && unitBody && body->getOp() == EOpFunction && unitBody->getOp() == EOpFunction && body->getName() == unitBody->getName()) {
-                error(infoSink, "Multiple function bodies in multiple compilation units for the same signature in the same stage:");
-                infoSink.info << "    " << globals[child]->getAsAggregate()->getName() << "\n";
-            }
-        }
+    // Duplicates are okay, but faster to not keep them, and they come grouped by caller,
+    // as long as new ones are push on the same end we check on for duplicates
+    for (TGraph::const_iterator call = callGraph.begin(); call != callGraph.end(); ++call) {
+        if (call->caller != caller)
+            break;
+        if (call->callee == callee)
+            return;
     }
 
-    // Merge the global objects, just in front of the linker objects
-    globals.insert(globals.end() - 1, unitGlobals.begin(), unitGlobals.end() - 1);
-}
-
-//
-// Merge the linker objects from unitLinkerObjects into linkerObjects.
-// Duplication is expected and filtered out, but contradictions are an error.
-//
-void TIntermediate::mergeLinkerObjects(TInfoSink& infoSink, TIntermSequence& linkerObjects, const TIntermSequence& unitLinkerObjects)
-{
-    // Error check and merge the linker objects (duplicates should not be merged)
-    std::size_t initialNumLinkerObjects = linkerObjects.size();
-    for (unsigned int unitLinkObj = 0; unitLinkObj < unitLinkerObjects.size(); ++unitLinkObj) {
-        bool merge = true;
-        for (std::size_t linkObj = 0; linkObj < initialNumLinkerObjects; ++linkObj) {
-            TIntermSymbol* symbol = linkerObjects[linkObj]->getAsSymbolNode();
-            TIntermSymbol* unitSymbol = unitLinkerObjects[unitLinkObj]->getAsSymbolNode();
-            assert(symbol && unitSymbol);
-            if (symbol->getName() == unitSymbol->getName()) {
-                // filter out copy
-                merge = false;
-                
-                // Check for consistent types/qualification/etc.
-                linkErrorCheck(infoSink, *symbol, *unitSymbol, false);
-            }
-        }
-        if (merge)
-            linkerObjects.push_back(unitLinkerObjects[unitLinkObj]);
-    }
-}
-
-void TIntermediate::errorCheck(TInfoSink& infoSink)
-{   
-    if (numMains < 1)
-        error(infoSink, "Missing entry point: Each stage requires one \"void main()\" entry point");
-}
-
-void TIntermediate::error(TInfoSink& infoSink, const char* message)
-{
-    infoSink.info.prefix(EPrefixError);
-    infoSink.info << "Linking " << StageName[language] << " stage: " << message << "\n";
-
-    ++numErrors;
-}
-
-//
-// Compare two global objects from two compilation units and see if they match
-// well enough.  Rules can be different for intra- vs. cross-stage matching.
-//
-// This function only does one of intra- or cross-stage matching per call.
-//
-// TODO: Linker Functionality: this function is under active development
-//
-void TIntermediate::linkErrorCheck(TInfoSink& infoSink, const TIntermSymbol& symbol, const TIntermSymbol& unitSymbol, bool crossStage)
-{
-    bool writeTypeComparison = false;
-
-    // Types have to match
-    if (symbol.getType() != unitSymbol.getType()) {
-        error(infoSink, "Types must match:");
-        writeTypeComparison = true;
-    }
-
-    // Qualifiers have to (almost) match
-
-    // Storage...
-    if (symbol.getQualifier().storage != unitSymbol.getQualifier().storage) {
-        error(infoSink, "Storage qualifiers must match:");
-        writeTypeComparison = true;
-    }
-
-    // Precision...
-    if (symbol.getQualifier().precision != unitSymbol.getQualifier().precision) {
-        error(infoSink, "Precision qualifiers must match:");
-        writeTypeComparison = true;
-    }
-
-    // Invariance...
-    if (! crossStage && symbol.getQualifier().invariant != unitSymbol.getQualifier().invariant) {
-        error(infoSink, "Presence of invariant qualifier must match:");
-        writeTypeComparison = true;
-    }
-
-    // Auxiliary and interpolation...
-    if (symbol.getQualifier().centroid  != unitSymbol.getQualifier().centroid ||
-        symbol.getQualifier().smooth    != unitSymbol.getQualifier().smooth ||
-        symbol.getQualifier().flat      != unitSymbol.getQualifier().flat ||
-        symbol.getQualifier().sample    != unitSymbol.getQualifier().sample ||
-        symbol.getQualifier().patch     != unitSymbol.getQualifier().patch ||
-        symbol.getQualifier().nopersp   != unitSymbol.getQualifier().nopersp) {
-        error(infoSink, "Interpolation and auxiliary storage qualifiers must match:");
-        writeTypeComparison = true;
-    }
-
-    // Memory...
-    if (symbol.getQualifier().shared    != unitSymbol.getQualifier().shared ||
-        symbol.getQualifier().coherent  != unitSymbol.getQualifier().coherent ||
-        symbol.getQualifier().volatil   != unitSymbol.getQualifier().volatil ||
-        symbol.getQualifier().restrict  != unitSymbol.getQualifier().restrict ||
-        symbol.getQualifier().readonly  != unitSymbol.getQualifier().readonly ||
-        symbol.getQualifier().writeonly != unitSymbol.getQualifier().writeonly) {
-        error(infoSink, "Memory qualifiers must match:");
-        writeTypeComparison = true;
-    }
-
-    // Layouts...
-    if (symbol.getQualifier().layoutMatrix       != unitSymbol.getQualifier().layoutMatrix ||
-        symbol.getQualifier().layoutPacking      != unitSymbol.getQualifier().layoutPacking ||
-        symbol.getQualifier().layoutSlotLocation != unitSymbol.getQualifier().layoutSlotLocation) {
-        error(infoSink, "Layout qualification must match:");
-        writeTypeComparison = true;
-    }
-
-    if (writeTypeComparison)
-        infoSink.info << "    " << symbol.getName() << ": \"" << symbol.getType().getCompleteString() << "\" versus \"" <<
-                                                             unitSymbol.getType().getCompleteString() << "\"\n";
+    callGraph.push_front(TCall(caller, callee));
 }
 
 //
@@ -1166,7 +1074,7 @@ bool TIntermUnary::promote()
     }
 
     setType(operand->getType());
-    getWritableType().getQualifier().storage = EvqTemporary;
+    getWritableType().getQualifier().makeTemporary();
 
     return true;
 }
@@ -1228,7 +1136,7 @@ bool TIntermBinary::promote()
     case EOpLessThanEqual:
     case EOpGreaterThanEqual:
         // Relational comparisons need matching numeric types and will promote to scalar Boolean.
-        if (left->getBasicType() == EbtBool || left->getType().isMatrix())
+        if (left->getBasicType() == EbtBool || left->getType().isVector() || left->getType().isMatrix())
             return false;
 
         // Fall through
@@ -1264,7 +1172,7 @@ bool TIntermBinary::promote()
     case EOpInclusiveOrAssign:
     case EOpExclusiveOrAssign:
         // Check for integer-only operands.
-        if ((left->getBasicType() != EbtInt &&  left->getBasicType() != EbtUint) ||
+        if (( left->getBasicType() != EbtInt &&  left->getBasicType() != EbtUint) ||
             (right->getBasicType() != EbtInt && right->getBasicType() != EbtUint))
             return false;
         if (left->isMatrix() || right->isMatrix())
@@ -1438,10 +1346,16 @@ bool TIntermBinary::promote()
     case EOpSub:
     case EOpDiv:
     case EOpMod:
+    case EOpAnd:
+    case EOpInclusiveOr:
+    case EOpExclusiveOr:
     case EOpAddAssign:
     case EOpSubAssign:
     case EOpDivAssign:
     case EOpModAssign:
+    case EOpAndAssign:
+    case EOpInclusiveOrAssign:
+    case EOpExclusiveOrAssign:
         if ((left->isMatrix() && right->isVector()) ||
             (left->isVector() && right->isMatrix()) ||
             left->getBasicType() != right->getBasicType())
@@ -1544,14 +1458,14 @@ void TIntermTyped::propagatePrecision(TPrecisionQualifier newPrecision)
     }
 }
 
-TIntermTyped* TIntermediate::promoteConstantUnion(TBasicType promoteTo, TIntermConstantUnion* node) 
+TIntermTyped* TIntermediate::promoteConstantUnion(TBasicType promoteTo, TIntermConstantUnion* node) const
 {
-    TConstUnion *rightUnionArray = node->getUnionArrayPointer();
-    int size = node->getType().getObjectSize();
+    const TConstUnionArray& rightUnionArray = node->getConstArray();
+    int size = node->getType().computeNumComponents();
 
-    TConstUnion *leftUnionArray = new TConstUnion[size];
+    TConstUnionArray leftUnionArray(size);
 
-    for (int i=0; i < size; i++) {        
+    for (int i=0; i < size; i++) {
         switch (promoteTo) {
         case EbtFloat:
             switch (node->getType().getBasicType()) {

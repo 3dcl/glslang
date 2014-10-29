@@ -45,8 +45,7 @@
 //   symbols.
 //
 // -->  This requires a copy mechanism, so initial pools used to create
-//   the shared information can be popped.  So, care is taken with
-//   copying pointers to point to new copies.  Done through "clone"
+//   the shared information can be popped.  Done through "clone"
 //   methods.
 //
 // * Name mangling will be used to give each function a unique name
@@ -74,30 +73,45 @@ namespace glslang {
 //
 // Symbol base class.  (Can build functions or variables out of these...)
 //
+
 class TVariable;
 class TFunction;
 class TAnonMember;
+
 class TSymbol {
 public:
     POOL_ALLOCATOR_NEW_DELETE(GetThreadPoolAllocator())
-    explicit TSymbol(const TString *n) :  name(n), writable(true) { }
-	virtual TSymbol* clone(TStructureMap& remapper) = 0;
-    virtual ~TSymbol() { }
+    explicit TSymbol(const TString *n) :  name(n), numExtensions(0), extensions(0), writable(true) { }
+	virtual TSymbol* clone() const = 0;
+    virtual ~TSymbol() { }  // rely on all symbol owned memory coming from the pool
 
-    const TString& getName() const { return *name; }
-    void changeName(const char* buf) { name = new TString(buf); }
+    virtual const TString& getName() const { return *name; }
+    virtual void changeName(const TString* newName) { name = newName; }
     virtual const TString& getMangledName() const { return getName(); }
     virtual TFunction* getAsFunction() { return 0; }
     virtual const TFunction* getAsFunction() const { return 0; }
     virtual TVariable* getAsVariable() { return 0; }
     virtual const TVariable* getAsVariable() const { return 0; }
     virtual const TAnonMember* getAsAnonMember() const { return 0; }
-    void setUniqueId(int id) { uniqueId = id; }
-    int getUniqueId() const { return uniqueId; }
+    virtual const TType& getType() const = 0;
+    virtual TType& getWritableType() = 0;
+    virtual void setUniqueId(int id) { uniqueId = id; }
+    virtual int getUniqueId() const { return uniqueId; }
+    virtual void setExtensions(int num, const char* const exts[])
+    {
+        assert(extensions == 0);
+        assert(num > 0);
+        numExtensions = num;
+        extensions = NewPoolObject(exts[0], num);
+        for (int e = 0; e < num; ++e)
+            extensions[e] = exts[e];
+    }
+    virtual int getNumExtensions() const { return numExtensions; }
+    virtual const char** getExtensions() const { return extensions; }
     virtual void dump(TInfoSink &infoSink) const = 0;
 
-    bool isReadOnly() { return ! writable; }
-    void makeReadOnly() { writable = false; }
+    virtual bool isReadOnly() const { return ! writable; }
+    virtual void makeReadOnly() { writable = false; }
 
 protected:
 	explicit TSymbol(const TSymbol&);
@@ -106,8 +120,13 @@ protected:
     const TString *name;
     unsigned int uniqueId;      // For cross-scope comparing during code generation
 
+    // For tracking what extensions must be present 
+    // (don't use if correct version/profile is present).
+    int numExtensions;
+    const char** extensions; // an array of pointers to existing constant char strings
+
     //
-    // N.B.: Non-const functions that will be generally used should assert an this,
+    // N.B.: Non-const functions that will be generally used should assert on this,
     // to avoid overwriting shared symbol-table information.
     //
     bool writable;
@@ -125,44 +144,30 @@ protected:
 //
 class TVariable : public TSymbol {
 public:
-    TVariable(const TString *name, const TType& t, bool uT = false ) : TSymbol(name), userType(uT), unionArray(0) { type.shallowCopy(t); }
-	virtual TVariable* clone(TStructureMap& remapper);
+    TVariable(const TString *name, const TType& t, bool uT = false ) : TSymbol(name), userType(uT) { type.shallowCopy(t); }
+	virtual TVariable* clone() const;
     virtual ~TVariable() { }
 
     virtual TVariable* getAsVariable() { return this; }
     virtual const TVariable* getAsVariable() const { return this; }
-    TType& getWritableType() { assert(writable); return type; }
-    const TType& getType() const { return type; }
-    bool isUserType() const { return userType; }
+    virtual const TType& getType() const { return type; }
+    virtual TType& getWritableType() { assert(writable); return type; }
+    virtual bool isUserType() const { return userType; }
+    virtual const TConstUnionArray& getConstArray() const { return unionArray; }
+    virtual TConstUnionArray& getWritableConstArray() { assert(writable); return unionArray; }
+    virtual void setConstArray(const TConstUnionArray& constArray) { unionArray = constArray; }
 
     virtual void dump(TInfoSink &infoSink) const;
 
-    TConstUnion* getConstUnionPointer()
-    {
-        if (!unionArray)
-            unionArray = new TConstUnion[type.getObjectSize()];
-
-        return unionArray;
-    }
-
-    TConstUnion* getConstUnionPointer() const { return unionArray; }
-
-    void shareConstPointer( TConstUnion *constArray)
-    {
-        delete unionArray;
-        unionArray = constArray;
-    }
-
 protected:
     explicit TVariable(const TVariable&);
-    TVariable(const TVariable&, TStructureMap& remapper);
     TVariable& operator=(const TVariable&);
 
     TType type;
     bool userType;
     // we are assuming that Pool Allocator will free the memory allocated to unionArray
     // when this object is destroyed
-    TConstUnion *unionArray;
+    TConstUnionArray unionArray;
 };
 
 //
@@ -172,13 +177,13 @@ protected:
 struct TParameter {
     TString *name;
     TType* type;
-	void copyParam(const TParameter& param, const TStructureMap& remapper) 
+	void copyParam(const TParameter& param) 
     {
 		if (param.name)
             name = NewPoolTString(param.name->c_str());
         else
             name = 0;
-		type = param.type->clone(remapper);
+		type = param.type->clone();
 	}
 };
 
@@ -190,42 +195,44 @@ public:
     explicit TFunction(TOperator o) :
         TSymbol(0),
         op(o),
-        defined(false) { }
+        defined(false), prototyped(false) { }
     TFunction(const TString *name, const TType& retType, TOperator tOp = EOpNull) :
         TSymbol(name),
         mangledName(*name + '('),
         op(tOp),
-        defined(false) { returnType.shallowCopy(retType); }    
-	virtual TFunction* clone(TStructureMap& remapper);
+        defined(false), prototyped(false) { returnType.shallowCopy(retType); }    
+	virtual TFunction* clone() const;
 	virtual ~TFunction();
 
     virtual TFunction* getAsFunction() { return this; }
     virtual const TFunction* getAsFunction() const { return this; }
 
-    void addParameter(TParameter& p)
+    virtual void addParameter(TParameter& p)
     {
         assert(writable);
         parameters.push_back(p);
         p.type->appendMangledName(mangledName);
     }
 
-    const TString& getMangledName() const { return mangledName; }
-    const TType& getReturnType() const { return returnType; }
-    void relateToOperator(TOperator o) { assert(writable); op = o; }
-    TOperator getBuiltInOp() const { return op; }
-    void setDefined() { assert(writable); defined = true; }
-    bool isDefined() const { return defined; }
+    virtual const TString& getMangledName() const { return mangledName; }
+    virtual const TType& getType() const { return returnType; }
+    virtual TType& getWritableType() { return returnType; }
+    virtual void relateToOperator(TOperator o) { assert(writable); op = o; }
+    virtual TOperator getBuiltInOp() const { return op; }
+    virtual void setDefined() { assert(writable); defined = true; }
+    virtual bool isDefined() const { return defined; }
+    virtual void setPrototyped() { assert(writable); prototyped = true; }
+    virtual bool isPrototyped() const { return prototyped; }
 
-    int getParamCount() const { return static_cast<int>(parameters.size()); }
-    TParameter& operator [](int i) { assert(writable); return parameters[i]; }
-    const TParameter& operator [](int i) const { return parameters[i]; }
+    virtual int getParamCount() const { return static_cast<int>(parameters.size()); }
+    virtual TParameter& operator[](int i) { assert(writable); return parameters[i]; }
+    virtual const TParameter& operator[](int i) const { return parameters[i]; }
 
     virtual void dump(TInfoSink &infoSink) const;
 
 protected:
-    explicit TFunction(TFunction&);
-	TFunction(const TFunction&, const TStructureMap& remapper);
-    TFunction& operator=(TFunction&);
+    explicit TFunction(const TFunction&);
+    TFunction& operator=(const TFunction&);
 
     typedef TVector<TParameter> TParamList;
 	TParamList parameters;
@@ -233,25 +240,42 @@ protected:
     TString mangledName;
     TOperator op;
     bool defined;
+    bool prototyped;
 };
 
 class TAnonMember : public TSymbol {
 public:
-    TAnonMember(const TString* n, unsigned int m, TSymbol& a) : TSymbol(n), anonContainer(a), memberNumber(m) { }
-	virtual TAnonMember* clone(TStructureMap& remapper);
+    TAnonMember(const TString* n, unsigned int m, const TVariable& a, int an) : TSymbol(n), anonContainer(a), memberNumber(m), anonId(an) { }
+	virtual TAnonMember* clone() const;
     virtual ~TAnonMember() { }
 
-    const TAnonMember* getAsAnonMember() const { return this; }
-    TSymbol& getAnonContainer() const { return anonContainer; }
-    unsigned int getMemberNumber() const { return memberNumber; }
+    virtual const TAnonMember* getAsAnonMember() const { return this; }
+    virtual const TVariable& getAnonContainer() const { return anonContainer; }
+    virtual unsigned int getMemberNumber() const { return memberNumber; }    
+    
+    virtual const TType& getType() const
+    {
+        const TTypeList& types = *anonContainer.getType().getStruct();
+        return *types[memberNumber].type;
+    }
+
+    virtual TType& getWritableType()
+    {
+        assert(writable);
+        const TTypeList& types = *anonContainer.getType().getStruct();
+        return *types[memberNumber].type;
+    }
+    
+    virtual int getAnonId() const { return anonId; }
     virtual void dump(TInfoSink &infoSink) const;
 
 protected:
-    explicit TAnonMember(TAnonMember&);
-    TAnonMember& operator=(TAnonMember&);
+    explicit TAnonMember(const TAnonMember&);
+    TAnonMember& operator=(const TAnonMember&);
 
-    TSymbol& anonContainer;
+    const TVariable& anonContainer;
     unsigned int memberNumber;
+    int anonId;
 };
 
 class TSymbolTableLevel {
@@ -260,7 +284,7 @@ public:
     TSymbolTableLevel() : defaultPrecision(0), anonId(0) { }
 	~TSymbolTableLevel();
 
-    bool insert(TSymbol& symbol)
+    bool insert(TSymbol& symbol, bool separateNameSpaces)
     {
         //
         // returning true means symbol was added to the table with no semantic errors
@@ -271,28 +295,29 @@ public:
             // An empty name means an anonymous container, exposing its members to the external scope.
             // Give it a name and insert its members in the symbol table, pointing to the container.
             char buf[20];
-            snprintf(buf, 20, "__anon__%d", anonId++);
-            symbol.changeName(buf);
+            snprintf(buf, 20, "%s%d", AnonymousPrefix, anonId);
+            symbol.changeName(NewPoolTString(buf));
 
             bool isOkay = true;
             const TTypeList& types = *symbol.getAsVariable()->getType().getStruct();
             for (unsigned int m = 0; m < types.size(); ++m) {
-                TAnonMember* member = new TAnonMember(&types[m].type->getFieldName(), m, symbol);
+                TAnonMember* member = new TAnonMember(&types[m].type->getFieldName(), m, *symbol.getAsVariable(), anonId);
                 result = level.insert(tLevelPair(member->getMangledName(), member));
                 if (! result.second)
                     isOkay = false;
             }
 
+            ++anonId;
+
             return isOkay;
         } else {
             // Check for redefinition errors:
-            // - STL itself will tell us if there is a direct name collision at this level
-            // - additionally, check for function/variable name collisions
-            // - for ES, for overriding or hiding built-in function
+            // - STL itself will tell us if there is a direct name collision, with name mangling, at this level
+            // - additionally, check for function-redefining-variable name collisions
             const TString& insertName = symbol.getMangledName();
             if (symbol.getAsFunction()) {
                 // make sure there isn't a variable of this name
-                if (level.find(name) != level.end())
+                if (! separateNameSpaces && level.find(name) != level.end())
                     return false;
 
                 // insert, and whatever happens is okay
@@ -316,15 +341,56 @@ public:
             return (*it).second;
     }
 
+    void findFunctionNameList(const TString& name, TVector<TFunction*>& list)
+    {
+        size_t parenAt = name.find_first_of('(');
+        TString base(name, 0, parenAt + 1);
+
+        tLevel::const_iterator begin = level.lower_bound(base);
+        base[parenAt] = ')';  // assume ')' is lexically after '('
+        tLevel::const_iterator end = level.upper_bound(base);
+        for (tLevel::const_iterator it = begin; it != end; ++it)
+            list.push_back(it->second->getAsFunction());
+    }
+
+    // See if there is already a function in the table having the given non-function-style name.
     bool hasFunctionName(const TString& name) const
     {
         tLevel::const_iterator candidate = level.lower_bound(name);
         if (candidate != level.end()) {
             const TString& candidateName = (*candidate).first;
             TString::size_type parenAt = candidateName.find_first_of('(');
-            if (parenAt != candidateName.npos && candidateName.substr(0, parenAt) == name)
+            if (parenAt != candidateName.npos && candidateName.compare(0, parenAt, name) == 0)
 
                 return true;
+        }
+
+        return false;
+    }
+
+    // See if there is a variable at this level having the given non-function-style name.
+    // Return true if name is found, and set variable to true if the name was a variable.
+    bool findFunctionVariableName(const TString& name, bool& variable) const
+    {
+        tLevel::const_iterator candidate = level.lower_bound(name);
+        if (candidate != level.end()) {
+            const TString& candidateName = (*candidate).first;
+            TString::size_type parenAt = candidateName.find_first_of('(');
+            if (parenAt == candidateName.npos) {
+                // not a mangled name
+                if (candidateName == name) {
+                    // found a variable name match
+                    variable = true;
+                    return true;
+                }
+            } else {
+                // a mangled name
+                if (candidateName.compare(0, parenAt, name) == 0) {
+                    // found a function name match
+                    variable = false;
+                    return true;
+                }
+            }
         }
 
         return false;
@@ -358,8 +424,9 @@ public:
     }
 
     void relateToOperator(const char* name, TOperator op);
+    void setFunctionExtensions(const char* name, int num, const char* const extensions[]);
     void dump(TInfoSink &infoSink) const;
-	TSymbolTableLevel* clone(TStructureMap& remapper);
+	TSymbolTableLevel* clone() const;
     void readOnly();
 
 protected:
@@ -377,7 +444,7 @@ protected:
 
 class TSymbolTable {
 public:
-    TSymbolTable() : uniqueId(0), noBuiltInRedeclarations(false), adoptedLevels(0)
+    TSymbolTable() : uniqueId(0), noBuiltInRedeclarations(false), separateNameSpaces(false), adoptedLevels(0)
     {
         //
         // This symbol table cannot be used until push() is called.
@@ -391,7 +458,7 @@ public:
         while (table.size() > adoptedLevels)
             pop(0);
     }
-
+    
     void adoptLevels(TSymbolTable& symTable)
     {
         for (unsigned int level = 0; level < symTable.table.size(); ++level) {
@@ -400,6 +467,7 @@ public:
         }
         uniqueId = symTable.uniqueId;
         noBuiltInRedeclarations = symTable.noBuiltInRedeclarations;
+        separateNameSpaces = symTable.separateNameSpaces;
     }
 
     //
@@ -411,15 +479,17 @@ public:
     //   3: user-shader globals
     //
 protected:
+    static const int globalLevel = 3;
     bool isSharedLevel(int level)  { return level <= 1; }    // exclude all per-compile levels
     bool isBuiltInLevel(int level) { return level <= 2; }    // exclude user globals
-    bool isGlobalLevel(int level)  { return level <= 3; }    // include user globals
+    bool isGlobalLevel(int level)  { return level <= globalLevel; }    // include user globals
 public:
     bool isEmpty() { return table.size() == 0; }
     bool atBuiltInLevel() { return isBuiltInLevel(currentLevel()); }
     bool atGlobalLevel()  { return isGlobalLevel(currentLevel()); }
 
     void setNoBuiltInRedeclarations() { noBuiltInRedeclarations = true; }
+    void setSeparateNameSpaces() { separateNameSpaces = true; }
     
     void push()
     {
@@ -433,15 +503,23 @@ public:
         table.pop_back();
     }
 
+    //
+    // Insert a visible symbol into the symbol table so it can
+    // be found later by name.
+    //
+    // Returns false if the was a name collision.
+    //
     bool insert(TSymbol& symbol)
     {
         symbol.setUniqueId(++uniqueId);
 
-        if (symbol.getAsVariable()) {
-            // make sure there isn't a function of this name
-            if (table[currentLevel()]->hasFunctionName(symbol.getName()))
-                return false;
-            if (atGlobalLevel() && currentLevel() > 0 && noBuiltInRedeclarations) {
+        // make sure there isn't a function of this variable name
+        if (! separateNameSpaces && ! symbol.getAsFunction() && table[currentLevel()]->hasFunctionName(symbol.getName()))
+            return false;
+            
+        // check for not overloading or redefining a built-in function
+        if (noBuiltInRedeclarations) {
+            if (atGlobalLevel() && currentLevel() > 0) {
                 if (table[0]->hasFunctionName(symbol.getName()))
                     return false;
                 if (currentLevel() > 1 && table[1]->hasFunctionName(symbol.getName()))
@@ -449,20 +527,51 @@ public:
             }
         }
 
-        return table[currentLevel()]->insert(symbol);
+        return table[currentLevel()]->insert(symbol, separateNameSpaces);
     }
 
     //
-    // To copy a variable from a shared level up to the current level, so it can be 
+    // To allocate an internal temporary, which will need to be uniquely
+    // identified by the consumer of the AST, but never need to 
+    // found by doing a symbol table search by name, hence allowed an
+    // arbitrary name in the symbol with no worry of collision.
+    //
+    void makeInternalVariable(TSymbol& symbol)
+    {
+        symbol.setUniqueId(++uniqueId);
+    }
+
+    //
+    // Copy a variable or anonymous member's structure from a shared level so that
+    // it can be added (soon after return) to the symbol table where it can be
     // modified without impacting other users of the shared table.
     //
-    TVariable* copyUp(TVariable* shared)
-    {        
-        TVariable* variable = shared->clone(remapper);
-        variable->setUniqueId(shared->getUniqueId());
-        table[currentLevel()]->insert(*variable);
+    TSymbol* copyUpDeferredInsert(TSymbol* shared)
+    {
+        if (shared->getAsVariable()) {
+            TSymbol* copy = shared->clone();
+            copy->setUniqueId(shared->getUniqueId());
+            return copy;
+        } else {
+            const TAnonMember* anon = shared->getAsAnonMember();
+            assert(anon);
+            TVariable* container = anon->getAnonContainer().clone();
+            container->changeName(NewPoolTString(""));
+            container->setUniqueId(anon->getAnonContainer().getUniqueId());
+            return container;
+        }
+    }
 
-        return variable;
+    TSymbol* copyUp(TSymbol* shared)
+    {
+        TSymbol* copy = copyUpDeferredInsert(shared);
+        table[globalLevel]->insert(*copy, separateNameSpaces);
+        if (shared->getAsVariable())
+            return copy;
+        else {
+            // return the copy of the anonymous member
+            return table[globalLevel]->find(shared->getName());
+        }
     }
 
     TSymbol* find(const TString& name, bool* builtIn = 0, bool *currentScope = 0)
@@ -482,10 +591,61 @@ public:
         return symbol;
     }
 
+    bool isFunctionNameVariable(const TString& name) const
+    {
+        if (separateNameSpaces)
+            return false;
+
+        int level = currentLevel();
+        do {
+            bool variable;
+            bool found = table[level]->findFunctionVariableName(name, variable);
+            if (found)
+                return variable;
+            --level;
+        } while (level >= 0);
+
+        return false;
+    }
+
+    void findFunctionNameList(const TString& name, TVector<TFunction*>& list, bool& builtIn)
+    {
+        // For user levels, return the set found in the first scope with a match
+        builtIn = false;
+        int level = currentLevel();
+        do {
+            table[level]->findFunctionNameList(name, list);
+            --level;
+        } while (list.empty() && level >= globalLevel);
+
+        if (! list.empty())
+            return;
+
+        // Gather across all built-in levels; they don't hide each other
+        builtIn = true;
+        do {
+            table[level]->findFunctionNameList(name, list);
+            --level;
+        } while (level >= 0);
+    }
+
     void relateToOperator(const char* name, TOperator op)
     {
         for (unsigned int level = 0; level < table.size(); ++level)
             table[level]->relateToOperator(name, op);
+    }
+    
+    void setFunctionExtensions(const char* name, int num, const char* const extensions[])
+    {
+        for (unsigned int level = 0; level < table.size(); ++level)
+            table[level]->setFunctionExtensions(name, num, extensions);
+    }
+
+    void setVariableExtensions(const char* name, int num, const char* const extensions[])
+    {
+        TSymbol* symbol = find(TString(name));
+        if (symbol)
+            symbol->setExtensions(num, extensions);
     }
 
     int getMaxSymbolId() { return uniqueId; }
@@ -509,8 +669,8 @@ protected:
     std::vector<TSymbolTableLevel*> table;
     int uniqueId;     // for unique identification in code generation
     bool noBuiltInRedeclarations;
+    bool separateNameSpaces;
     unsigned int adoptedLevels;
-    TStructureMap remapper;  // for now, dummy for copyUp(), which is not yet used for structures
 };
 
 } // end namespace glslang
