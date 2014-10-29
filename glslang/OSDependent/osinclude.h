@@ -2,9 +2,9 @@
 #define OSDEPENDENT_OSINCLUDE_INCLUDED
 
 #ifdef _WIN32
-#	include "../OSDependent/windows/osinclude.h"
+#	include "../OSDependent/Windows/osinclude.h"
 #else
-#	include "../OSDependent/posix/osinclude.h"
+#	include "../OSDependent/Posix/osinclude.h"
 #endif
 
 #endif//OSDEPENDENT_OSINCLUDE_INCLUDED
