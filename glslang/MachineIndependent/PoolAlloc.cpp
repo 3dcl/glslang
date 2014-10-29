@@ -36,23 +36,23 @@
 #include "../Include/Common.h"
 
 #include "../Include/InitializeGlobals.h"
-#include "../OSDependent/osinclude.h"
+#include "osinclude.h"
 
 namespace glslang {
 
 OS_TLSIndex PoolIndex;
 
-void InitializeGlobalPools()
+void InitializeMemoryPools()
 {
-    TThreadGlobalPools* globalPools = static_cast<TThreadGlobalPools*>(OS_GetTLSValue(PoolIndex));    
-    if (globalPools)
+    TThreadMemoryPools* pools = static_cast<TThreadMemoryPools*>(OS_GetTLSValue(PoolIndex));    
+    if (pools)
         return;
 
-    TPoolAllocator *globalPoolAllocator = new TPoolAllocator();
+    TPoolAllocator *threadPoolAllocator = new TPoolAllocator();
 
-    TThreadGlobalPools* threadData = new TThreadGlobalPools();
+    TThreadMemoryPools* threadData = new TThreadMemoryPools();
     
-    threadData->globalPoolAllocator = globalPoolAllocator;
+    threadData->threadPoolAllocator = threadPoolAllocator;
     	
     OS_SetTLSValue(PoolIndex, threadData);
 }
@@ -60,7 +60,7 @@ void InitializeGlobalPools()
 void FreeGlobalPools()
 {
     // Release the allocated memory for this thread.
-    TThreadGlobalPools* globalPools = static_cast<TThreadGlobalPools*>(OS_GetTLSValue(PoolIndex));    
+    TThreadMemoryPools* globalPools = static_cast<TThreadMemoryPools*>(OS_GetTLSValue(PoolIndex));    
     if (! globalPools)
         return;
 	
@@ -86,16 +86,16 @@ void FreePoolIndex()
 
 TPoolAllocator& GetThreadPoolAllocator()
 {
-    TThreadGlobalPools* threadData = static_cast<TThreadGlobalPools*>(OS_GetTLSValue(PoolIndex));
+    TThreadMemoryPools* threadData = static_cast<TThreadMemoryPools*>(OS_GetTLSValue(PoolIndex));
 
-    return *threadData->globalPoolAllocator;
+    return *threadData->threadPoolAllocator;
 }
 
 void SetThreadPoolAllocator(TPoolAllocator& poolAllocator)
 {
-    TThreadGlobalPools* threadData = static_cast<TThreadGlobalPools*>(OS_GetTLSValue(PoolIndex));
+    TThreadMemoryPools* threadData = static_cast<TThreadMemoryPools*>(OS_GetTLSValue(PoolIndex));
 
-    threadData->globalPoolAllocator = &poolAllocator;
+    threadData->threadPoolAllocator = &poolAllocator;
 }
 
 //
@@ -185,17 +185,21 @@ const unsigned char TAllocation::userDataFill       = 0xcd;
 //
 void TAllocation::checkGuardBlock(unsigned char* blockMem, unsigned char val, const char* locText) const
 {
+#ifdef GUARD_BLOCKS
     for (int x = 0; x < guardBlockSize; x++) {
         if (blockMem[x] != val) {
 			const int maxSize = 80;
             char assertMsg[80];
 
             // We don't print the assert message.  It's here just to be helpful.
-            snprintf(assertMsg, maxSize, "PoolAlloc: Damage %s %lu byte allocation at 0x%p\n",
+            snprintf(assertMsg, maxSize, "PoolAlloc: Damage %s %zu byte allocation at 0x%p\n",
                       locText, size, data());
             assert(0 && "PoolAlloc: Damage in guard block");
         }
     }
+#else
+    assert(guardBlockSize == 0);
+#endif
 }
 
 
@@ -276,7 +280,7 @@ void* TPoolAllocator::allocate(size_t numBytes)
         //
         // Safe to allocate from currentPageOffset.
         //
-        unsigned char* memory = reinterpret_cast<unsigned char *>(inUseList) + currentPageOffset;
+        unsigned char* memory = reinterpret_cast<unsigned char*>(inUseList) + currentPageOffset;
         currentPageOffset += allocationSize;
         currentPageOffset = (currentPageOffset + alignmentMask) & ~alignmentMask;
 
@@ -320,7 +324,7 @@ void* TPoolAllocator::allocate(size_t numBytes)
     new(memory) tHeader(inUseList, 1);
     inUseList = memory;
     
-    unsigned char* ret = reinterpret_cast<unsigned char *>(inUseList) + headerSkip;
+    unsigned char* ret = reinterpret_cast<unsigned char*>(inUseList) + headerSkip;
     currentPageOffset = (headerSkip + allocationSize + alignmentMask) & ~alignmentMask;
 
     return initializeAllocation(inUseList, ret, numBytes);

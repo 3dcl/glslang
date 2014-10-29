@@ -32,38 +32,78 @@
 //POSSIBILITY OF SUCH DAMAGE.
 //
 
+//
+// This file contains the Linux-specific functions
+//
 #include "osinclude.h"
-
-#define STRICT
-#define VC_EXTRALEAN 1
-#include <windows.h>
-#include <assert.h>
-#include <process.h>
-#include <psapi.h>
-#include <stdio.h>
-
-//
-// This file contains contains the Window-OS-specific functions
-//
-
-#if !(defined(_WIN32) || defined(_WIN64))
-#error Trying to build a windows specific file in a non windows build.
-#endif
+#include "InitializeDll.h"
 
 namespace glslang {
+
+//
+// Thread cleanup
+//
+
+//
+// Wrapper for Linux call to DetachThread.  This is required as pthread_cleanup_push() expects 
+// the cleanup routine to return void.
+// 
+void DetachThreadLinux(void *)
+{
+	DetachThread();
+}
+
+
+//
+// Registers cleanup handler, sets cancel type and state, and excecutes the thread specific
+// cleanup handler.  This function will be called in the Standalone.cpp for regression 
+// testing.  When OpenGL applications are run with the driver code, Linux OS does the 
+// thread cleanup.
+// 
+void OS_CleanupThreadData(void)
+{
+	int old_cancel_state, old_cancel_type;
+	void *cleanupArg = NULL;
+
+	//
+	// Set thread cancel state and push cleanup handler.
+	//
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &old_cancel_state);
+	pthread_cleanup_push(DetachThreadLinux, (void *) cleanupArg);
+
+	//
+	// Put the thread in deferred cancellation mode.
+	//
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &old_cancel_type);
+
+	//
+	// Pop cleanup handler and execute it prior to unregistering the cleanup handler.
+	//
+	pthread_cleanup_pop(1);
+
+	//
+	// Restore the thread's previous cancellation mode.
+	//
+	pthread_setcanceltype(old_cancel_state, NULL);
+}
+
 
 //
 // Thread Local Storage Operations
 //
 OS_TLSIndex OS_AllocTLSIndex()
 {
-	DWORD dwIndex = TlsAlloc();
-	if (dwIndex == TLS_OUT_OF_INDEXES) {
-		assert(0 && "OS_AllocTLSIndex(): Unable to allocate Thread Local Storage");
-		return OS_INVALID_TLS_INDEX;
-	}
+	pthread_key_t pPoolIndex;
 
-	return dwIndex;
+	//
+	// Create global pool key.
+	//
+	if ((pthread_key_create(&pPoolIndex, NULL)) != 0) {
+		assert(0 && "OS_AllocTLSIndex(): Unable to allocate Thread Local Storage");
+		return false;
+	}
+	else
+		return pPoolIndex;
 }
 
 
@@ -74,17 +114,12 @@ bool OS_SetTLSValue(OS_TLSIndex nIndex, void *lpvValue)
 		return false;
 	}
 
-	if (TlsSetValue(nIndex, lpvValue))
+	if (pthread_setspecific(nIndex, lpvValue) == 0)
 		return true;
 	else
 		return false;
 }
 
-void* OS_GetTLSValue(OS_TLSIndex nIndex)
-{
-	assert(nIndex != OS_INVALID_TLS_INDEX);
-	return TlsGetValue(nIndex);
-}
 
 bool OS_FreeTLSIndex(OS_TLSIndex nIndex)
 {
@@ -93,54 +128,35 @@ bool OS_FreeTLSIndex(OS_TLSIndex nIndex)
 		return false;
 	}
 
-	if (TlsFree(nIndex))
+	//
+	// Delete the global pool key.
+	//
+	if (pthread_key_delete(nIndex) == 0)
 		return true;
 	else
 		return false;
 }
 
-HANDLE GlobalLock;
-
-void InitGlobalLock()
-{
-    GlobalLock = CreateMutex(0, false, 0);
-}
-
-void GetGlobalLock()
-{
-    WaitForSingleObject(GlobalLock, INFINITE);
-}
-
-void ReleaseGlobalLock()
-{
-    ReleaseMutex(GlobalLock);
-}
+// TODO: non-windows: if we need these on linux, flesh them out
+void InitGlobalLock() { }
+void GetGlobalLock() { }
+void ReleaseGlobalLock() { }
 
 void* OS_CreateThread(TThreadEntrypoint entry)
 {
-    return (void*)_beginthreadex(0, 0, entry, 0, 0, 0);
-    //return CreateThread(0, 0, entry, 0, 0, 0);
+    return 0;
 }
 
 void OS_WaitForAllThreads(void* threads, int numThreads)
 {
-    WaitForMultipleObjects(numThreads, (HANDLE*)threads, true, INFINITE);
 }
 
 void OS_Sleep(int milliseconds)
 {
-    Sleep(milliseconds);
 }
 
 void OS_DumpMemoryCounters()
 {
-#ifdef DUMP_COUNTERS
-    PROCESS_MEMORY_COUNTERS counters;
-    GetProcessMemoryInfo(GetCurrentProcess(), &counters, sizeof(counters));
-    printf("Working set size: %d\n", counters.WorkingSetSize);
-#else
-    printf("Recompile with DUMP_COUNTERS defined to see counters.\n");
-#endif
 }
 
-} // namespace glslang
+} // end namespace glslang

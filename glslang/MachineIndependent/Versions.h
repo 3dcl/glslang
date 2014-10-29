@@ -40,19 +40,63 @@
 // Help manage multiple profiles, versions, extensions etc.
 //
 
+//
+// Profiles are set up for masking operations, so queries can be done on multiple
+// profiles at the same time.
+//
+// Don't maintain an ordinal set of enums (0,1,2,3...) to avoid all possible
+// defects from mixing the two different forms.
+//
 typedef enum {
-    ENoProfile,              // only for desktop, before profiles showed up
-    ECoreProfile,
-    ECompatibilityProfile,
-    EEsProfile,
-    EProfileCount,
+    EBadProfile           = 0,
+    ENoProfile            = (1 << 0), // only for desktop, before profiles showed up
+    ECoreProfile          = (1 << 1),
+    ECompatibilityProfile = (1 << 2),
+    EEsProfile            = (1 << 3)
 } EProfile;
 
+namespace glslang {
+
+//
+// The behaviors from the GLSL "#extension extension_name : behavior"
+//
 typedef enum {
-    ENoProfileMask            = (1 << ENoProfile),
-    ECoreProfileMask          = (1 << ECoreProfile),
-    ECompatibilityProfileMask = (1 << ECompatibilityProfile),
-    EEsProfileMask            = (1 << EEsProfile)
-} EProfileMask;
+    EBhMissing = 0,
+    EBhRequire,
+    EBhEnable,
+    EBhWarn,
+    EBhDisable,
+    EBhDisablePartial    // use as initial state of an extension that is only partially implemented
+} TExtensionBehavior;
+
+//
+// Symbolic names for extensions.  Strings may be directly used when calling the
+// functions, but better to have the compiler do spelling checks.
+//
+const char* const GL_OES_texture_3D                   = "GL_OES_texture_3D";
+const char* const GL_OES_standard_derivatives         = "GL_OES_standard_derivatives";
+const char* const GL_EXT_frag_depth                   = "GL_EXT_frag_depth";
+const char* const GL_OES_EGL_image_external           = "GL_OES_EGL_image_external";
+const char* const GL_EXT_shader_texture_lod           = "GL_EXT_shader_texture_lod";
+
+const char* const GL_ARB_texture_rectangle            = "GL_ARB_texture_rectangle";
+const char* const GL_3DL_array_objects                = "GL_3DL_array_objects";
+const char* const GL_ARB_shading_language_420pack     = "GL_ARB_shading_language_420pack";
+const char* const GL_ARB_texture_gather               = "GL_ARB_texture_gather";
+const char* const GL_ARB_gpu_shader5                  = "GL_ARB_gpu_shader5";
+const char* const GL_ARB_separate_shader_objects      = "GL_ARB_separate_shader_objects";
+const char* const GL_ARB_tessellation_shader          = "GL_ARB_tessellation_shader";
+const char* const GL_ARB_enhanced_layouts             = "GL_ARB_enhanced_layouts";
+const char* const GL_ARB_texture_cube_map_array       = "GL_ARB_texture_cube_map_array";
+const char* const GL_ARB_shader_texture_lod           = "GL_ARB_shader_texture_lod";
+const char* const GL_ARB_explicit_attrib_location     = "GL_ARB_explicit_attrib_location";
+const char* const GL_ARB_shader_image_load_store      = "GL_ARB_shader_image_load_store";
+const char* const GL_ARB_shader_atomic_counters       = "GL_ARB_shader_atomic_counters";
+const char* const GL_ARB_derivative_control           = "GL_ARB_derivative_control";
+const char* const GL_ARB_shader_texture_image_samples = "GL_ARB_shader_texture_image_samples";
+const char* const GL_ARB_viewport_array               = "GL_ARB_viewport_array";
+//const char* const GL_ARB_cull_distance            = "GL_ARB_cull_distance";  // present for 4.5, but need extension control over block members
+
+} // end namespace glslang
 
 #endif // _VERSIONS_INCLUDED_

@@ -37,8 +37,9 @@
 #include <assert.h>
 
 #include "InitializeDll.h"
-#include "../glslang/Include/InitializeGlobals.h"
-#include "../glslang/Public/ShaderLang.h"
+#include "Include/InitializeGlobals.h"
+
+#include "Public/ShaderLang.h"
 
 namespace glslang {
 
@@ -67,7 +68,7 @@ bool InitProcess()
 	}
 
     if (! InitializePoolIndex()) {
-        assert(0 && "InitProcess(): Failed to initalize global pool");
+        assert(0 && "InitProcess(): Failed to initialize global pool");
 
         glslang::ReleaseGlobalLock();
         return false;
@@ -93,7 +94,7 @@ bool InitThread()
     if (OS_GetTLSValue(ThreadInitializeIndex) != 0)
         return true;
 
-	InitializeGlobalPools();
+	InitializeMemoryPools();
 
     if (! OS_SetTLSValue(ThreadInitializeIndex, (void *)1)) {
 		assert(0 && "InitThread(): Unable to set init flag.");

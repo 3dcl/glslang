@@ -84,15 +84,33 @@ namespace glslang {
 
 class TPpToken {
 public:
+    TPpToken() : token(0), ival(0), space(false), dval(0.0), atom(0)
+    { 
+        loc.line = 0; 
+        loc.string = 0; 
+        name[0] = 0;
+    }
+
+    bool operator==(const TPpToken& right)
+    {
+        return token == right.token && atom == right.atom &&
+               ival == right.ival && dval == right.dval &&
+               strcmp(name, right.name) == 0;
+    }
+    bool operator!=(const TPpToken& right) { return ! operator==(right); }
+
     static const int maxTokenLength = 1024;
 
     TSourceLoc loc;
-    int    ppToken;
+    int    token;
+    bool   space;  // true if a space (for white space or a removed comment) should also be recognized, in front of the token returned
     int    ival;
     double dval;
     int    atom;
     char   name[maxTokenLength+1];
 };
+
+class TInputScanner;
 
 // This class is the result of turning a huge pile of C code communicating through globals
 // into a class.  This was done to allowing instancing to attain thread safety.
@@ -102,33 +120,42 @@ public:
     TPpContext(TParseContext&);
     virtual ~TPpContext();
 
-    void setPreamble(const char* preamble, int length);
-    void setShaderStrings(char* strings[], int lengths[], int numStrings);
+    void setPreamble(const char* preamble, size_t length);
 
-    const char* tokenize(TPpToken* yylvalpp);
+    const char* tokenize(TPpToken* ppToken);
 
-    struct InputSrc {
-        struct InputSrc	*prev;
-        int			(*scan)(TPpContext*, struct InputSrc *, TPpToken *);
-        int			(*getch)(TPpContext*, struct InputSrc *, TPpToken *);
-        void		(*ungetch)(TPpContext*, struct InputSrc *, int, TPpToken *);
-        int			name;  /* atom */
-        int			line;
+    class tInput {
+    public:
+        tInput(TPpContext* p) : done(false), pp(p) { }
+        virtual ~tInput() { }
+
+        virtual int scan(TPpToken*) = 0;
+        virtual int getch() = 0;
+        virtual void ungetch() = 0;
+
+        static const int endOfInput = -2;
+
+    protected:
+        bool done;
+        TPpContext* pp;
     };
 
-    struct TokenBlock {
-        TokenBlock *next;
-        int current;
-        int count;
-        int max;
-        unsigned char *data;
-    };
+    void setInput(TInputScanner& input, bool versionWillBeError);
+
+    void pushInput(tInput* in)
+    {
+        inputStack.push_back(in);
+    }
+    void popInput()
+    {
+        delete inputStack.back();
+        inputStack.pop_back();
+    }
 
     struct TokenStream {
-        TokenStream *next;
-        char *name;
-        TokenBlock *head;
-        TokenBlock *current;
+        TokenStream() : current(0) { }
+        TVector<unsigned char> data;
+        size_t current;
     };
 
     struct MemoryPool {
@@ -136,48 +163,14 @@ public:
         uintptr_t           free, end;
         size_t              chunksize;
         uintptr_t           alignmask;
-        struct cleanup      *cleanup;
     };
 
     //
-    // From PpAtom.cpp
+    // From Pp.cpp
     //
-    struct StringTable {
-        char *strings;
-        int nextFree;
-        int size;
-    };
-    struct HashEntry {
-        int index;      // String table offset of string representation
-        int value;      // Atom (symbol) value
-    };
-
-    static const int hashTableMaxCollisions = 3;
-
-    struct HashTable {
-        HashEntry *entry;
-        int size;
-        int entries;
-        int counts[hashTableMaxCollisions + 1];
-    };
-
-    struct AtomTable {
-        StringTable stable; // String table.
-        HashTable htable;   // Hashes string to atom number and token value.  Multiple strings can
-        // have the same token value but each unique string is a unique atom.
-        int *amap;          // Maps atom value to offset in string table.  Atoms all map to unique
-        // strings except for some undefined values in the lower, fixed part
-        // of the atom table that map to "<undefined>".  The lowest 256 atoms
-        // correspond to single character ASCII values except for alphanumeric
-        // characters and '_', which can be other tokens.  Next come the
-        // language tokens with their atom values equal to the token value.
-        // Then come predefined atoms, followed by user specified identifiers.
-        int *arev;          // Reversed atom for symbol table use.
-        int nextFree;
-        int size;
-    };
 
     struct MacroSymbol {
+        MacroSymbol() : argc(0), args(0), body(0), busy(0), undef(0) { }
         int argc;
         int *args;
         TokenStream *body;
@@ -185,19 +178,9 @@ public:
         unsigned undef:1;
     };
 
-    typedef enum symbolkind {
-        MACRO_S
-    } symbolkind;
-
     struct Symbol {
-        Symbol *left, *right;
-        Symbol *next;
-        int name;       // Name atom
-        TSourceLoc loc;
-        symbolkind kind;
-        union {
-            MacroSymbol mac;
-        } details;
+        int atom;
+        MacroSymbol mac;
     };
 
     struct SymbolList {
@@ -205,48 +188,95 @@ public:
         Symbol *symb;
     };
 
-    struct Scope {
-        Scope *next, *prev;     // doubly-linked list of all scopes
-        Scope *parent;
-        Scope *funScope;        // Points to base scope of enclosing function
-        MemoryPool *pool;       // pool used for allocation in this scope
-        Symbol *symbols;
-
-        int level;              // 0 = super globals, 1 = globals, etc.
-
-        // Only used at global scope (level 1):
-        SymbolList *programs;   // List of programs for this compilation.
-    };
+    MemoryPool *pool;
+    typedef std::map<int, Symbol*> TSymbolMap;
+    TSymbolMap symbols; // this has light use... just defined macros
 
 protected:
-    char*  preamble;               // string to parse, all before line 1 of string 0, it is 0 if no preamble
-    int    preambleLength;
-    char** strings;                // official strings of shader, starting a string 0 line 1
-    int*   lengths;
-    int    numStrings;             // how many official strings there are
-    int    currentString;          // which string we're currently parsing  (-1 for preamble)
+    char*   preamble;               // string to parse, all before line 1 of string 0, it is 0 if no preamble
+    int     preambleLength;
+    char**  strings;                // official strings of shader, starting a string 0 line 1
+    size_t* lengths;
+    int     numStrings;             // how many official strings there are
+    int     currentString;          // which string we're currently parsing  (-1 for preamble)
 
     // Scanner data:
-    int mostRecentToken;        // Most recent token seen by the scanner
     int previous_token;
-    bool notAVersionToken;      // used to make sure that #version is the first token seen in the file, if present
     TParseContext& parseContext;
+
+    // Get the next token from *stack* of input sources, popping input sources
+    // that are out of tokens, down until an input sources is found that has a token.
+    // Return EOF when there are no more tokens to be found by doing this.
+    int scanToken(TPpToken* ppToken)
+    {
+        int token = EOF;
+
+        while (! inputStack.empty()) {
+            token = inputStack.back()->scan(ppToken);
+            if (token != tInput::endOfInput)
+                break;
+            popInput();
+        }
+
+        if (token == tInput::endOfInput)
+            return EOF;
+
+        return token;
+    }
+    int  getChar() { return inputStack.back()->getch(); }
+    void ungetChar() { inputStack.back()->ungetch(); }
 
     static const int maxMacroArgs = 64;
     static const int maxIfNesting = 64;
 
-    int ifdepth;                 // current #if-#else-#endif nesting in the cpp.c file (pre-processor)    
-    int elsedepth[maxIfNesting]; // Keep a track of #if depth..Max allowed is 64.   
-    int elsetracker;             // #if-#else and #endif constructs...Counter.
-    const char *ErrMsg;
+    int ifdepth;                  // current #if-#else-#endif nesting in the cpp.c file (pre-processor)    
+    bool elseSeen[maxIfNesting];  // Keep a track of whether an else has been seen at a particular depth
+    int elsetracker;              // #if-#else and #endif constructs...Counter.
+    const char* ErrMsg;
 
-    struct MacroInputSrc {
-        InputSrc    base;
+    class tMacroInput : public tInput {
+    public:
+        tMacroInput(TPpContext* pp) : tInput(pp) { }
+        virtual ~tMacroInput()
+        {
+            for (size_t i = 0; i < args.size(); ++i)
+                delete args[i];
+        }
+
+        virtual int scan(TPpToken*);
+        virtual int getch() { assert(0); return endOfInput; }
+        virtual void ungetch() { assert(0); }
         MacroSymbol *mac;
-        TokenStream **args;
+        TVector<TokenStream*> args;
     };
 
-    InputSrc *currentInput;
+    class tMarkerInput : public tInput {
+    public:
+        tMarkerInput(TPpContext* pp) : tInput(pp) { }
+        virtual int scan(TPpToken*)
+        {
+            if (done)
+                return endOfInput;
+            done = true;
+
+            return marker;
+        }
+        virtual int getch() { assert(0); return endOfInput; }
+        virtual void ungetch() { assert(0); }
+        static const int marker = -3;
+    };
+
+    class tZeroInput : public tInput {
+    public:
+        tZeroInput(TPpContext* pp) : tInput(pp) { }
+        virtual int scan(TPpToken*);
+        virtual int getch() { assert(0); return endOfInput; }
+        virtual void ungetch() { assert(0); }
+    };
+
+    std::vector<tInput*> inputStack;
+    bool errorOnVersion;
+    bool versionSeen;
 
     //
     // from Pp.cpp
@@ -276,116 +306,172 @@ protected:
     int compatibilityAtom;
     int esAtom;
     int extensionAtom;
-    Scope *macros;
     TSourceLoc ifloc; /* outermost #if */
 
     int InitCPP();
-    int FreeCPP();
-    int FinalCPP();
-    int CPPdefine(TPpToken * yylvalpp);
-    int CPPundef(TPpToken * yylvalpp);
-    int CPPelse(int matchelse, TPpToken * yylvalpp);
-    int eval(int token, int prec, int *res, int *err, TPpToken * yylvalpp);
-    int CPPif (TPpToken * yylvalpp); 
-    int CPPifdef(int defined, TPpToken * yylvalpp);
-    int CPPline(TPpToken * yylvalpp); 
-    int CPPerror(TPpToken * yylvalpp); 
-    int CPPpragma(TPpToken * yylvalpp);
-    int CPPversion(TPpToken * yylvalpp);
-    int CPPextension(TPpToken * yylvalpp);
-    int readCPPline(TPpToken * yylvalpp);
-    void FreeMacro(MacroSymbol *s);
-    void PushEofSrc();
-    void PopEofSrc();
-    TokenStream* PrescanMacroArg(TokenStream *a, TPpToken * yylvalpp);
-    static int macro_scan(TPpContext* pp, InputSrc *inInput, TPpToken * yylvalpp); 
-    static int zero_scan(TPpContext* pp, InputSrc *inInput, TPpToken * yylvalpp); 
-    int MacroExpand(int atom, TPpToken* yylvalpp, int expandUndef);
-    int ChkCorrectElseNesting();
+    int CPPdefine(TPpToken * ppToken);
+    int CPPundef(TPpToken * ppToken);
+    int CPPelse(int matchelse, TPpToken * ppToken);
+    int extraTokenCheck(int atom, TPpToken* ppToken, int token);
+    int eval(int token, int precedence, bool shortCircuit, int& res, bool& err, TPpToken * ppToken);
+    int evalToToken(int token, bool shortCircuit, int& res, bool& err, TPpToken * ppToken);
+    int CPPif (TPpToken * ppToken); 
+    int CPPifdef(int defined, TPpToken * ppToken);
+    int CPPline(TPpToken * ppToken); 
+    int CPPerror(TPpToken * ppToken); 
+    int CPPpragma(TPpToken * ppToken);
+    int CPPversion(TPpToken * ppToken);
+    int CPPextension(TPpToken * ppToken);
+    int readCPPline(TPpToken * ppToken);
+    TokenStream* PrescanMacroArg(TokenStream *a, TPpToken * ppToken, bool newLineOkay);
+    int MacroExpand(int atom, TPpToken* ppToken, bool expandUndef, bool newLineOkay);
 
     //
     // from PpSymbols.cpp
     //
-    Scope *ScopeList;
-    Scope *CurrentScope;
-    Scope *GlobalScope;
-
-    Scope *NewScopeInPool(MemoryPool *pool);
-    void PushScope(Scope *fScope);
-    Scope *PopScope(void);
-    Symbol *NewSymbol(TSourceLoc *loc, Scope *fScope, int name, symbolkind kind);
-    void lAddToTree(Symbol **fSymbols, Symbol *fSymb, AtomTable *atable);
-    Symbol *AddSymbol(TSourceLoc *loc, Scope *fScope, int atom, symbolkind kind);
-    Symbol *LookUpLocalSymbol(Scope *fScope, int atom);
-    Symbol *LookUpSymbol(Scope *fScope, int atom);
+    Symbol *NewSymbol(int name);
+    Symbol *AddSymbol(int atom);
+    Symbol *LookUpSymbol(int atom);
 
     //
     // From PpTokens.cpp
     //
-    char* idstr(const char *fstr, MemoryPool *pool);
-    TPpContext::TokenBlock* lNewBlock(TokenStream *fTok, MemoryPool *pool);
     void lAddByte(TokenStream *fTok, unsigned char fVal);
     int lReadByte(TokenStream *pTok);
-    TokenStream *NewTokenStream(const char *name, MemoryPool *pool);
-    void DeleteTokenStream(TokenStream *pTok);
-    void RecordToken(TokenStream *pTok, int token, TPpToken * yylvalpp);
+    void lUnreadByte(TokenStream *pTok);
+    void RecordToken(TokenStream* pTok, int token, TPpToken* ppToken);
     void RewindTokenStream(TokenStream *pTok);
-    int ReadToken(TokenStream *pTok, TPpToken * yylvalpp);
-    int ReadFromTokenStream(TokenStream *ts, int name, int (*final)(TPpContext *));
-    void UngetToken(int token, TPpToken * yylvalpp);
-    void DumpTokenStream(FILE *fp, TokenStream *s, TPpToken * yylvalpp);
-    struct TokenInputSrc {
-        InputSrc            base;
-        TokenStream         *tokens;
-        int                 (*final)(TPpContext *);
+    int ReadToken(TokenStream* pTok, TPpToken* ppToken);
+    void pushTokenStreamInput(TokenStream *ts, int name);
+    void UngetToken(int token, TPpToken* ppToken);
+    
+    class tTokenInput : public tInput {
+    public:
+        tTokenInput(TPpContext* pp, TokenStream* t) : tInput(pp), tokens(t) { }
+        virtual int scan(TPpToken *);
+        virtual int getch() { assert(0); return endOfInput; }
+        virtual void ungetch() { assert(0); }
+    protected:
+        TokenStream *tokens;
     };
-    static int scan_token(TPpContext*, TokenInputSrc *in, TPpToken * yylvalpp);
-    struct UngotToken {
-        InputSrc    base;
-        int         token;
-        TPpToken     lval;
+
+    class tUngotTokenInput : public tInput {
+    public:
+        tUngotTokenInput(TPpContext* pp, int t, TPpToken* p) : tInput(pp), token(t), lval(*p) { }
+        virtual int scan(TPpToken *);
+        virtual int getch() { assert(0); return endOfInput; }
+        virtual void ungetch() { assert(0); }
+    protected:
+        int token;
+        TPpToken lval;
     };
-    static int reget_token(TPpContext *, UngotToken *t, TPpToken * yylvalpp);
 
     //
     // From PpScanner.cpp
     //
-    struct StringInputSrc {
-        InputSrc base;
-        char *p;
+    class tStringInput : public tInput {
+    public:
+        tStringInput(TPpContext* pp, TInputScanner& i) : tInput(pp), input(&i) { }
+        virtual int scan(TPpToken*);
+
+        // Scanner used to get source stream characters.
+        //  - Escaped newlines are handled here, invisibly to the caller.
+        //  - All forms of newline are handled, and turned into just a '\n'.
+        int getch()
+        {
+            int ch = input->get();
+
+            if (ch == '\\') {
+                // Move past escaped newlines, as many as sequentially exist
+                do {
+                    if (input->peek() == '\r' || input->peek() == '\n') {
+                        bool allowed = pp->parseContext.lineContinuationCheck(input->getSourceLoc(), pp->inComment);
+                        if (! allowed && pp->inComment)
+                            return '\\';
+
+                        // escape one newline now
+                        ch = input->get();
+                        int nextch = input->get();
+                        if (ch == '\r' && nextch == '\n')
+                            ch = input->get();
+                        else
+                            ch = nextch;
+                    } else
+                        return '\\';
+                } while (ch == '\\');
+            }
+    
+            // handle any non-escaped newline
+            if (ch == '\r' || ch == '\n') {
+                if (ch == '\r' && input->peek() == '\n')
+                    ch = input->get();
+                return '\n';
+            }
+
+            return ch;
+        }
+
+        // Scanner used to backup the source stream characters.  Newlines are
+        // handled here, invisibly to the caller, meaning have to undo exactly
+        // what getch() above does (e.g., don't leave things in the middle of a
+        // sequence of escaped newlines).
+        void ungetch()
+        {
+            input->unget();
+
+            do {
+                int ch = input->peek();
+                if (ch == '\r' || ch == '\n') {
+                    if (ch == '\n') {
+                        // correct for two-character newline
+                        input->unget();
+                        if (input->peek() != '\r')
+                            input->get();
+                    }
+                    // now in front of a complete newline, move past an escape character
+                    input->unget();
+                    if (input->peek() == '\\')
+                        input->unget();
+                    else {
+                        input->get();
+                        break;
+                    }
+                } else
+                    break;
+            } while (true);
+        }
+
+    protected:
+        TInputScanner* input;
     };
-    int InitScanner(TPpContext *cpp);
-    int FreeScanner(void);
-    static int str_getch(TPpContext*, StringInputSrc *in);
-    static void str_ungetch(TPpContext*, StringInputSrc *in, int ch, TPpToken *type);
-    int ScanFromString(char *s);
-    int check_EOF(int token);
-    int lFloatConst(char *str, int len, int ch, TPpToken * yylvalpp);
-    static int byte_scan(TPpContext*, InputSrc *in, TPpToken * yylvalpp);
+
+    int InitScanner(TPpContext* cpp);
+    int ScanFromString(char* s);
+    void missingEndifCheck();
+    int lFloatConst(int len, int ch, TPpToken* ppToken);
+
+    bool inComment;
 
     //
     // From PpAtom.cpp
     //
-    AtomTable atomTable;
-    int InitAtomTable(AtomTable *atable, int htsize);
-    void FreeAtomTable(AtomTable *atable);
-    int AddAtom(AtomTable *atable, const char *s);
-    int AddAtomFixed(AtomTable *atable, const char *s, int atom);
-    void PrintAtomTable(AtomTable *atable);
-    int IncreaseHashTableSize(TPpContext::AtomTable *atable);
-    int LookUpAddStringHash(AtomTable *atable, const char *s);
-    int LookUpAddString(AtomTable *atable, const char *s);
-    const char *GetAtomString(AtomTable *atable, int atom);
-    int GetReversedAtom(AtomTable *atable, int atom);
-    char* GetStringOfAtom(AtomTable *atable, int atom);
+    typedef std::map<const TString, int> TAtomMap;
+    typedef TVector<const TString*> TStringMap;
+    TAtomMap atomMap;
+    TStringMap stringMap;
+    int nextAtom;
+    void InitAtomTable();
+    int AddAtomFixed(const char* s, int atom);
+    int LookUpAddString(const char* s);
+    const char* GetAtomString(int atom);
 
     //
     // From PpMemory.cpp
     //
     MemoryPool *mem_CreatePool(size_t chunksize, unsigned align);
-    void mem_FreePool(MemoryPool *);
-    void *mem_Alloc(MemoryPool *p, size_t size);
-    int mem_AddCleanup(MemoryPool *p, void (*fn)(void *, void*), void *arg1, void* arg2);
+    void mem_FreePool(MemoryPool*);
+    void *mem_Alloc(MemoryPool* p, size_t size);
+    int mem_AddCleanup(MemoryPool* p, void (*fn)(void *, void*), void* arg1, void* arg2);
 };
 
 } // end namespace glslang
