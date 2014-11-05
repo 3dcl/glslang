@@ -40,8 +40,13 @@ set(SOURCES
     GenericCodeGen/CodeGen.cpp
     GenericCodeGen/Link.cpp)
 
-set(HEADERS
+set(PUBLIC_HEADERS
     Public/ShaderLang.h
+    Public/ResourceLimits.h  
+)
+    
+set(HEADERS
+    ${PUBLIC_HEADERS}
     Include/BaseTypes.h
     Include/Common.h
     Include/ConstantUnion.h
@@ -49,7 +54,6 @@ set(HEADERS
     Include/InitializeGlobals.h
     Include/intermediate.h
     Include/PoolAlloc.h
-    Include/ResourceLimits.h
     Include/revision.h
     Include/ShHandle.h
     Include/Types.h
@@ -96,7 +100,9 @@ endif(WIN32)
 
 install(TARGETS glslang 
         LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
+        ARCHIVE DESTINATION lib
+        INCLUDES DESTINATION include/glslang)
+install(FILES ${PUBLIC_HEADERS} DESTINATION include/glslang)
 
 # find bison
 #find_package(BISON REQUIRED)

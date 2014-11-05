@@ -34,7 +34,7 @@
 #ifndef _COMPILER_INTERFACE_INCLUDED_
 #define _COMPILER_INTERFACE_INCLUDED_
 
-#include "../Include/ResourceLimits.h"
+#include "ResourceLimits.h"
 
 #ifdef _WIN32
 #define C_DECL __cdecl
