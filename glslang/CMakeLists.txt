@@ -91,7 +91,6 @@ else(BISON_FOUND)
 endif(BISON_FOUND)
 
 add_library(glslang ${LIBRARY_TYPE} ${BISON_GLSLParser_OUTPUT_SOURCE} ${SOURCES} ${HEADERS})
-add_dependencies(glslang GLSLParser)
 
 if(WIN32)
     source_group("Public" REGULAR_EXPRESSION "Public/*")
